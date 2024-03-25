@@ -4,12 +4,24 @@ import pandas as pd
 import datetime
 
 class PapersData():
-
     def load_papers(self):
         tdw = DataWharehouse()
         df = tdw.event('arxiv_papers')
-
         return df
+
+    def load_between_dates(self, start, end):
+        df = self.load_papers()
+        print("Date filters (from, to): ", start, end)
+        return df[(df['published'].dt.strftime('%Y-%m-%d') >= start) & (df['published'].dt.strftime('%Y-%m-%d') <= end)]
+
+    def load_since_last_summary_execution(self):
+        from state_of_the_art.summaries import SummariesData
+        latest_date = SummariesData().get_latest_date_covered_by_summary()
+        print("Latest date covered by summary: ", latest_date)
+        today =  datetime.date.today().isoformat()
+        papers = self.load_between_dates(latest_date, today)
+
+        self.print_papers(papers)
 
     def papers_schema(self):
         return list(self.load_papers().columns)
@@ -30,7 +42,6 @@ class PapersData():
     
     def print_all_papers(self):
         papers = self.load_from_most_recent()
-
         self.print_papers(papers)
 
 

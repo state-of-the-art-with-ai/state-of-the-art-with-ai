@@ -1,5 +1,6 @@
 import arxiv
 import os
+from state_of_the_art.papers import PapersData
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 from typing import Literal
@@ -63,9 +64,7 @@ def register_new_papers(*, query='cs', number_of_papers=50, sort_by: Literal['su
     print(f"{after_amount - before_amount} new papers registered")
 
 def load_papers_between_published_dates(start, end) -> pd.DataFrame:
-    tdw = DataWharehouse()
-    df = tdw.event('arxiv_papers')
-    return df[(df['published'].dt.strftime('%Y-%m-%d') >= start) & (df['published'].dt.strftime('%Y-%m-%d') <= end)]
+    return PapersData().load_between_dates(start, end)
 
 def download_papers(num_results=100):
     search = arxiv.Search(

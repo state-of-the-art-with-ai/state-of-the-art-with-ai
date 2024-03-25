@@ -2,10 +2,15 @@ from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from state_of_the_art.papers import PapersComparer, PapersData
 
 class SummariesData():
-    def get_latest_summary(self, index=-1):
+
+    def get_summary(self):
         tdw = DataWharehouse()
-        df = tdw.event('state_of_the_art_summary')
-        return df['summary'].to_list()[index]
+        return tdw.event('state_of_the_art_summary')
+    def get_latest_summary(self, index=-1):
+        return self.get_summary()['summary'].to_list()[index]
+
+    def get_latest_date_covered_by_summary(self):
+        return self.get_summary().sort_values(by='to_date', ascending=False).head(1).to_dict()['to_date'][0]
 
 
 class TopSummaries():

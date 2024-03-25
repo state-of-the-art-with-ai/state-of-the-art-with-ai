@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "state-of-the-art-via-ai"
-version = "0.1.0"
+name = "state-of-the-art"
+version = "0.1.1"
 description = ""
 authors = ["Jean Carlo Machado <jean.machado@getyourguide.com>"]
 readme = "README.md"
@@ -21,9 +21,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 sota = 'state_of_the_art.state_of_the_art:main'
-
-[tool.setuptools.packages.find]
-where = ["."]  # list of folders that contain the packages (["."] by default)
-include = ["state_of_the_art"]  # package names should match these glob patterns (["*"] by default)
-exclude = []  # exclude packages matching these glob patterns (empty by default)
-namespaces = false  # to di
