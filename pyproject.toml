@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "state-of-the-art-via-ai"
+version = "0.1.0"
+description = ""
+authors = ["Jean Carlo Machado <jean.machado@getyourguide.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fire = "^0.6.0"
+langchain-community = "^0.0.29"
+openai = "^1.14.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+black = "^24.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
