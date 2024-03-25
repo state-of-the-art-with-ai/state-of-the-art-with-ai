@@ -1,10 +1,15 @@
 
+import os
+import sys
 import datetime
-
+from typing import Optional
 from state_of_the_art.arxiv_utils import load_papers_between_published_dates
 
+from state_of_the_art.config import config
 
-def rank_sota_by_relevance(*, look_back_days=7, dry_run=False):
+
+
+def rank_by_relevance(*, from_date: Optional[str]=None, look_back_days=7, dry_run=False):
     MAX_ARTICLES_TO_RETURN=15
     prompt = f"""You are an world class expert in Data Science and MLOPs.
 Your taks is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
@@ -69,14 +74,20 @@ Output: ##start
     from langchain_community.chat_models import ChatOpenAI
 
     PROMPT_TWEET = PromptTemplate(template=prompt, input_variables=["text"])
-    llm = ChatOpenAI(temperature=0.0, model='gpt-4-turbo-preview', openai_api_key='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')
+    llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)
     chain =LLMChain(llm=llm, prompt=PROMPT_TWEET,verbose=True)
     
     # two weeks ago
-    from_date = (datetime.date.today() - datetime.timedelta(days=look_back_days)).isoformat()
+    from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=look_back_days)).isoformat()
     to_date = datetime.date.today().isoformat()
-    max_papers = 2000
+    max_papers = config.sort_papers_max_to_compute
     articles = get_articles_str(max_papers, from_date, to_date)
+
+    user_input = input(f"Will generate a summary from {max_papers} articles between {from_date} and {to_date}. Press c to continue \n")
+    if user_input != 'c':
+        print("Aborting")
+        sys.exit(1)
+
 
     if not dry_run:
         result = chain.run(articles)

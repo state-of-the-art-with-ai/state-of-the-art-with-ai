@@ -58,7 +58,6 @@ def register_new_papers(*, query='cs', number_of_papers=50, sort_by: Literal['su
         tdw.write_event('arxiv_papers', {'title': r.title, 'abstract': r.summary, 'url': r.entry_id, 'published': r.published})
 
     print('Done')
-
     arxiv_papers = tdw.event('arxiv_papers')
     after_amount = len(arxiv_papers.index)
     print(f"{after_amount - before_amount} new papers registered")

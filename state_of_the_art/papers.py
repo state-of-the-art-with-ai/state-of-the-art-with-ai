@@ -12,7 +12,7 @@ class PapersData():
     def load_between_dates(self, start, end):
         df = self.load_papers()
         print("Date filters (from, to): ", start, end)
-        return df[(df['published'].dt.strftime('%Y-%m-%d') >= start) & (df['published'].dt.strftime('%Y-%m-%d') <= end)]
+        return df[(df['published'].dt.strftime('%Y-%m-%d') >= start) & (df['published'].dt.strftime('%Y-%m-%d') <= end)].sort_values(by='published', ascending=False)
 
     def load_since_last_summary_execution(self):
         from state_of_the_art.summaries import SummariesData
@@ -37,18 +37,13 @@ class PapersData():
         print("Found ", len(result), " papers")
         return result
 
-    def load_from_most_recent(self) -> pd.DataFrame:
-        return self.sort_by_recently_published(self.load_papers())
+    def print_from_most_recent(self) -> pd.DataFrame:
+        self.print_papers(self.sort_by_recently_published(self.load_papers()))
     
-    def print_all_papers(self):
-        papers = self.load_from_most_recent()
-        self.print_papers(papers)
-
-
     def print_papers(self, papers_df):
         papers_dict = papers_df.to_dict(orient='records')
         for i in papers_dict:
-            print(i['title'], ' ', str(i['published'])[0:10], ' ', i['url'])
+            print(str(i['published'])[0:10], ' ', i['title'], ' ', i['url'])
 
     
     def sort_by_recently_published(self, df):
