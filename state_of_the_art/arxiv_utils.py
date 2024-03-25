@@ -62,8 +62,6 @@ def register_new_papers(*, query='cs', number_of_papers=50, sort_by: Literal['su
     after_amount = len(arxiv_papers.index)
     print(f"{after_amount - before_amount} new papers registered")
 
-def load_papers_between_published_dates(start, end) -> pd.DataFrame:
-    return PapersData().load_between_dates(start, end)
 
 def download_papers(num_results=100):
     search = arxiv.Search(

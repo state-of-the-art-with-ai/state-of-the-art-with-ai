@@ -37,8 +37,14 @@ class PapersData():
         print("Found ", len(result), " papers")
         return result
 
-    def print_from_most_recent(self) -> pd.DataFrame:
-        self.print_papers(self.sort_by_recently_published(self.load_papers()))
+    def print_from_most_recent(self, from_date=None, to_date=None) -> pd.DataFrame:
+
+        if from_date and to_date:
+            papers = self.load_between_dates(from_date, to_date)
+        else:
+            papers = self.load_papers()
+
+        self.print_papers(self.sort_by_recently_published(papers))
     
     def print_papers(self, papers_df):
         papers_dict = papers_df.to_dict(orient='records')
