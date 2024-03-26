@@ -29,46 +29,34 @@ class InsightExtractor:
 
 
         prompt = f"""You are an world class expert in Data Science and computer science.
-    Your taks is spotting key insights of what is going on in academia an in the industry via the content of the article that is provided to you.
-    Your audience is 
-    {config.audience_description}
+    Your taks is selecting key insights of the state of the art in academia an in the industry via the content of the article that is provided to you.
     Highlight only key insights, ideally actionalable ones. The insights can come form the results of the paper or form literature review
     Do not highlight more than 3 insights.
+    you Optimize your suggestions to:
 
-
-    Paper content example: ##start
-    here goes the paper content
-    ## end
+    {config.audience_description}
 
     Follow the follinwg example structure when reporting your insights
     Insight extraction example: ##start
 
-    Insight 1: "One can understand if networks are modular in neural nets by using a a method using differentiable weight masks" 
-    Institution : Microsoft 
-    Authors: Róbert Csordás, Alex lamb
-    Arxiv Paper: {pdf_file}
+    Insight example 1: "One can understand if networks are modular in neural nets by using a a method using differentiable weight masks" 
     More details on how: "using binary weight masks to identify individual weights and subnets
 responsible for specific functions testing several standard architectures
 and datasets demonstrate how common NNs fail to reuse submodules and offer
 new insights into the related issue of systematic generalization on language tasks"
+    Institution : Microsoft 
+    Authors: Róbert Csordás, Alex lamb
+    Arxiv Paper : {pdf_file} (use this literal value always)
     Relevance: Explain why its relevant
 
-
-    Insight 2: ...
-    Institution : ...
-    Authors: ...
-    Arxiv Paper: {pdf_file}
-    More details on how: ...
-    Relevance: ...
-
     ## end
 
-    Paper content : ##start
+    Article to extract inisghts now starts: ##start
     {{text}}
-    ## end
+    ## end of article ontent
 
 
-    Insight extraction: ##start
+    Now begings the Insight extraction: ##start
         """
 
 
