@@ -4,6 +4,7 @@ from state_of_the_art.paper_ranker import rank_by_relevance
 from state_of_the_art.summaries import TopSummaries, SummariesData
 from state_of_the_art.papers import PapersData
 from state_of_the_art.config import Config
+from state_of_the_art.insight_extractor import InsightExtractor
 
 
 def register_papers():
@@ -12,7 +13,6 @@ def register_papers():
     for topic in topics:
         register_new_papers(query=topic, sort_by='relevance')
         register_new_papers(query=topic, sort_by='submitted')
-
 
 
 def register_and_sort_papers():

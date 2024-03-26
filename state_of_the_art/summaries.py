@@ -14,12 +14,13 @@ class SummariesData():
 
 
 class TopSummaries():
-    def get_top_papers_from_summary(self, extractions= 5, top_n=50, ):
+    def get_top_papers_from_summary(self, extractions=3, top_n=60, ):
 
         papers = []
         for i in range(-1,-(extractions+1),-1):
             try:
-                extracted_papers = PapersComparer().extract_papers_urls(SummariesData().get_latest_summary(i))[0:top_n]
+                summary = SummariesData().get_latest_summary(i)
+                extracted_papers = PapersComparer().extract_papers_urls(summary)[0:top_n]
             except:  # catch the exception
                 print(" Extraction error ")
                 continue

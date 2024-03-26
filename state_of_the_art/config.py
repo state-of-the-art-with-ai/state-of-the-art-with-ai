@@ -1,8 +1,11 @@
-
-
+import os
 
 class Config():
     topics_to_query_arxiv = ['cs', 'ai', 'machine learning', 'cs.AI']
+    HOME = os.path.expanduser("~")
+    PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
+    NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"
+
     # the maximum number of papers to compute while sorting the batch of papers
     sort_papers_max_to_compute = 4000
     sort_papers_gpt_model = 'gpt-4-turbo-preview'

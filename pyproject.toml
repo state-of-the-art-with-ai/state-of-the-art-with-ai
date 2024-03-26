@@ -10,6 +10,8 @@ python = "^3.12"
 fire = "^0.6.0"
 langchain-community = "^0.0.29"
 openai = "^1.14.2"
+pypdf = "^4.1.0"
+pydantic = "1.10.14"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"

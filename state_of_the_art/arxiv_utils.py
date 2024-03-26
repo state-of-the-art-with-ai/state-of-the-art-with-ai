@@ -2,8 +2,8 @@ import arxiv
 import os
 from state_of_the_art.papers import PapersData
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-import pandas as pd
-from typing import Literal
+from typing import Literal, Optional
+from state_of_the_art.config import config
 
 def arxiv_search(*, query, max_results=10, short_version=True) -> str:
     summary = ''
@@ -71,13 +71,10 @@ def download_papers(num_results=100):
     )
     for r in search.results():
         print('Downloading: ', r.title, r.pdf_url)
-        download_paper(r.title, r.pdf_url)
+        download_named_paper(r.pdf_url,r.title)
 
     open_papers_folder()
     
-
-HOME = os.path.expanduser("~")
-PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
 
 def convert_title_to_filename(title) -> str:
     for c in title:
@@ -85,13 +82,28 @@ def convert_title_to_filename(title) -> str:
             title = title.replace(c, '_')
     return title
 
-def download_paper(title, url):
-    destination = f'{PAPERS_FOLDER}/{convert_title_to_filename(title)}.pdf'
+def download_named_paper(url: str, title: Optional[str] = None):
+    destination = f'{config.PAPERS_FOLDER}/{convert_title_to_filename(title)}.pdf'
     import urllib
     urllib.request.urlretrieve(url, destination)
 
+def download_paper(url: str) -> str:
+    file_name= url.split('/')[-1]
+    destination = f'{config.NEW_PAPERS_FOLDER}/{file_name}'
+
+    if os.path.exists(destination):
+        print(f"File {destination} already exists")
+        return destination
+
+
+    print(f"Downloading file {url} to {destination}")
+
+    import urllib
+    urllib.request.urlretrieve(url, destination)
+    return destination
+
 def open_papers_folder():
-    os.system(f"open {PAPERS_FOLDER}/")
+    os.system(f"open {config.PAPERS_FOLDER}/")
 
 if __name__ == "__main__":
     import fire
