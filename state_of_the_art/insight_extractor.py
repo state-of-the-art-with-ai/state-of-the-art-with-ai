@@ -4,7 +4,12 @@ from state_of_the_art.config import config
 import sys
 
 class InsightExtractor:
+    """
+    Looks into a single paper and extracts insights
+    """
     def extract(self, pdf_file: str):
+        if not pdf_file.endswith('.pdf'):
+            raise Exception("Invalid file format. Only PDF files are supported")
         local_location = download_paper(pdf_file)
 
         from pypdf import PdfReader
@@ -29,35 +34,33 @@ class InsightExtractor:
 
 
         prompt = f"""You are an world class expert in Data Science and computer science.
-    Your taks is selecting key insights of the state of the art in academia an in the industry via the content of the article that is provided to you.
-    Highlight only key insights, ideally actionalable ones. The insights can come form the results of the paper or form literature review
-    Do not highlight more than 3 insights.
-    you Optimize your suggestions to:
+Your taks is selecting key insights of the state of the art in academia an in the industry via the content of the article that is provided to you.
+Highlight only key insights, ideally actionalable ones. The insights can come form the results of the paper or form literature review
+Do not highlight more than 3 insights.
+you Optimize your suggestions to the following audience: {config.audience_description}
 
-    {config.audience_description}
+Follow the folloinwg example structure when reporting your insights
 
-    Follow the follinwg example structure when reporting your insights
-    Insight extraction example: ##start
+Insight example: ##start
 
-    Insight example 1: "One can understand if networks are modular in neural nets by using a a method using differentiable weight masks" 
-    More details on how: "using binary weight masks to identify individual weights and subnets
+Insight example 1: "One can understand if networks are modular in neural nets by using a a method using differentiable weight masks" 
+More details on how: "using binary weight masks to identify individual weights and subnets
 responsible for specific functions testing several standard architectures
 and datasets demonstrate how common NNs fail to reuse submodules and offer
 new insights into the related issue of systematic generalization on language tasks"
-    Institution : Microsoft 
-    Authors: Róbert Csordás, Alex lamb
-    Arxiv Paper : {pdf_file} (use this literal value always)
-    Relevance: Explain why its relevant
+Institution : Microsoft 
+Authors: Róbert Csordás, Alex lamb
+Arxiv Paper : {pdf_file} (use this literal value always)
+Relevance: Explain why its relevant
 
-    ## end
+## end
 
-    Article to extract inisghts now starts: ##start
-    {{text}}
-    ## end of article ontent
+Article to extract insights now starts: ##start
+{{text}}
+## end of article to extract insights
 
 
-    Now begings the Insight extraction: ##start
-        """
+Now begings the Insight extraction: ##start"""
 
 
         from langchain import PromptTemplate, LLMChain

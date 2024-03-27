@@ -13,12 +13,12 @@ def rank_by_relevance(*, from_date: Optional[str]=None, to_date: Optional[str]=N
     """
     Ranks existing papers by relevance
     """
+    print("Look back days ", look_back_days)
 
     MAX_ARTICLES_TO_RETURN=15
     prompt = f"""You are an world class expert in Data Science and computer science.
 Your taks is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
-Your audience is 
-{config.audience_description}
+Your audience is {config.audience_description}
 Sort the papers from most relevant to less, return not more than {MAX_ARTICLES_TO_RETURN}
 Highlight only topics that are exciting or import so you reading the paper.
 The articles for you to work with will be provided below in the following format (Title, URL)

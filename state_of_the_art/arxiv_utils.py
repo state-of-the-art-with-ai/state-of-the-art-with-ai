@@ -26,7 +26,7 @@ def arxiv_search(*, query, max_results=10, short_version=True) -> str:
     return summary
 
 
-def register_new_papers(*, query='cs', number_of_papers=50, sort_by: Literal['submitted', 'relevance' ] = 'submitted'):
+def register_papers_by_topic(*, query='cs', number_of_papers=50, sort_by: Literal['submitted', 'relevance' ] = 'submitted'):
     """
     Loads papers from arxiv and store them into the tiny data wharehouse
     """
