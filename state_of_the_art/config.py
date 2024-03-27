@@ -1,7 +1,7 @@
 import os
 
 class Config():
-    topics_to_query_arxiv = ['cs', 'ai', 'machine learning', 'cs.AI']
+    topics_to_query_arxiv = ['cs', 'ai', 'machine learning', 'cs.AI', 'cs.LG', 'cs.SI', 'stat.ML']
     HOME = os.path.expanduser("~")
     PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
     NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"

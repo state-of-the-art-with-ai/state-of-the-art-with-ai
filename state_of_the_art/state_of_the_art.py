@@ -6,6 +6,7 @@ from state_of_the_art.papers import PapersData
 from state_of_the_art.config import Config
 from state_of_the_art.insight_extractor import InsightExtractor
 from state_of_the_art import open_ai_utils
+from state_of_the_art.topic_insights import TopicInsights
 
 
 def register_papers():
