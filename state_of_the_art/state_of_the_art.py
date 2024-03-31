@@ -4,7 +4,7 @@ from state_of_the_art.paper_ranker import rank
 from state_of_the_art.summaries import TopSummaries, SummariesData
 from state_of_the_art.papers import PapersData
 from state_of_the_art.config import Config
-from state_of_the_art.insight_extractor import InsightExtractor
+from state_of_the_art.paper_insight import InsightExtractor
 from state_of_the_art import open_ai_utils
 from state_of_the_art.topic_insights import TopicInsights
 

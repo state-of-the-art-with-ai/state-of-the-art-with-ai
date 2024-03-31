@@ -79,7 +79,7 @@ Ranked output of articles: ##start
     cost = calculate_cost(chars_input=len(articles), chars_output=4000)
 
     user_input = input(f"""Ranking generation of ({len(articles.index)}) articles from {from_date} to {to_date} cost estimate ${cost}.
-Press c to continue""")
+Press c to continue: """)
     if user_input != 'c':
         print("Aborting")
         sys.exit(1)

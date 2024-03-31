@@ -8,10 +8,10 @@ class InsightExtractor:
     """
     Looks into a single paper and extracts insights
     """
-    def extract(self, pdf_file: str):
-        if not pdf_file.endswith('.pdf'):
+    def extract(self, pdf_url: str):
+        if not pdf_url.endswith('.pdf'):
             raise Exception("Invalid file format. Only PDF files are supported")
-        local_location = download_paper(pdf_file)
+        local_location = download_paper(pdf_url)
 
         from pypdf import PdfReader
 
@@ -52,8 +52,9 @@ and datasets demonstrate how common NNs fail to reuse submodules and offer
 new insights into the related issue of systematic generalization on language tasks"
 Institution : Microsoft 
 Authors: Róbert Csordás, Alex lamb
-Arxiv Paper : {pdf_file} (use this literal value always)
+Arxiv Paper : {pdf_url} (use this literal value always)
 Relevance: Explain why its relevant
+Exact part in text: mention here a few words from the text that support the insight
 
 ## end
 
@@ -75,3 +76,7 @@ Now begings the Insight extraction: ##start"""
         result = chain.run(PAPER_CONTENT)
 
         print(result)
+
+        from tiny_data_wharehouse.data_wharehouse import DataWharehouse
+        tdw = DataWharehouse()
+        tdw.write_event('sota_paper_insight', {'pdf_url': pdf_url, 'insights': result, 'prompt': prompt})
