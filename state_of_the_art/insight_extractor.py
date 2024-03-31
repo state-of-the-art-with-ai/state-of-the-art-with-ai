@@ -2,6 +2,7 @@
 from state_of_the_art.arxiv_utils import download_paper
 from state_of_the_art.config import config
 import sys
+from state_of_the_art.open_ai_utils import calculate_cost
 
 class InsightExtractor:
     """
@@ -26,8 +27,9 @@ class InsightExtractor:
         print("Number of pages: ", number_of_pages)
         print("Number of characters: ", len(PAPER_CONTENT))
         print("Number of tokens: ", len(PAPER_CONTENT)/4)
+        cost = calculate_cost(chars_input=len(PAPER_CONTENT), chars_output=4000)
 
-        user_input = input(f"Do you want ton continue to generate insights? Type c to continue \n")
+        user_input = input(f"Do you want ton continue to generate insights at a cost of $ {cost}? Type c to continue \n")
         if user_input != 'c':
             print("Aborting")
             sys.exit(1)
@@ -37,7 +39,7 @@ class InsightExtractor:
 Your taks is selecting key insights of the state of the art in academia an in the industry via the content of the article that is provided to you.
 Highlight only key insights, ideally actionalable ones. The insights can come form the results of the paper or form literature review
 Do not highlight more than 3 insights.
-you Optimize your suggestions to the following audience: {config.audience_description}
+you Optimize your suggestions to the following audience: {config.get_current_profile().audience_description}
 
 Follow the folloinwg example structure when reporting your insights
 
