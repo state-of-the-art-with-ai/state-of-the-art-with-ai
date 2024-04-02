@@ -24,16 +24,18 @@ class RankGeneratedData:
         return {'summary': self.summary, 'from_date': self.from_date, 'to_date': self.to_date, 'prompt': self.prompt }
 
 
-def rank(*, from_date: Optional[str]=None, to_date: Optional[str]=None, look_back_days=7, dry_run=False):
+def rank(*, from_date: Optional[str]=None, to_date: Optional[str]=None, look_back_days=None, dry_run=False):
     """
     Ranks existing papers by relevance
     """
+    if not to_date and not look_back_days:
+        look_back_days = config.DEFAULT_LOOK_BACK_DAYS
     print("Look back days ", look_back_days)
 
     MAX_ARTICLES_TO_RETURN=15
     prompt = f"""You are an world class expert in Data Science and computer science.
 Your taks is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
-Your audience is {config.get_current_profile().audience_description}
+Your audience is {config.get_current_profile().get_preferences()}
 Highlight only topics that are exciting or import so you reading the paper.
 The articles for you to work with will be provided below in the following format (Title, Abstract, URL)
 the order they are provided is not optimized, figure out the best order to present them to your audience.
@@ -63,9 +65,9 @@ Ranked output of articles: ##start
     from langchain import PromptTemplate, LLMChain
     from langchain_community.chat_models import ChatOpenAI
 
-    PROMPT_TWEET = PromptTemplate(template=prompt, input_variables=["text"])
+    prompt_template = PromptTemplate(template=prompt, input_variables=["text"])
     llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)
-    chain =LLMChain(llm=llm, prompt=PROMPT_TWEET,verbose=True)
+    chain =LLMChain(llm=llm, prompt=prompt_template,verbose=True)
     
     # two weeks ago
     from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=look_back_days)).isoformat()

@@ -1,6 +1,5 @@
 import arxiv
 import os
-from state_of_the_art.papers import PapersData
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal, Optional
 from state_of_the_art.config import config
@@ -113,7 +112,7 @@ if __name__ == "__main__":
 
 def register_papers():
     from state_of_the_art.config import Config
-    topics = Config.load_config().get_current_profile().arxiv_topics
+    topics = Config.load_config().get_current_profile().keyworkds
     loader = ArxivLoader()
     print("Registering papers for topics: ", topics)
     total_skipped = 0

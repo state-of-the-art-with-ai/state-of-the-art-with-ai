@@ -1,4 +1,5 @@
 
+from state_of_the_art.config import config
 
 open_ai_cost = {
     'gpt-4-turbo-preview': {
@@ -23,3 +24,14 @@ def calculate_cost(*, chars_input=None, chars_output=None, tokens_input=None, to
 
     return input_cost + output_cost
 
+
+def call_chatgpt(prompt_str: str, input_str: str) -> str:
+        from langchain import PromptTemplate, LLMChain
+        from langchain_community.chat_models import ChatOpenAI
+
+        prompt_template = PromptTemplate(template=prompt_str, input_variables=["text"])
+        llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)
+        chain =LLMChain(llm=llm, prompt=prompt_template, verbose=True)
+        # two weeks ago
+
+        return chain.run(input_str)

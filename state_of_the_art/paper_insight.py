@@ -46,7 +46,7 @@ class InsightExtractor:
 Your taks is selecting key insights of the state of the art in academia an in the industry via the content of the article that is provided to you.
 Highlight only key insights, ideally actionalable ones. The insights can come form the results of the paper or form literature review
 Do not highlight more than 3 insights.
-you Optimize your suggestions to the following audience: {config.get_current_profile().audience_description}
+you Optimize your suggestions to the following audience: {config.get_current_profile().get_preferences()}
 Avoid trivial insights that are common knowledge for your audience.
 Avoid salesly insights that are not backed up by data.
 Hightlight also inishgts from the literature review in the paper.
