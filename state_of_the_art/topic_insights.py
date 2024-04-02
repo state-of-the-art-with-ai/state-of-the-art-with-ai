@@ -40,9 +40,6 @@ Economics
 Economics (econ new, recent, search )
 includes: (see detailed description):Econometrics; General Economics; Theoretical Economics
 """
-
-
-
 class TopicInsights:
     def get_categories_for_topic(self):
 

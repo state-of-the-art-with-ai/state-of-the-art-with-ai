@@ -19,6 +19,10 @@ class Config():
     def load_config():
         return Config()
 
+    def get_datawharehouse(self):
+        from tiny_data_wharehouse.data_wharehouse import DataWharehouse
+        return DataWharehouse()
+
 
 
 

@@ -1,17 +1,24 @@
 
-from state_of_the_art.arxiv_utils import download_paper
+from state_of_the_art.arxiv_loader import ArxivLoader
 from state_of_the_art.config import config
 import sys
 from state_of_the_art.open_ai_utils import calculate_cost
+from state_of_the_art.paper import Paper
 
 class InsightExtractor:
     """
     Looks into a single paper and extracts insights
     """
     def extract(self, pdf_url: str):
+
+        if Paper.is_abstract_url(pdf_url):
+            pdf_url = Paper.convert_abstract_to_pdf(pdf_url)
+
+        print("Extracting insights from paper: ", pdf_url)
+
         if not pdf_url.endswith('.pdf'):
             raise Exception("Invalid file format. Only PDF files are supported")
-        local_location = download_paper(pdf_url)
+        local_location = ArxivLoader().download_paper(pdf_url)
 
         from pypdf import PdfReader
 
