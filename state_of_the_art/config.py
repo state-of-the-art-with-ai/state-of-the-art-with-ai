@@ -6,6 +6,7 @@ class Config():
     PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
     NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"
     get_current_profile = get_current_profile
+    MAX_ABSTRACT_SIZE_RANK=500
 
     # the maximum number of papers to compute while sorting the batch of papers
     sort_papers_max_to_compute = 2500

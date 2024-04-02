@@ -47,6 +47,9 @@ Your taks is selecting key insights of the state of the art in academia an in th
 Highlight only key insights, ideally actionalable ones. The insights can come form the results of the paper or form literature review
 Do not highlight more than 3 insights.
 you Optimize your suggestions to the following audience: {config.get_current_profile().audience_description}
+Avoid trivial insights that are common knowledge for your audience.
+Avoid salesly insights that are not backed up by data.
+Hightlight also inishgts from the literature review in the paper.
 
 Follow the folloinwg example structure when reporting your insights
 

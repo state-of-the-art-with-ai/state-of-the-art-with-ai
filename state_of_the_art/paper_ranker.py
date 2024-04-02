@@ -35,7 +35,7 @@ def rank(*, from_date: Optional[str]=None, to_date: Optional[str]=None, look_bac
 Your taks is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
 Your audience is {config.get_current_profile().audience_description}
 Highlight only topics that are exciting or import so you reading the paper.
-The articles for you to work with will be provided below in the following format (Title, URL)
+The articles for you to work with will be provided below in the following format (Title, Abstract, URL)
 the order they are provided is not optimized, figure out the best order to present them to your audience.
 Do not be biased by the given order of the papers, it does not mean more recent is more relevant.
 Sort the papers from most relevant to less, return not more than {MAX_ARTICLES_TO_RETURN}
@@ -105,6 +105,7 @@ def get_articles_str(papers)->str:
     for i in papers.iterrows():
         papers_str += f"""
 Title: {i[1]['title']}
+Abstract: {i[1]['abstract'][0:config.MAX_ABSTRACT_SIZE_RANK]}
 Arxiv URL: {i[1]['url']}
 Published: {str(i[1]['published']).split(' ')[0]}
         """

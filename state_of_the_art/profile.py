@@ -35,6 +35,7 @@ Some topics interesting for Jean.
 - exeperimentation
 - analytics
 - Knowledge graphs
+- Graph neural networks
 
 Topics not interesting to jean are
 - Phisics

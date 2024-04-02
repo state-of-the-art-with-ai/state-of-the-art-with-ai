@@ -37,6 +37,13 @@ class PapersData():
         print("Found ", len(result), " papers")
         return result
 
+    def display(self):
+        """
+        Entrypoint to display papers. We add options to this function to change the display logic 
+        Rather than introducing more functions.
+        """
+        self.print_from_most_recent()
+
     def print_from_most_recent(self, from_date=None, to_date=None) -> pd.DataFrame:
 
         if from_date and to_date:
@@ -46,11 +53,13 @@ class PapersData():
 
         self.print_papers(self.sort_by_recently_published(papers))
     
-    def print_papers(self, papers_df):
+    def print_papers(self, papers_df, title_max_lenght=50, show_abstract=False):
         papers_dict = papers_df.to_dict(orient='records')
         for i in papers_dict:
-            print(str(i['published'])[0:10], ' ', i['title'], ' ', i['url'])
-
+            abstract = ''
+            if show_abstract:
+                abstract = i['abstract']
+            print(str(i['published'])[0:10],' ', i['title'][0:title_max_lenght], ' ', i['url'], abstract)
     
     def sort_by_recently_published(self, df):
         return df.sort_values(by='published', ascending=False)
