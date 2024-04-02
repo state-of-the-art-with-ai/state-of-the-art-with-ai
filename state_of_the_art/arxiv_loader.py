@@ -45,26 +45,23 @@ class ArxivLoader():
         tdw = DataWharehouse()
 
         arxiv_papers = tdw.event('arxiv_papers')
-        before_amount = len(arxiv_papers.index)
-        print("Exising papers: ", before_amount)
         existing_papers_urls = arxiv_papers['url'].values
 
         counter = 0
         skipped = 0
+        registered = 0
         for r in search.results():
             counter = counter+1
             if r.entry_id in existing_papers_urls:
                 skipped += 1
                 continue
 
-            print(f'Registering paper {r.title}, {r.published}')
+            registered+=1
             tdw.write_event('arxiv_papers', {'title': r.title, 'abstract': r.summary, 'url': r.entry_id, 'published': r.published})
 
-        print('Done')
-        print(f"Skipped {skipped} papers")
         arxiv_papers = tdw.event('arxiv_papers')
         after_amount = len(arxiv_papers.index)
-        print(f"{after_amount - before_amount} new papers registered")
+        return registered, skipped
 
 
     def download_papers(num_results=100):
@@ -112,3 +109,22 @@ class ArxivLoader():
 if __name__ == "__main__":
     import fire
     fire.Fire()
+
+
+def register_papers():
+    from state_of_the_art.config import Config
+    topics = Config.load_config().get_current_profile().arxiv_topics
+    loader = ArxivLoader()
+    print("Registering papers for topics: ", topics)
+    total_skipped = 0
+    total_registered = 0
+    for topic in topics:
+        registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='relevance')
+        total_skipped += skipped
+        total_registered += registered
+        registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='submitted')
+        total_skipped += skipped
+        total_registered += registered
+
+    print("Registered ", total_registered, " papers")
+    print("Skipped ", total_skipped, " papers")
