@@ -1,9 +1,18 @@
-
+import os
+from state_of_the_art.arxiv_loader import ArxivLoader
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime
 
 class PapersData():
+    TITLE_MAX_LENGH = 80
+    def display(self):
+        """
+        Entrypoint to display papers. We add options to this function to change the display logic 
+        Rather than introducing more functions.
+        """
+        self.print_from_most_recent()
+
     def load_papers(self):
         tdw = DataWharehouse()
         df = tdw.event('arxiv_papers')
@@ -37,13 +46,6 @@ class PapersData():
         print("Found ", len(result), " papers")
         return result
 
-    def display(self):
-        """
-        Entrypoint to display papers. We add options to this function to change the display logic 
-        Rather than introducing more functions.
-        """
-        self.print_from_most_recent()
-
     def print_from_most_recent(self, from_date=None, to_date=None) -> pd.DataFrame:
 
         if from_date and to_date:
@@ -53,13 +55,13 @@ class PapersData():
 
         self.print_papers(self.sort_by_recently_published(papers))
     
-    def print_papers(self, papers_df, title_max_lenght=50, show_abstract=False):
+    def print_papers(self, papers_df,  show_abstract=False):
         papers_dict = papers_df.to_dict(orient='records')
         for i in papers_dict:
             abstract = ''
             if show_abstract:
                 abstract = i['abstract']
-            print(str(i['published'])[0:10],' ', i['title'][0:title_max_lenght], ' ', i['url'], abstract)
+            print(str(i['published'])[0:10],' ', i['title'][0:self.TITLE_MAX_LENGH], ' ', i['url'], abstract)
     
     def sort_by_recently_published(self, df):
         return df.sort_values(by='published', ascending=False)
@@ -105,4 +107,19 @@ class PapersComparer():
         return (2* overlap_size) / total
         
         
+
+
+class BrowserPapers:
+    def fzf(self):
+        outoput = os.system('sota papers display | /Users/jean.machado/.fzf/bin/fzf --layout=reverse  | sota browser_papers open_from_fzf')
+        print(outoput)
+
+    def open_from_fzf(self):
+        import sys
+        text = sys.stdin.readlines()[0]
+        paper_url = text.split(' ')[-2].strip()
+        print('"', paper_url,'"')
+        print('Opening paper: ', paper_url)
+        os.system(f"clipboard set_content {paper_url}")
+        ArxivLoader().download_and_open(paper_url)
 

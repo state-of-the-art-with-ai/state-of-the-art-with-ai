@@ -2,7 +2,7 @@
 from state_of_the_art.arxiv_loader import register_papers
 from state_of_the_art.ranker.paper_ranker import rank
 from state_of_the_art.summaries import TopSummaries, SummariesData
-from state_of_the_art.papers import PapersData as papers
+from state_of_the_art.papers import PapersData as papers, BrowserPapers as browser_papers
 from state_of_the_art.paper_insight import InsightExtractor
 from state_of_the_art.topic_insights import TopicInsights
 from state_of_the_art.config import config

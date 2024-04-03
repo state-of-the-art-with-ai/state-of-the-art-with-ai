@@ -3,6 +3,7 @@ import os
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal, Optional
 from state_of_the_art.config import config
+from state_of_the_art.paper import Paper
 
 
 class ArxivLoader():
@@ -88,22 +89,40 @@ class ArxivLoader():
         urllib.request.urlretrieve(url, destination)
 
     def download_paper(self, url: str) -> str:
-        file_name= url.split('/')[-1]
-        destination = f'{config.NEW_PAPERS_FOLDER}/{file_name}'
+
+        if not url.endswith('.pdf'):
+                pdf_url = Paper.convert_abstract_to_pdf(url)
+
+        if not pdf_url.endswith('.pdf'):
+            raise Exception("Invalid file format. Only PDF files are supported")
+
+        destination = self.get_destination(pdf_url)
 
         if os.path.exists(destination):
             print(f"File {destination} already exists")
             return destination
 
 
-        print(f"Downloading file {url} to {destination}")
+        print(f"Downloading file {pdf_url} to {destination}")
 
         import urllib
-        urllib.request.urlretrieve(url, destination)
+        urllib.request.urlretrieve(pdf_url, destination)
         return destination
+        
+    def get_destination(self, url):
+        if not url.endswith('.pdf'):
+                url = Paper.convert_abstract_to_pdf(url)
 
-    def open_papers_folder(self):
-        os.system(f"open {config.PAPERS_FOLDER}/")
+        file_name= url.split('/')[-1]
+        return f'{config.NEW_PAPERS_FOLDER}/{file_name}'
+
+
+    def download_and_open(self, url):
+        destination = self.download_paper(url)
+        self.open_paper(url)
+
+    def open_paper(self, url):
+        os.system(f"open {self.get_destination(url)}")
 
 if __name__ == "__main__":
     import fire
