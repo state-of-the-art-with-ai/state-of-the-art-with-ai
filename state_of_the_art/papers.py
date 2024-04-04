@@ -1,5 +1,5 @@
 import os
-from state_of_the_art.arxiv_miner import ArxivMiner
+from state_of_the_art.paper_miner import ArxivMiner
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime
@@ -111,7 +111,7 @@ class PapersComparer():
 
 class BrowserPapers:
     def fzf(self):
-        outoput = os.system('sota papers display | /Users/jean.machado/.fzf/bin/fzf --layout=reverse  | sota browser_papers open_from_fzf')
+        outoput = os.system('sota papers | /Users/jean.machado/.fzf/bin/fzf --layout=reverse  | sota browser_papers open_from_fzf')
         print(outoput)
 
     def open_from_fzf(self):

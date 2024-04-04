@@ -1,5 +1,5 @@
 
-from state_of_the_art.arxiv_miner import ArxivMiner
+from state_of_the_art.paper_miner import ArxivMiner
 from state_of_the_art.config import config
 import sys
 from state_of_the_art.open_ai_utils import calculate_cost

@@ -1,8 +1,8 @@
 
-from state_of_the_art.arxiv_miner import ArxivMiner
+from state_of_the_art.paper_miner import ArxivMiner
 from state_of_the_art.ranker.paper_ranker import rank
 from state_of_the_art.summaries import TopSummaries, SummariesData
-from state_of_the_art.papers import PapersData as papers, BrowserPapers as browser_papers
+from state_of_the_art.papers import PapersData, BrowserPapers as browser_papers
 from state_of_the_art.paper_insight import InsightExtractor
 from state_of_the_art.topic_insights import TopicInsights
 from state_of_the_art.config import config
@@ -10,14 +10,16 @@ from state_of_the_art.config import config
 from state_of_the_art.bookmark import Bookmark as bookmark
 
 latest_summary = SummariesData().get_latest_summary
+papers_ui = browser_papers().fzf
+papers = PapersData().display
 
-def generate(*, lookback_days=None, from_date=None, skip_register=False):
+def generate(*, lookback_days=None, from_date=None, skip_register=False, dry_run=False):
     """
     The main entrypoint of the application does the entire cycle from registering papers to ranking them
     """
-    miner = ArxivMinner()
+    miner = ArxivMiner()
     if not skip_register:
-        miner.register_papers()
+        miner.register_papers(dry_run=dry_run)
     else:
         print("Skipping registering papers")
 

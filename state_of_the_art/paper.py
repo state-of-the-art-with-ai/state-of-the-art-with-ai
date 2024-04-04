@@ -1,16 +1,17 @@
 
 
 class Paper():
-    def __init__(self,*, arxiv_url):
+    def __init__(self,*, arxiv_url, published=None, title=None, abstract=None):
         self._validate_arxiv_url(arxiv_url)
         self.arxiv_url = arxiv_url
 
+        self.published = published
+        self.title = title
+        self.abstract = abstract
+
     def _validate_arxiv_url(self, url):
-        if not url.startswith("https://arxiv.org"):
-            raise Exception(f'{url} not a valid arxiv url example')
-        
-        if url.endswith('.pdf'):
-            raise Exception(f'paper url {url} should not end in .pdf')
+        if not url.startswith("https://arxiv.org") and not url.startswith("http://arxiv.org") :
+            raise Exception(f'"{url}" not a valid arxiv url example')
 
     @staticmethod
     def is_abstract_url(url):

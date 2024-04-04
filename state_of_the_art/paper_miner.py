@@ -6,7 +6,10 @@ from state_of_the_art.config import config
 from state_of_the_art.paper import Paper
 
 class ArxivMiner():
-    def register_papers(self):
+    """
+    Looks at arxiv api for papers
+    """
+    def register_papers(self, dry_run=False):
         from state_of_the_art.config import Config
         topics = Config.load_config().get_current_profile().keyworkds
         loader = ArxivMiner()
@@ -14,49 +17,42 @@ class ArxivMiner():
         total_skipped = 0
         total_registered = 0
         for topic in topics:
-            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='relevance')
+            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='relevance', dry_run=dry_run)
             total_skipped += skipped
             total_registered += registered
-            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='submitted')
+            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='submitted', dry_run=dry_run)
             total_skipped += skipped
             total_registered += registered
 
         print("Registered ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
-    def arxiv_search(self, *, query, max_results=10, short_version=True) -> str:
-        summary = ''
+
+    def load_papers(self, *, query='cs', number_of_papers=50, sort_by: Literal['submitted', 'relevance' ] = 'submitted'):
+        sort=  arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
+
         search = arxiv.Search(
-        query=query,
-        max_results = max_results,
-        sort_by = arxiv.SortCriterion.SubmittedDate
+            query=query,
+            max_results = number_of_papers,
+            sort_by = sort
         )
 
-        summary = ""
-        counter = 0
-        for result in search.results():
-            if short_version:
-                summary += f"{counter} ({result.published}) {result.title} {result.entry_id}\n"
-            else:
-                summary += f"Title: {result.title}, Abstract: {result.summary}, URL: {result.entry_id}\n"
-            counter += 1
-        print("Found  ", counter, " articles")
+        result = []
+        for r in search.results():
+            result.append({'title': r.title, 'abstract': r.summary, 'url': r.entry_id, 'published': r.published})
+        return result
 
-        return summary
-
-
-    def register_papers_by_topic(self, *, query='cs', number_of_papers=50, sort_by: Literal['submitted', 'relevance' ] = 'submitted'):
+    def register_papers_by_topic(self, *, query='cs', number_of_papers=50, sort_by: Literal['submitted', 'relevance' ] = 'submitted', dry_run=False):
         """
         Loads papers from arxiv and store them into the tiny data wharehouse
         """
         print(f"Registering new papers with query '{query}' and sorting by '{sort_by}'")
 
-        sort=  arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
+        papers = self.load_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
+        if dry_run:
+            print("Dry run, not registering papers")
+            print(f"Would have registered {papers} papers")
+            return len(papers), 0
 
-        search = arxiv.Search(
-        query=query,
-        max_results = number_of_papers,
-        sort_by = sort
-        )
 
         tdw = DataWharehouse()
 
@@ -66,32 +62,18 @@ class ArxivMiner():
         counter = 0
         skipped = 0
         registered = 0
-        for r in search.results():
+        for paper in papers:
             counter = counter+1
-            if r.entry_id in existing_papers_urls:
+            if paper['url'] in existing_papers_urls:
                 skipped += 1
                 continue
 
             registered+=1
-            tdw.write_event('arxiv_papers', {'title': r.title, 'abstract': r.summary, 'url': r.entry_id, 'published': r.published})
+            tdw.write_event('arxiv_papers', paper)
 
         arxiv_papers = tdw.event('arxiv_papers')
         after_amount = len(arxiv_papers.index)
         return registered, skipped
-
-
-    def download_papers(num_results=100):
-        search = arxiv.Search(
-        query='data science',
-        max_results = num_results,
-        sort_by = arxiv.SortCriterion.SubmittedDate
-        )
-        for r in search.results():
-            print('Downloading: ', r.title, r.pdf_url)
-            download_named_paper(r.pdf_url,r.title)
-
-        open_papers_folder()
-        
 
     def convert_title_to_filename(self, title) -> str:
         for c in title:
@@ -100,11 +82,16 @@ class ArxivMiner():
         return title
 
     def download_named_paper(self, url: str, title: Optional[str] = None):
-        destination = f'{config.PAPERS_FOLDER}/{convert_title_to_filename(title)}.pdf'
+        destination = f'{config.PAPERS_FOLDER}/{self.convert_title_to_filename(title)}.pdf'
         import urllib
         urllib.request.urlretrieve(url, destination)
 
     def download_paper(self, url: str) -> str:
+        """
+        Downloads a paper from a given url
+        :param url:
+        :return:
+        """
         if not url.endswith('.pdf'):
             pdf_url = Paper.convert_abstract_to_pdf(url)
 
@@ -116,7 +103,6 @@ class ArxivMiner():
         if os.path.exists(destination):
             print(f"File {destination} already exists")
             return destination
-
 
         print(f"Downloading file {pdf_url} to {destination}")
 
