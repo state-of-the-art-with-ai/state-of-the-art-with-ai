@@ -14,9 +14,8 @@ class Config():
     sort_papers_max_to_compute = 800 
     # the maximum allowed context lenght for the open-ai model
     MAX_CHARS_CONTEXT_LENGHT = 128000 * 4 
-    open_ai_key = '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'
+    open_ai_key = os.environ['SOTA_OPENAI_KEY']
 
-    
     @staticmethod
     def load_config():
         return Config()
