@@ -5,8 +5,24 @@ from typing import Literal, Optional
 from state_of_the_art.config import config
 from state_of_the_art.paper import Paper
 
+class ArxivMiner():
+    def register_papers(self):
+        from state_of_the_art.config import Config
+        topics = Config.load_config().get_current_profile().keyworkds
+        loader = ArxivMiner()
+        print("Registering papers for topics: ", topics)
+        total_skipped = 0
+        total_registered = 0
+        for topic in topics:
+            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='relevance')
+            total_skipped += skipped
+            total_registered += registered
+            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='submitted')
+            total_skipped += skipped
+            total_registered += registered
 
-class ArxivLoader():
+        print("Registered ", total_registered, " papers")
+        print("Skipped ", total_skipped, " papers")
     def arxiv_search(self, *, query, max_results=10, short_version=True) -> str:
         summary = ''
         search = arxiv.Search(
@@ -89,9 +105,8 @@ class ArxivLoader():
         urllib.request.urlretrieve(url, destination)
 
     def download_paper(self, url: str) -> str:
-
         if not url.endswith('.pdf'):
-                pdf_url = Paper.convert_abstract_to_pdf(url)
+            pdf_url = Paper.convert_abstract_to_pdf(url)
 
         if not pdf_url.endswith('.pdf'):
             raise Exception("Invalid file format. Only PDF files are supported")
@@ -128,21 +143,3 @@ if __name__ == "__main__":
     import fire
     fire.Fire()
 
-
-def register_papers():
-    from state_of_the_art.config import Config
-    topics = Config.load_config().get_current_profile().keyworkds
-    loader = ArxivLoader()
-    print("Registering papers for topics: ", topics)
-    total_skipped = 0
-    total_registered = 0
-    for topic in topics:
-        registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='relevance')
-        total_skipped += skipped
-        total_registered += registered
-        registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='submitted')
-        total_skipped += skipped
-        total_registered += registered
-
-    print("Registered ", total_registered, " papers")
-    print("Skipped ", total_skipped, " papers")

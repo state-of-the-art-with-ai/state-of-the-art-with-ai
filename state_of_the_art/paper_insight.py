@@ -1,5 +1,5 @@
 
-from state_of_the_art.arxiv_loader import ArxivLoader
+from state_of_the_art.arxiv_miner import ArxivMiner
 from state_of_the_art.config import config
 import sys
 from state_of_the_art.open_ai_utils import calculate_cost
@@ -11,7 +11,7 @@ class InsightExtractor:
     """
     def extract(self, url: str):
 
-        local_location = ArxivLoader().download_paper(url)
+        local_location = ArxivMiner().download_paper(url)
 
         from pypdf import PdfReader
 

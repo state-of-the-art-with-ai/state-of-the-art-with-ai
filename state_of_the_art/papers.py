@@ -1,5 +1,5 @@
 import os
-from state_of_the_art.arxiv_loader import ArxivLoader
+from state_of_the_art.arxiv_miner import ArxivMiner
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime
@@ -121,5 +121,5 @@ class BrowserPapers:
         print('"', paper_url,'"')
         print('Opening paper: ', paper_url)
         os.system(f"clipboard set_content {paper_url}")
-        ArxivLoader().download_and_open(paper_url)
+        ArxivMiner().download_and_open(paper_url)
 
