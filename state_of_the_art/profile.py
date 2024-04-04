@@ -19,19 +19,18 @@ keywords that did not work well
 """
 
 KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
-                   'construction engineering', 'material science']
-
+                   'construction engineering', 'material science', 'robotics', 'mobility', 'geology']
 
 class Profile:
     audience_description: str
-    keyworkds: List[str]
+    keywords: List[str]
     keywords_to_exclude: List[str]
     time_frame: Any = None
 
     def __init__(self, *, audience_description: str, keywords: List[str], keywords_to_exclude: List[str],
                  time_frame=None) -> None:
         self.audience_description = audience_description
-        self.keyworkds = keywords
+        self.keywords = keywords
         self.keywords_to_exclude = keywords_to_exclude
         self.time_frame = time_frame
 
@@ -40,18 +39,18 @@ class Profile:
         Returns all the preferences of the profile encoded in a string
         """
         return f"""General Preferences: {self.audience_description}
-Important relevant Keywords: {'\n - '.join(self.keyworkds)}
+Important relevant topics: \n - {'\n - '.join(self.keywords)}
 
-Keywords to exclude (do not return any content related to it): {'\n - '.join(self.keywords_to_exclude)}
+Non relevant topics (make sure they are not mentioned in the results): \n - {'\n - '.join(self.keywords_to_exclude)}
         """
 
 
 jean = Profile(
-    audience_description="""Jean Machado, a Data Science Manager for GetYoruGuide.
+    audience_description="""Jean Machado, a Data Science Manager for GetYourGuide.
 Jean wants the following out this tool:
 2. to understand exciting and important topics with further depth
 1. to have actionable insights and learnings he can apply
-3. to stay on the bleading edge of the field
+3. to stay on the bleeding edge of the field
 
 to see what is going on on important institutions and companies in the field of data science and machine learning
     """,
@@ -67,8 +66,7 @@ The mission of the team is to  optimize multi-channel customer acquisition and c
 to see what is going on on important institutions and companies in the field of data science and machine learning
     """,
     keywords=COMMON_KEYWORDS,
-    keywords_to_exclude=['physics', 'biology', 'medicine', 'astronomy', 'chemistry', 'construction engineering',
-                         'material science', 'football']
+    keywords_to_exclude=KEYWORS_EXCLUDE
 )
 
 
@@ -77,7 +75,6 @@ def get_current_profile(self=None):
         'jean': jean,
         'gdp': gdp,
     }
-    current_profile = 'jean'
     current_profile = os.environ.get('SOTA_PROFILE', 'jean')
     print(f"Using profile {current_profile}")
     return profiles[current_profile]
