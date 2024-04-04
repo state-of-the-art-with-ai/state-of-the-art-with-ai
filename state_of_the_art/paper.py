@@ -5,9 +5,20 @@ class Paper():
         self._validate_arxiv_url(arxiv_url)
         self.arxiv_url = arxiv_url
 
+        self.url = arxiv_url
         self.published = published
         self.title = title
         self.abstract = abstract
+
+
+    def to_dict(self):
+        return {
+            'url': self.arxiv_url,
+            'published': self.published,
+            'title': self.title,
+            'abstract': self.abstract
+        }
+
 
     def _validate_arxiv_url(self, url):
         if not url.startswith("https://arxiv.org") and not url.startswith("http://arxiv.org") :
