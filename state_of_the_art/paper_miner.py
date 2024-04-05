@@ -13,7 +13,7 @@ class ArxivMiner():
 
     def register_papers(self, dry_run=False):
         from state_of_the_art.config import Config
-        topics = Config.load_config().get_current_profile().keyworkds
+        topics = Config.load_config().get_current_profile().keywords
         loader = ArxivMiner()
         print("Registering papers for topics: ", topics)
         total_skipped = 0
