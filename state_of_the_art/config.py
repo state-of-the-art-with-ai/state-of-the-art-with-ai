@@ -1,5 +1,5 @@
 import os
-from state_of_the_art.profile import get_current_profile
+from state_of_the_art.audience import get_current_profile
 
 class Config():
     HOME = os.path.expanduser("~")

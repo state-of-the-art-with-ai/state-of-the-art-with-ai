@@ -9,28 +9,36 @@ class ArxivMiner():
     Looks at arxiv api for papers
     """
 
-    DEFAULT_MAX_PAPERS_TO_LOAD=10
+    DEFAULT_MAX_PAPERS_TO_LOAD=100
 
-    def register_papers(self, dry_run=False):
-        from state_of_the_art.config import Config
-        topics = Config.load_config().get_current_profile().keywords
-        loader = ArxivMiner()
-        print("Registering papers for topics: ", topics)
+    def register_papers(self, dry_run=False, disable_relevance_miner=False):
+        """
+        Register papers by looking in arxiv api with the keyworkds of the audience configuration
+        :param dry_run:
+        :param disable_relevance_miner:
+        :return:
+        """
+        if dry_run:
+            print("Dry run, just printing, not registering them")
+
+        topics = config.get_current_profile().keywords
+        print("Registering papers for the following keywords: ", topics)
         total_skipped = 0
         total_registered = 0
+
         for topic in topics:
-            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='relevance', dry_run=dry_run)
-            total_skipped += skipped
-            total_registered += registered
-            registered, skipped = loader.register_papers_by_topic(query=topic, sort_by='submitted', dry_run=dry_run)
+            if not disable_relevance_miner:
+                registered, skipped = self.register_papers_by_topic(query=topic, sort_by='relevance', dry_run=dry_run)
+                total_skipped += skipped
+                total_registered += registered
+            registered, skipped = self.register_papers_by_topic(query=topic, sort_by='submitted', dry_run=dry_run)
             total_skipped += skipped
             total_registered += registered
 
-        print("Registered ", total_registered, " papers")
+        print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
     def load_papers(self, *, query='cs', number_of_papers=None, sort_by: Literal['submitted', 'relevance' ] = 'submitted'):
-
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 
         search = arxiv.Search(

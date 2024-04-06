@@ -23,17 +23,25 @@ class RankGeneratedData:
     def to_dict(self):
         return {'summary': self.summary, 'from_date': self.from_date, 'to_date': self.to_date, 'prompt': self.prompt }
 
-
 class PaperRanker:
-    def rank(self, *, from_date: Optional[str]=None, to_date: Optional[str]=None, look_back_days=None, dry_run=False):
+    MAX_ARTICLES_TO_RETURN = 25
+
+    def rank(self, *, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, dry_run=False, article_slices=None):
         """
         Ranks existing papers by relevance
         """
-        if not to_date and not look_back_days:
-            look_back_days = config.DEFAULT_LOOK_BACK_DAYS
-        print("Look back days ", look_back_days)
+        if not to_date and not lookback_days:
+            lookback_days = config.DEFAULT_LOOK_BACK_DAYS
 
-        MAX_ARTICLES_TO_RETURN=15
+
+        max_papers = config.sort_papers_max_to_compute
+        if not article_slices:
+            article_slices = (0, max_papers)
+        print("Article slices ", article_slices)
+
+
+        print("Look back days ", lookback_days)
+
         prompt = f"""You are an world class expert in Data Science and computer science.
 Your task is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you..
 Highlight only topics that are exciting or import for yoru target audience
@@ -45,7 +53,7 @@ Highlight only topics that are exciting or import for yoru target audience
 The articles for you to work with will be provided below in the following format (Title, Abstract, URL)
 the order they are provided is not optimized, figure out the best order to present them to your audience.
 Do not be biased by the given order of the papers, it does not mean more recent is more relevant.
-Sort the papers from most relevant to less, return not more than {MAX_ARTICLES_TO_RETURN}
+Sort the papers from most relevant to less, return not more than {self.MAX_ARTICLES_TO_RETURN}
 Try also to include meta-analysis and reviews of the field.
 
 Example of expected output format: ##start
@@ -77,13 +85,15 @@ Ranked output of articles: ##start """
         chain =LLMChain(llm=llm, prompt=prompt_template,verbose=True)
 
         # two weeks ago
-        from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=look_back_days)).isoformat()
+        from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=lookback_days)).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()
-        max_papers = config.sort_papers_max_to_compute
 
         articles = PapersData().load_between_dates(from_date, to_date)
         print("Found  ", len(articles), f" articles with date filters but filtering down to {max_papers} ")
-        articles = articles[0:max_papers]
+
+        print("Slicing articles ", article_slices)
+
+        articles = articles[article_slices[0]:article_slices[1]]
         articles_str = get_articles_str(articles)
         cost = calculate_cost(chars_input=len(articles), chars_output=4000)
 

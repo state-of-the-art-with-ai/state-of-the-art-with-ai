@@ -21,7 +21,7 @@ keywords that did not work well
 KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
                    'construction engineering', 'material science', 'robotics', 'mobility', 'geology']
 
-class Profile:
+class Audience:
     audience_description: str
     keywords: List[str]
     keywords_to_exclude: List[str]
@@ -45,7 +45,7 @@ Non relevant topics (make sure they are not mentioned in the results): \n - {'\n
         """
 
 
-jean = Profile(
+jean = Audience(
     audience_description="""Jean Machado, a Data Science Manager for GetYourGuide.
 Jean wants the following out this tool:
 2. to understand exciting and important topics with further depth
@@ -58,7 +58,7 @@ to see what is going on on important institutions and companies in the field of 
     keywords_to_exclude=KEYWORS_EXCLUDE
 )
 
-gdp = Profile(
+gdp = Audience(
     audience_description="""
 Growth Data Products is a team in GetYourGuide that is responsible for the data science and machine learning for growing the business
 You provide insights to GDP manager to share with the team :)
