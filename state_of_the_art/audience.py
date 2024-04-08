@@ -51,6 +51,12 @@ Then evaluate: Is the methodoloy of hte claims paper sound? Are there weaknesses
 Return an overview and list the possible weakensses of the methodology of the paper
 """,
     'literature_review': 'What is the most interesting part of this paper in the literature review?',
+    'hardest_part': """ Explain the hardest part technical part of the the paper.
+First identify what it is and define it well. Explain terms that are not necessarily explained in the paper but are crucial to understand the hardest part.
+Then break down the topic on its parts and explain them as well.
+First explain it normally and then explain it in analogies.
+No more than 10 sentences.
+"""
 }
 
 

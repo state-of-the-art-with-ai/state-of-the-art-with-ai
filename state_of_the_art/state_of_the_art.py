@@ -8,6 +8,7 @@ from state_of_the_art.paper_insight import InsightExtractor
 from state_of_the_art.paper import Paper
 
 from state_of_the_art.bookmark import Bookmark as bookmark
+from state_of_the_art.retriver import TopicRetriver
 
 
 class Sota:
@@ -23,6 +24,7 @@ class Sota:
         self.extract_insights = InsightExtractor().extract
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
+        self.topic_retriver = TopicRetriver
 
     def generate(self, *, lookback_days=None, from_date=None, skip_register=False, dry_run=False):
         """
