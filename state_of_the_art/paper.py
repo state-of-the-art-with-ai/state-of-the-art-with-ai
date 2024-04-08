@@ -2,6 +2,10 @@
 import os
 from state_of_the_art.config import config
 class Paper():
+    """
+    Main dto to acceess papers functionality
+
+    """
     def __init__(self,*, arxiv_url, published=None, title=None, abstract=None):
         self._validate_arxiv_url(arxiv_url)
         self.arxiv_url = arxiv_url

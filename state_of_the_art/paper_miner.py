@@ -1,5 +1,4 @@
 import arxiv
-import os
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal, Optional
 from state_of_the_art.config import config
