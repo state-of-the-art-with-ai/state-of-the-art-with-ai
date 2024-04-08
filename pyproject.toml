@@ -8,11 +8,13 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 fire = "^0.6.0"
-langchain-community = "^0.0.29"
 openai = "^1.14.2"
 pypdf = "^4.1.0"
 pydantic = "1.10.14"
 arxiv = "^2.1.0"
+langchain = "^0.1.14"
+langchain-community = "^0.0.31"
+pyarrow = "^15.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"

@@ -1,6 +1,6 @@
 import arxiv
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-from typing import Literal, Optional
+from typing import Literal
 from state_of_the_art.config import config
 from state_of_the_art.paper import Paper
 class ArxivMiner():
@@ -45,13 +45,12 @@ class ArxivMiner():
         """
         print(f"Registering new papers with query '{query}' and sorting by '{sort_by}'")
 
-        papers = self.load_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
+        papers = self.find_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
 
         if dry_run:
             return len(papers), 0
         return self._register_given_papers(papers)
-
-    def load_papers(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False):
+    def find_papers(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False):
         if not query:
             print("No query provided, using default query")
             query = self.DEFAULT_QUERY
@@ -80,6 +79,13 @@ class ArxivMiner():
         if only_print:
             return
         return result
+
+    def find_latest_papers(self, *, query=None):
+        """"
+        Useful to debugging what is latest in arxiv
+        """
+        self.find_papers(query=query, number_of_papers=30, sort_by='submitted', only_print=True)
+
     def _register_given_papers(self, papers):
         tdw = DataWharehouse()
 

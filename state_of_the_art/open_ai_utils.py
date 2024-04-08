@@ -26,8 +26,8 @@ def calculate_cost(*, chars_input=None, chars_output=None, tokens_input=None, to
 
 
 def call_chatgpt(prompt_str: str, input_str: str) -> str:
-        from langchain import PromptTemplate, LLMChain
         from langchain_community.chat_models import ChatOpenAI
+        from langchain import PromptTemplate, LLMChain
 
         prompt_template = PromptTemplate(template=prompt_str, input_variables=["text"])
         llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)

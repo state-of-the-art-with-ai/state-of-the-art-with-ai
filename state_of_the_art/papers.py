@@ -1,4 +1,6 @@
 import os
+
+from state_of_the_art.paper import Paper
 from state_of_the_art.paper_miner import ArxivMiner
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
@@ -121,5 +123,6 @@ class BrowserPapers:
         print('"', paper_url,'"')
         print('Opening paper: ', paper_url)
         os.system(f"clipboard set_content {paper_url}")
-        ArxivMiner().download_and_open(paper_url)
+        Paper(arxiv_url=paper_url).download_and_open()
+
 
