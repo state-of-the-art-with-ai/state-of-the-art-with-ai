@@ -48,6 +48,7 @@ class Paper():
         :param url:
         :return:
         """
+        pdf_url = self.url
         if not self.url.endswith('.pdf'):
             pdf_url = Paper.convert_abstract_to_pdf(self.url)
 
@@ -74,8 +75,8 @@ class Paper():
         return f'{config.NEW_PAPERS_FOLDER}/{file_name}'
 
     def download_and_open(self):
-        self.download_paper()
-        self.open_paper()
+        self.download()
+        self.open()
 
     def open(self):
         """

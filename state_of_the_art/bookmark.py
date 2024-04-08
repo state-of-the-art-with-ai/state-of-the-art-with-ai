@@ -26,7 +26,7 @@ class Bookmark():
         dwh = config.get_datawharehouse()
         dict = dwh.event(self.EVENT_NAME).sort_values(by='bookmarked_date', ascending=False).to_dict(orient='record')
         latest = dict[0]
-        Paper(arxiv_url=latest['paper_url']).open()
+        Paper(arxiv_url=latest['paper_url']).download_and_open()
 
 
 

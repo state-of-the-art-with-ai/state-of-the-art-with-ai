@@ -11,7 +11,8 @@ class InsightExtractor:
     """
     def extract(self, url: str):
 
-        local_location = ArxivMiner().download_paper(url)
+        local_location = Paper(arxiv_url=url).download()
+
 
         from pypdf import PdfReader
 

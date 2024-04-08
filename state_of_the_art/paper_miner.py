@@ -9,6 +9,7 @@ class ArxivMiner():
     """
 
     DEFAULT_MAX_PAPERS_TO_LOAD=100
+    DEFAULT_QUERY = 'cs.AI'
 
     def register_papers(self, dry_run=False, disable_relevance_miner=False):
         """
@@ -37,7 +38,27 @@ class ArxivMiner():
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
-    def load_papers(self, *, query='cs', number_of_papers=None, sort_by: Literal['submitted', 'relevance' ] = 'submitted'):
+
+    def register_papers_by_topic(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance' ] = 'submitted', dry_run=False):
+        """
+        Loads papers from arxiv and store them into the tiny data wharehouse
+        """
+        print(f"Registering new papers with query '{query}' and sorting by '{sort_by}'")
+
+        papers = self.load_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
+
+        if dry_run:
+            return len(papers), 0
+        return self._register_given_papers(papers)
+
+    def load_papers(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False):
+        if not query:
+            print("No query provided, using default query")
+            query = self.DEFAULT_QUERY
+
+        if not number_of_papers:
+            number_of_papers = self.DEFAULT_MAX_PAPERS_TO_LOAD
+
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 
         search = arxiv.Search(
@@ -47,30 +68,19 @@ class ArxivMiner():
         )
 
         result = []
+        print(" =========== For query ", query, " and sorting by ", sort_by)
+        order_counter = 1
         for r in search.results():
             paper = Paper(title=r.title, abstract=r.summary, arxiv_url=r.entry_id, published=r.published)
             result.append(paper)
+            print(order_counter, paper.published, paper.title, paper.url)
+
+            order_counter += 1
+
+        if only_print:
+            return
         return result
-
-    def register_papers_by_topic(self, *, query='cs', number_of_papers=None, sort_by: Literal['submitted', 'relevance' ] = 'submitted', dry_run=False):
-        """
-        Loads papers from arxiv and store them into the tiny data wharehouse
-        """
-        print(f"Registering new papers with query '{query}' and sorting by '{sort_by}'")
-
-        if not number_of_papers:
-            number_of_papers = self.DEFAULT_MAX_PAPERS_TO_LOAD
-
-        papers = self.load_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
-        if dry_run:
-            print("Dry run, just printing the papers")
-            print(" =========== For query ", query, " and sorting by ", sort_by, " found ", len(papers), " papers =========== ")
-            for i in papers:
-                print(i.published, i.title, i.url)
-
-            return len(papers), 0
-
-
+    def _register_given_papers(self, papers):
         tdw = DataWharehouse()
 
         arxiv_papers = tdw.event('arxiv_papers')
