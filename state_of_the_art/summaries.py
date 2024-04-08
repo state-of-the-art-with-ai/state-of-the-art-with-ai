@@ -2,7 +2,6 @@ from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from state_of_the_art.papers import PapersComparer, PapersData
 
 class SummariesData():
-
     def get_summary(self):
         tdw = DataWharehouse()
         return tdw.event('state_of_the_art_summary')

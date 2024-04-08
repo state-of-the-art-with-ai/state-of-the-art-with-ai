@@ -4,10 +4,11 @@ from state_of_the_art.config import config
 import datetime
 from state_of_the_art.paper import Paper
 
+
 class Bookmark():
 
     EVENT_NAME = 'paper_bookmarks'
-    def new(self, paper_url, comment: Optional[str]):
+    def add(self, paper_url, comment: Optional[str]):
         print(f"Registering paper {paper_url} in bookmarks")
         paper = Paper(arxiv_url=paper_url)
 
@@ -16,5 +17,20 @@ class Bookmark():
 
     def list(self):
         dwh = config.get_datawharehouse()
-        return dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").to_dict(orient='index')
+        dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
+
+        for i in dict:
+            print(f"{str(dict[i]['bookmarked_date']).split(' ')[0]} {dict[i]['comment'][0:50]} {dict[i]['paper_url']} ")
+
+    def open_latest_paper(self):
+        dwh = config.get_datawharehouse()
+        dict = dwh.event(self.EVENT_NAME).sort_values(by='bookmarked_date', ascending=False).to_dict(orient='record')
+        latest = dict[0]
+        Paper(arxiv_url=latest['paper_url']).open()
+
+
+
+    def fzf(self):
+        import os
+        os.system("sota bookmark list | fzf ")
 

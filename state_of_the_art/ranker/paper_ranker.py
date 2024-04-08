@@ -33,7 +33,6 @@ class PaperRanker:
         if not to_date and not lookback_days:
             lookback_days = config.DEFAULT_LOOK_BACK_DAYS
 
-
         max_papers = config.sort_papers_max_to_compute
         if not article_slices:
             article_slices = (0, max_papers)

@@ -91,55 +91,6 @@ class ArxivMiner():
 
         return registered, skipped
 
-    def convert_title_to_filename(self, title) -> str:
-        for c in title:
-            if not c.isalnum():
-                title = title.replace(c, '_')
-        return title
-
-    def download_named_paper(self, url: str, title: Optional[str] = None):
-        destination = f'{config.PAPERS_FOLDER}/{self.convert_title_to_filename(title)}.pdf'
-        import urllib
-        urllib.request.urlretrieve(url, destination)
-
-    def download_paper(self, url: str) -> str:
-        """
-        Downloads a paper from a given url
-        :param url:
-        :return:
-        """
-        if not url.endswith('.pdf'):
-            pdf_url = Paper.convert_abstract_to_pdf(url)
-
-        if not pdf_url.endswith('.pdf'):
-            raise Exception("Invalid file format. Only PDF files are supported")
-
-        destination = self.get_destination(pdf_url)
-
-        if os.path.exists(destination):
-            print(f"File {destination} already exists")
-            return destination
-
-        print(f"Downloading file {pdf_url} to {destination}")
-
-        import urllib
-        urllib.request.urlretrieve(pdf_url, destination)
-        return destination
-        
-    def get_destination(self, url):
-        if not url.endswith('.pdf'):
-                url = Paper.convert_abstract_to_pdf(url)
-
-        file_name= url.split('/')[-1]
-        return f'{config.NEW_PAPERS_FOLDER}/{file_name}'
-
-
-    def download_and_open(self, url):
-        destination = self.download_paper(url)
-        self.open_paper(url)
-
-    def open_paper(self, url):
-        os.system(f"open {self.get_destination(url)}")
 
 if __name__ == "__main__":
     import fire
