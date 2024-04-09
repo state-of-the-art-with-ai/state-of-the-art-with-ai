@@ -24,6 +24,8 @@ class Paper():
             'abstract': self.abstract
         }
 
+    def published_str(self):
+        return str(self.published)[0:10]
 
     def _validate_arxiv_url(self, url):
         if not url.startswith("https://arxiv.org") and not url.startswith("http://arxiv.org") :

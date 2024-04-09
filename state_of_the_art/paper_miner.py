@@ -3,7 +3,7 @@ from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal
 from state_of_the_art.config import config
 from state_of_the_art.paper import Paper
-class ArxivMiner():
+class PaperMiner():
     """
     Looks at arxiv api for papers
     """
@@ -82,7 +82,7 @@ class ArxivMiner():
 
     def find_latest_papers(self, *, query=None):
         """"
-        Useful to debugging what is latest in arxiv
+        Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
         self.find_papers(query=query, number_of_papers=30, sort_by='submitted', only_print=True)
 

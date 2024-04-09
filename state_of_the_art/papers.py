@@ -1,7 +1,8 @@
 import os
+from typing import List
 
 from state_of_the_art.paper import Paper
-from state_of_the_art.paper_miner import ArxivMiner
+from state_of_the_art.paper_miner import PaperMiner
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime
@@ -56,7 +57,15 @@ class PapersData():
             papers = self.load_papers()
 
         self.print_papers(self.sort_by_recently_published(papers))
-    
+
+    def df_to_papers(self, papers_df) -> List[Paper]:
+        papers_dict = papers_df.to_dict(orient='records')
+        result = []
+        for i in papers_dict:
+            paper = Paper(title=i['title'], abstract=i['abstract'], arxiv_url=i['url'], published=i['published'])
+            result.append(paper)
+        return result
+
     def print_papers(self, papers_df,  show_abstract=False):
         papers_dict = papers_df.to_dict(orient='records')
         for i in papers_dict:
@@ -77,6 +86,17 @@ class PapersData():
         to_date = datetime.date.today().isoformat()
 
         return self.load_papers_between_published_dates(from_date, to_date)
+
+class PapersFormatter():
+    """
+    Used to oncode papers as prompts
+    """
+
+    def papers_urls(self, papers: List[Paper]) -> str:
+        urls = ""
+        for i in papers:
+            urls += i.url + '\n'
+        return urls
 
 class PapersComparer():
     def extract_papers_urls(self, data) -> str:

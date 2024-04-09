@@ -4,24 +4,9 @@ import datetime
 from typing import Optional, Any
 
 from state_of_the_art.config import config
-from state_of_the_art.papers import PapersData
+from state_of_the_art.papers import PapersData, PapersFormatter
 from state_of_the_art.open_ai_utils import calculate_cost
 
-class RankGeneratedData:
-    prompt: str
-    from_date: Any
-    to_date: Any
-    summary: str
-
-
-    def __init__(self, from_date, to_date, prompt, summary=None) -> None:
-        self.from_date = from_date
-        self.to_date = to_date
-        self.prompt = prompt
-        self.summary = summary
-
-    def to_dict(self):
-        return {'summary': self.summary, 'from_date': self.from_date, 'to_date': self.to_date, 'prompt': self.prompt }
 
 class PaperRanker:
     MAX_ARTICLES_TO_RETURN = 25
@@ -52,7 +37,7 @@ Highlight only topics that are exciting or import for yoru target audience
 The articles for you to work with will be provided below in the following format (Title, Abstract, URL)
 the order they are provided is not optimized, figure out the best order to present them to your audience.
 Do not be biased by the given order of the papers, it does not mean more recent is more relevant.
-Sort the papers from most relevant to less, return not more than {self.MAX_ARTICLES_TO_RETURN}
+Sort the papers from most relevant to less, return not more than a single page of results
 Try also to include meta-analysis and reviews of the field.
 
 Example of expected output format: ##start
@@ -88,12 +73,15 @@ Ranked output of articles: ##start """
         to_date = to_date if to_date else datetime.date.today().isoformat()
 
         articles = PapersData().load_between_dates(from_date, to_date)
-        print("Found  ", len(articles), f" articles with date filters but filtering down to {max_papers} ")
+        amount_of_articles = len(articles)
+        print("Found  ", amount_of_articles, f" articles with date filters but filtering down to {max_papers} ")
 
+        if amount_of_articles < max_papers:
+            article_slices = (0, amount_of_articles)
         print("Slicing articles ", article_slices)
 
         articles = articles[article_slices[0]:article_slices[1]]
-        articles_str = get_articles_str(articles)
+        articles_str = self.get_articles_str(articles)
         cost = calculate_cost(chars_input=len(articles), chars_output=4000)
 
         user_input = input(f"""Ranking generation of ({len(articles.index)}) articles from {from_date} to {to_date} cost estimate ${cost}.
@@ -102,32 +90,50 @@ Ranked output of articles: ##start """
             print("Aborting")
             sys.exit(1)
 
-
         if not dry_run:
             result = chain.run(articles_str)
         else:
             result = "Dry run result"
 
-        result = f"Results generated at {datetime.datetime.now().isoformat()} for period ({from_date}, {to_date}): \n\n" + result
+        result = f"Results generated at {datetime.datetime.now().isoformat()} for period ({from_date}, {to_date}) analysed {amount_of_articles} papers: \n\n" + result
         from tiny_data_wharehouse.data_wharehouse import DataWharehouse
         tdw = DataWharehouse()
-        ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=result)
+
+        papers_str = PapersFormatter().papers_urls(PapersData().df_to_papers(articles))
+        print(papers_str)
+        ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=result, papers_analysed=papers_str)
         if not dry_run:
             tdw.write_event('state_of_the_art_summary', ranking_data.to_dict())
         print(result)
 
 
-def get_articles_str(papers)->str:
+    def get_articles_str(self, papers)->str:
 
-    papers_str = " "
-    for i in papers.iterrows():
-        papers_str += f"""
-Title: {i[1]['title']}
-Abstract: {i[1]['abstract'][0:config.MAX_ABSTRACT_SIZE_RANK]}
-Arxiv URL: {i[1]['url']}
-Published: {str(i[1]['published']).split(' ')[0]}
-        """
-    return papers_str
+        papers_str = " "
+        for i in papers.iterrows():
+            papers_str += f"""
+    Title: {i[1]['title']}
+    Abstract: {i[1]['abstract'][0:config.MAX_ABSTRACT_SIZE_RANK]}
+    Arxiv URL: {i[1]['url']}
+            """
+        return papers_str
+
+class RankGeneratedData:
+    prompt: str
+    from_date: Any
+    to_date: Any
+    summary: str
+
+
+    def __init__(self, from_date, to_date, prompt, summary, papers_analysed) -> None:
+        self.from_date = from_date
+        self.to_date = to_date
+        self.prompt = prompt
+        self.summary = summary
+        self.papers_analysed = papers_analysed
+
+    def to_dict(self):
+        return {'summary': self.summary, 'from_date': self.from_date, 'to_date': self.to_date, 'prompt': self.prompt, 'papers_analysed': self.papers_analysed}
 
 if __name__ == "__main__":
     import fire
