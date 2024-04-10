@@ -20,7 +20,7 @@ class Bookmark():
         dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
 
         for i in dict:
-            print(f"{str(dict[i]['bookmarked_date']).split(' ')[0]} {dict[i]['comment'][0:50]} {dict[i]['paper_url']} ")
+            print(f"{str(dict[i]['bookmarked_date']).split(' ')[0]} {dict[i]['paper_url']} {dict[i]['comment']} ")
 
     def open_latest_paper(self):
         dwh = config.get_datawharehouse()

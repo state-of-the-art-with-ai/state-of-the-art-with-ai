@@ -26,12 +26,22 @@ marketing_measurment = Topic(
 )
 
 bidding = Topic(
-    synonyms=['bidding', 'bid optimization', 'bidding', 'bid management', 'bid optimization'],
-    subtopics=['bidding', 'bid optimization', 'bidding strategy', 'bid management', 'bid optimization']
+    synonyms=['bidding', 'google ads', 'paid search', 'bid optimization', 'bidding', 'bid management', 'bid optimization', 'search engine marketing', 'paid advertising', 'bid', 'portifolio optimization'],
+    subtopics=[]
 )
 
 experimentation_and_reporting = Topic(
     synonyms=['experimentation', 'experiment design', 'experiment analysis', 'experimentation and reporting'],
+    subtopics=[]
+)
+
+management_dataproduct = Topic(
+    synonyms=['data products management', 'data science leadership', 'success metrics'],
+    subtopics=[]
+)
+
+collaboration = Topic(
+    synonyms=['tech teams collaboration beyond immediate team', 'tech organizations cohesion', 'achieving impact beydon the team', 'top performing organization', 'data prodcuts'],
     subtopics=[]
 )
 
@@ -40,5 +50,7 @@ topics = {
     'xsell': xsell,
     'marketing_measurment': marketing_measurment,
     'bidding': bidding,
-    'experimentation': experimentation_and_reporting
+    'experimentation': experimentation_and_reporting,
+    'management_dataproduct': management_dataproduct,
+    'collaboration': collaboration
 }

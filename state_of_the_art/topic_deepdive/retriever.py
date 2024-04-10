@@ -11,7 +11,12 @@ MAX_PAPERS = 30
 
 
 class TopicRetriever:
-    def retrieve(self, topic_name: str):
+    def search(self, topic_name: str):
+        """
+        Search for papers on a given topic
+        :param topic_name:
+        :return:
+        """
         papers_data = PapersData()
         papers = papers_data.load_papers()
         papers_list = papers_data.df_to_papers(papers)
