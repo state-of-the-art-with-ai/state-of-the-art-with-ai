@@ -2,7 +2,7 @@ from state_of_the_art.config import config
 class TopicInsights:
     def get_categories_for_topic(self):
 
-        use_case = """
+        input_use_case = """
     Growth Data Products is a team in GetYourGuide that is responsible for the data science and machine learning for growing the business
     The mission of the team is to  optimize multi-channel customer acquisition and customer loyalty by building data products.
 
@@ -14,16 +14,8 @@ class TopicInsights:
         Recommend topics for the following use-case:
         {{text}}
         """
-
-        from langchain import PromptTemplate, LLMChain
-        from langchain_community.chat_models import ChatOpenAI
-
-        PROMPT_TWEET = PromptTemplate(template=prompt, input_variables=["text"])
-        llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)
-        chain =LLMChain(llm=llm, prompt=PROMPT_TWEET, verbose=True)
-        # two weeks ago
-        result = chain.run(use_case)
-
+        from state_of_the_art.llm import LLM
+        result = LLM().call(prompt, input_use_case)
         print(result)
 
 
@@ -68,3 +60,7 @@ Economics
 Economics (econ new, recent, search )
 includes: (see detailed description):Econometrics; General Economics; Theoretical Economics
 """
+
+if __name__ == "__main__":
+    import fire
+    fire.Fire()

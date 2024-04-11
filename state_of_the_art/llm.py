@@ -1,3 +1,4 @@
+import os
 
 from state_of_the_art.config import config
 
@@ -7,6 +8,7 @@ open_ai_cost = {
         'output_cost_per_million': 30,
     },
 }
+
 
 
 def calculate_cost(*, chars_input=None, chars_output=None, tokens_input=None, tokens_output=None):
@@ -35,3 +37,24 @@ def call_chatgpt(prompt_str: str, input_str: str) -> str:
         # two weeks ago
 
         return chain.run(input_str)
+
+
+class LLM:
+    """Wrapper for llm call """
+
+    def __init__(self, mock=False):
+
+        self.mock = mock
+
+        if 'LLM_MOCK' in os.environ:
+            print("LLM mock enabled via enviroment variable")
+            self.mock = True
+
+
+    def call(self, prompt, input):
+        if self.mock:
+            return f"""Mocked llm return
+INPUT: {input}
+PROMPT: {prompt[0:200]}...
+            """
+        return call_chatgpt(prompt, input)
