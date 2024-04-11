@@ -8,7 +8,6 @@ class ArxivPaperMiner():
     Looks at arxiv api for papers
     """
 
-    DEFAULT_MAX_PAPERS_TO_LOAD=100
     DEFAULT_QUERY = 'cs.AI'
 
     def register_papers(self, dry_run=False, disable_relevance_miner=False):
@@ -21,7 +20,7 @@ class ArxivPaperMiner():
         if dry_run:
             print("Dry run, just printing, not registering them")
 
-        topics = config.get_current_profile().keywords
+        topics = config.get_current_audience().keywords
         print("Registering papers for the following keywords: ", topics)
         total_skipped = 0
         total_registered = 0
@@ -59,7 +58,7 @@ class ArxivPaperMiner():
             query = self.DEFAULT_QUERY
 
         if not number_of_papers:
-            number_of_papers = self.DEFAULT_MAX_PAPERS_TO_LOAD
+            number_of_papers = self.config.MAX_PAPERS_TO_MINE_PER_QUERY
 
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 

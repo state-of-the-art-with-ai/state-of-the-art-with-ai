@@ -1,7 +1,6 @@
 
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
-from state_of_the_art.summary.summaries import SummariesData
 from state_of_the_art.papers import PapersData
 from state_of_the_art.papers import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight import InsightExtractor
@@ -32,7 +31,7 @@ class Sota:
         self.SummariesData = SummariesData
 
 
-    def generate(self, *, lookback_days=None, from_date=None, skip_register=False, dry_run=False):
+    def report(self, *, lookback_days=None, from_date=None, skip_register=False, dry_run=False):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """

@@ -31,7 +31,7 @@ Your task is spotting key insights of what is going on in academia an in the ind
 Highlight only topics that are exciting or import for yoru target audience
     
 ##start of target audience 
-        {config.get_current_profile().get_preferences()}
+        {config.get_current_audience().get_preferences()}
 ##end of target audience
     
 The articles for you to work with will be provided below in the following format (Title, Abstract, URL)

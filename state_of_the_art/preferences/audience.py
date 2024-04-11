@@ -111,7 +111,7 @@ to see what is going on on important institutions and companies in the field of 
 )
 
 
-def get_current_profile(self=None):
+def get_current_audience(self=None):
     profiles = {
         'jean': jean,
         'gdp': gdp,

@@ -29,7 +29,7 @@ class InsightExtractor:
         cost = calculate_cost(chars_input=len(PAPER_CONTENT), chars_output=4000)
 
         user_input = input(f"Do you want ton continue to generate insights at a cost of $ {cost}? Type c to continue \n")
-        profile = config.get_current_profile()
+        profile = config.get_current_audience()
         if user_input != 'c':
             print("Aborting")
             sys.exit(1)
