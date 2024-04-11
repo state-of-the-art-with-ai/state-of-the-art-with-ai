@@ -2,7 +2,6 @@ import os
 from typing import List
 
 from state_of_the_art.paper import Paper
-from state_of_the_art.paper_miner import PaperMiner
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime

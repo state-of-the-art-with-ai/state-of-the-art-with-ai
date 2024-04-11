@@ -1,11 +1,9 @@
 import os
-from state_of_the_art.audience import get_current_profile
 
 class Config():
     HOME = os.path.expanduser("~")
     PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
     NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"
-    get_current_profile = get_current_profile
     MAX_ABSTRACT_SIZE_RANK=500
     DEFAULT_LOOK_BACK_DAYS = 14
 
@@ -16,6 +14,9 @@ class Config():
     MAX_CHARS_CONTEXT_LENGHT = 128000 * 4 
     open_ai_key = os.environ['SOTA_OPENAI_KEY']
 
+    def get_current_profile(self):
+        from state_of_the_art.audience import get_current_profile
+        return get_current_profile()
     @staticmethod
     def load_config():
         return Config()

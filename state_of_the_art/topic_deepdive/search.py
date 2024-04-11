@@ -2,7 +2,8 @@ from typing import List
 
 from state_of_the_art.paper import Paper
 from state_of_the_art.papers import PapersData
-from state_of_the_art.topic_deepdive.topic import topics, Topic
+from state_of_the_art.topic_deepdive.topic import Topic
+from state_of_the_art.preferences.topics import topics
 from rank_bm25 import BM25Okapi as BM25
 import nltk
 
@@ -10,17 +11,19 @@ import nltk
 MAX_PAPERS = 30
 
 
-class TopicRetriever:
-    def search(self, topic_name: str):
+class TopicSearch:
+    def __init__(self):
+        papers_data = PapersData()
+        papers = papers_data.load_papers()
+        papers_list = papers_data.df_to_papers(papers)
+        self.search = Bm25Search(papers_list)
+
+    def search_by_topic(self, topic_name: str):
         """
         Search for papers on a given topic
         :param topic_name:
         :return:
         """
-        papers_data = PapersData()
-        papers = papers_data.load_papers()
-        papers_list = papers_data.df_to_papers(papers)
-        self.search = Bm25Search(papers_list)
 
         selected_topic = topics[topic_name]
 
@@ -32,12 +35,13 @@ class TopicRetriever:
             word_bag = word_bag + topic.split(' ')
 
         word_bag = list(set(word_bag))
-        query = ' '.join(word_bag)
         print(f"Searching for papers on '{word_bag}'")
+        query = ' '.join(word_bag)
+        print("\n\n")
+        self.search_with_query(query)
+    def search_with_query(self, query):
         papers = self.search.search(query)
         self.print_papers(papers)
-        print("\n\n")
-
 
     def print_papers(self, papers):
         result = [ p.published_str() + ' ' + p.title[0:100] + ' ' + p.url for p in papers]

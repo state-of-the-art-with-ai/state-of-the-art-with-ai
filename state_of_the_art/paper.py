@@ -60,7 +60,7 @@ class Paper():
         destination = self.get_destination(pdf_url)
 
         if os.path.exists(destination):
-            print(f"File {destination} already exists")
+            print(f"File {destination} already exists so wont download it again")
             return destination
 
         print(f"Downloading file {pdf_url} to {destination}")

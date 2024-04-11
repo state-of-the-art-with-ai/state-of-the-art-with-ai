@@ -5,7 +5,7 @@ from typing import Optional, Any
 
 from state_of_the_art.config import config
 from state_of_the_art.papers import PapersData, PapersFormatter
-from state_of_the_art.open_ai_utils import calculate_cost
+from state_of_the_art.llm import calculate_cost
 
 
 class PaperRanker:

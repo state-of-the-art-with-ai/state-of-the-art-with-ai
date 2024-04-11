@@ -3,7 +3,7 @@ from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal
 from state_of_the_art.config import config
 from state_of_the_art.paper import Paper
-class PaperMiner():
+class ArxivPaperMiner():
     """
     Looks at arxiv api for papers
     """
@@ -45,12 +45,15 @@ class PaperMiner():
         """
         print(f"Registering new papers with query '{query}' and sorting by '{sort_by}'")
 
-        papers = self.find_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
+        papers = self._find_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
 
         if dry_run:
             return len(papers), 0
         return self._register_given_papers(papers)
-    def find_papers(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False):
+
+    def query_papers(self, query):
+        self._find_papers(query, number_of_papers=15, sort_by='relevance', only_print=True)
+    def _find_papers(self, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False):
         if not query:
             print("No query provided, using default query")
             query = self.DEFAULT_QUERY
@@ -60,6 +63,7 @@ class PaperMiner():
 
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 
+        print({'query': query, 'sort_by': sort_by})
         search = arxiv.Search(
             query=query,
             max_results = number_of_papers,
@@ -67,7 +71,6 @@ class PaperMiner():
         )
 
         result = []
-        print(" =========== For query ", query, " and sorting by ", sort_by)
         order_counter = 1
         for r in search.results():
             paper = Paper(title=r.title, abstract=r.summary, arxiv_url=r.entry_id, published=r.published)
@@ -84,7 +87,7 @@ class PaperMiner():
         """"
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
-        self.find_papers(query=query, number_of_papers=30, sort_by='submitted', only_print=True)
+        self._find_papers(query=query, number_of_papers=30, sort_by='submitted', only_print=True)
 
     def _register_given_papers(self, papers):
         tdw = DataWharehouse()

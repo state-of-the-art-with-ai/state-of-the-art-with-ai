@@ -1,9 +1,8 @@
 
 from state_of_the_art.config import config
 import sys
-from state_of_the_art.open_ai_utils import calculate_cost
+from state_of_the_art.llm import calculate_cost, call_chatgpt
 from state_of_the_art.paper import Paper
-from state_of_the_art.open_ai_utils import call_chatgpt
 
 
 class InsightExtractor:

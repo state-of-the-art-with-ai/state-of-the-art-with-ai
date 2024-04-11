@@ -1,5 +1,5 @@
 
-from state_of_the_art.paper_miner import PaperMiner
+from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.summaries import SummariesData
 from state_of_the_art.papers import PapersData
@@ -8,7 +8,7 @@ from state_of_the_art.paper_insight import InsightExtractor
 from state_of_the_art.paper import Paper
 
 from state_of_the_art.bookmark import Bookmark as bookmark
-from state_of_the_art.topic_deepdive.retriever import TopicRetriever
+from state_of_the_art.topic_deepdive.search import TopicSearch
 
 
 class Sota:
@@ -18,13 +18,15 @@ class Sota:
         self.papers_ui = browser_papers().fzf
         self.papers = PapersData().display
         self.rank = PaperRanker().rank
-        self.paper_miner = PaperMiner()
+        self.paper_miner = ArxivPaperMiner()
+        self.arxiv = self.paper_miner
         self.register = self.paper_miner.register_papers
         self.find_latest_papers = self.paper_miner.find_latest_papers
         self.extract_insights = InsightExtractor().extract
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
-        self.topic_retriever = TopicRetriever
+        self.topic_search = TopicSearch
+
 
     def generate(self, *, lookback_days=None, from_date=None, skip_register=False, dry_run=False):
         """
