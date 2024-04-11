@@ -1,7 +1,7 @@
 
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
-from state_of_the_art.summaries import SummariesData
+from state_of_the_art.summary.summaries import SummariesData
 from state_of_the_art.papers import PapersData
 from state_of_the_art.papers import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight import InsightExtractor
@@ -9,6 +9,8 @@ from state_of_the_art.paper import Paper
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.topic_deepdive.search import TopicSearch
+from state_of_the_art.summary.summary_formatter import SummaryFormatter
+from state_of_the_art.summary.summaries import SummariesData
 
 
 class Sota:
@@ -26,6 +28,8 @@ class Sota:
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
         self.topic_search = TopicSearch
+        self.SummaryFormatter = SummaryFormatter
+        self.SummariesData = SummariesData
 
 
     def generate(self, *, lookback_days=None, from_date=None, skip_register=False, dry_run=False):

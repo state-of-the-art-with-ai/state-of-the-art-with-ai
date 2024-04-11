@@ -97,8 +97,11 @@ class PapersFormatter():
             urls += i.url + '\n'
         return urls
 
-class PapersComparer():
-    def extract_papers_urls(self, data) -> str:
+class PapersExtractor():
+    def extract_urls(self, data: str) -> List[str]:
+        if not type(data)==str:
+            raise Exception("Data to extract papers must be a string")
+
         urls = []
         for row in data.split('\n'):
             for k, _  in enumerate(row):

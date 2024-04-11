@@ -1,12 +1,21 @@
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-from state_of_the_art.papers import PapersComparer, PapersData
+from state_of_the_art.papers import PapersExtractor, PapersData
 
 class SummariesData():
     def get_summary(self):
         tdw = DataWharehouse()
         return tdw.event('state_of_the_art_summary')
-    def get_latest_summary(self, index=-1):
-        return self.get_summary()['summary'].to_list()[index]
+    def schema(self):
+        return self.get_summary().dtypes
+    def get_latest_summary(self, as_json=False, as_dict=False):
+        result = self.get_summary().iloc[-1]
+        if as_json:
+            return result.to_json()
+        if as_dict:
+            return result.to_dict()
+
+        return result['summary']
+
 
     def get_latest_date_covered_by_summary(self):
         return self.get_summary().sort_values(by='to_date', ascending=False).head(1).to_dict()['to_date'][0]
@@ -19,7 +28,7 @@ class TopSummaries():
         for i in range(-1,-(extractions+1),-1):
             try:
                 summary = SummariesData().get_latest_summary(i)
-                extracted_papers = PapersComparer().extract_papers_urls(summary)[0:top_n]
+                extracted_papers = PapersExtractor().extract_urls(summary)[0:top_n]
             except:  # catch the exception
                 print(" Extraction error ")
                 continue
