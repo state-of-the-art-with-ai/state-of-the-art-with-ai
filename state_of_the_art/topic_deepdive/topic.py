@@ -20,19 +20,15 @@ xsell = Topic(
     subtopics=['recommnder systems', 'cross sell', 'cross sell recommendation', 'cross sell strategy', 'cross sell optimization']
 )
 
-marketing_measurment = Topic(
-    synonyms=['marketing measurement', 'marketing metrics', 'marketing analytics', 'marketing attribution', 'marketing ROI'],
-    subtopics=[]
-)
 
 bidding = Topic(
     synonyms=['bidding', 'google ads', 'paid search', 'bid optimization', 'bidding', 'bid management', 'bid optimization', 'search engine marketing', 'paid advertising', 'bid', 'portifolio optimization'],
     subtopics=[]
 )
 
-experimentation_and_reporting = Topic(
+experimentation = Topic(
     synonyms=['experimentation', 'experiment design', 'experiment analysis', 'experimentation and reporting'],
-    subtopics=[]
+    subtopics=['markov chain attribution', 'marketing measurement', 'marketing metrics', 'marketing analytics', 'marketing attribution', 'marketing ROI', 'mc roas', 'markov chain attribution']
 )
 
 management_dataproduct = Topic(
@@ -48,9 +44,8 @@ collaboration = Topic(
 topics = {
     'deep_learning': deep_learning,
     'xsell': xsell,
-    'marketing_measurment': marketing_measurment,
     'bidding': bidding,
-    'experimentation': experimentation_and_reporting,
+    'experimentation': experimentation,
     'management_dataproduct': management_dataproduct,
     'collaboration': collaboration
 }
