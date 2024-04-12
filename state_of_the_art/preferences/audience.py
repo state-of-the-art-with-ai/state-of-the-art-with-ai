@@ -7,7 +7,7 @@ COMMON_KEYWORDS = [
     'ads','data science', 'mlops',
     'large language models', 'ai for social good', 'ai ethics'
     'data science management and data science teams  performance', 'ai regulation', 'deep learning & neural nets',
-    'computer science','knowledge graphs', 'graph neural networks']
+    'computer science','knowledge graphs', 'graph neural networks', 'ai productivity', 'explainable ai', 'xai']
 
 """
 keywords that did not work well

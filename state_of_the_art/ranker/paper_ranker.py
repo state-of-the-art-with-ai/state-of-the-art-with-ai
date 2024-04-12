@@ -104,7 +104,7 @@ Ranked output of articles: ##start """
         ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=result, papers_analysed=papers_str)
         if not dry_run:
             tdw.write_event('state_of_the_art_summary', ranking_data.to_dict())
-        print(result)
+        return result
 
 
     def get_articles_str(self, papers)->str:

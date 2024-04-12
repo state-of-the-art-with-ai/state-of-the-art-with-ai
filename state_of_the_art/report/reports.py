@@ -1,5 +1,6 @@
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 
+from state_of_the_art.mail import Mail
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.papers import PapersExtractor, PapersData
 from state_of_the_art.ranker.paper_ranker import PaperRanker
@@ -8,7 +9,6 @@ from state_of_the_art.ranker.paper_ranker import PaperRanker
 class Report():
     def __init__(self):
         pass
-
     def generate(self, *, lookback_days=None, topic=None, from_date=None, skip_register=False, dry_run=False):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
@@ -18,7 +18,10 @@ class Report():
         else:
             print("Skipping registering papers")
 
-        PaperRanker().rank(lookback_days=lookback_days, from_date=from_date)
+        result = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date)
+
+        Mail().send(result, 'Sota summary')
+        return result
     def latest(self):
         return ReportsData().get_latest_summary()
 
