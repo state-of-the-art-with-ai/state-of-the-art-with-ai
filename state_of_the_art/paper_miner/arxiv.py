@@ -10,6 +10,9 @@ class ArxivPaperMiner():
 
     DEFAULT_QUERY = 'cs.AI'
 
+    def __init__(self):
+        self.config = config
+
     def register_papers(self, dry_run=False, disable_relevance_miner=False):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration

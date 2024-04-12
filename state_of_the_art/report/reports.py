@@ -1,7 +1,28 @@
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-from state_of_the_art.papers import PapersExtractor, PapersData
 
-class SummariesData():
+from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
+from state_of_the_art.papers import PapersExtractor, PapersData
+from state_of_the_art.ranker.paper_ranker import PaperRanker
+
+
+class Report():
+    def __init__(self):
+        pass
+
+    def generate(self, *, lookback_days=None, topic=None, from_date=None, skip_register=False, dry_run=False):
+        """
+        The main entrypoint of the application does the entire cycle from registering papers to ranking them
+        """
+        if not skip_register:
+            ArxivPaperMiner().register_papers(dry_run=dry_run)
+        else:
+            print("Skipping registering papers")
+
+        PaperRanker().rank(lookback_days=lookback_days, from_date=from_date)
+    def latest(self):
+        return ReportsData().get_latest_summary()
+
+class ReportsData():
     def get_summary(self):
         tdw = DataWharehouse()
         return tdw.event('state_of_the_art_summary')
@@ -21,13 +42,14 @@ class SummariesData():
         return self.get_summary().sort_values(by='to_date', ascending=False).head(1).to_dict()['to_date'][0]
 
 
-class TopSummaries():
+
+class TopReports():
     def get_top_papers_from_summary(self, extractions=3, top_n=60, ):
 
         papers = []
         for i in range(-1,-(extractions+1),-1):
             try:
-                summary = SummariesData().get_latest_summary(i)
+                summary = ReportsData().get_latest_summary(i)
                 extracted_papers = PapersExtractor().extract_urls(summary)[0:top_n]
             except:  # catch the exception
                 print(" Extraction error ")
