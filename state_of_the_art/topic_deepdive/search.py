@@ -1,8 +1,7 @@
 from typing import List
 
 from state_of_the_art.paper.paper import Paper
-from state_of_the_art.papers import PapersData
-from state_of_the_art.topic_deepdive.topic import Topic
+from state_of_the_art.paper.papers import PapersData
 from state_of_the_art.preferences.topics import topics
 from rank_bm25 import BM25Okapi as BM25
 import nltk
@@ -47,11 +46,6 @@ class TopicSearch:
         result = [p.published_date_str() + ' ' + p.title[0:100] + ' ' + p.url for p in papers]
         for r in result:
             print(r)
-
-    def by_topic(self, topic: Topic):
-        print(topic.synonyms)
-        print(topic.subtopics)
-        return papers
 
 
 class Bm25Search:

@@ -1,5 +1,7 @@
 
 import os
+from typing import List
+
 from state_of_the_art.config import config
 
 
@@ -19,13 +21,19 @@ class Paper():
 
 
     @staticmethod
-    def load_url_from_db(url) -> 'Paper':
-        from state_of_the_art.papers import PapersData
+    def load_paper_from_url(url) -> 'Paper':
+        from state_of_the_art.paper.papers import PapersData
         result = PapersData().load_from_url(url)
         if result is None:
             raise Exception(f"Paper with url {url} not found")
         result = result.iloc[0].to_dict()
         return Paper(arxiv_url=result['url'], published=result['published'], title=result['title'], abstract=result['abstract'])
+
+    def load_papers_from_urls(urls) -> List['Paper']:
+        result = []
+        for url in urls:
+            result.append(Paper.load_paper_from_url(url))
+        return result
 
     def to_dict(self):
         return {

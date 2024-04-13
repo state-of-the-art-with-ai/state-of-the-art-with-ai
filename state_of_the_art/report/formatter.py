@@ -1,4 +1,4 @@
-from state_of_the_art.papers import PapersExtractor
+from state_of_the_art.paper.papers import PapersExtractor
 from state_of_the_art.report.reports import ReportsData
 
 

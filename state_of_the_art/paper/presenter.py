@@ -2,7 +2,7 @@ from state_of_the_art.paper.paper import Paper
 
 class PaperHumanPresenter:
     def __init__(self, url):
-        self.paper = Paper.load_url_from_db(url)
+        self.paper = Paper.load_paper_from_url(url)
 
     @staticmethod
     def present_from_url(url):

@@ -3,7 +3,7 @@ from typing import Optional
 
 from state_of_the_art.config import config
 from state_of_the_art.paper.presenter import PaperHumanPresenter
-from state_of_the_art.papers import PapersData, PapersFormatter, PapersExtractor
+from state_of_the_art.paper.papers import PapersData, PapersFormatter, PapersExtractor
 from state_of_the_art.llm import LLM
 from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
 from state_of_the_art.utils.mail import Mail

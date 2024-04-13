@@ -1,8 +1,8 @@
 
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
-from state_of_the_art.papers import PapersData
-from state_of_the_art.papers import BrowserPapers as browser_papers
+from state_of_the_art.paper.papers import PapersData
+from state_of_the_art.paper.papers import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight.paper_insight import InsightExtractor
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.presenter import PaperHumanPresenter

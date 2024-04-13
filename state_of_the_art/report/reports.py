@@ -1,9 +1,7 @@
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 
-from state_of_the_art.paper.presenter import PaperHumanPresenter
-from state_of_the_art.utils.mail import Mail
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
-from state_of_the_art.papers import PapersExtractor, PapersData
+from state_of_the_art.paper.papers import PapersExtractor, PapersData
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 
 

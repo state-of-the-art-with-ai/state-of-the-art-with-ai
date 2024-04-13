@@ -20,6 +20,13 @@ class PapersData():
         df = tdw.event('arxiv_papers')
         return df
 
+    def to_papers(self, df) -> List[Paper]:
+        papers = []
+        for i in df.iterrows():
+            paper = Paper(title=i[1]['title'], abstract=i[1]['abstract'], arxiv_url=i[1]['url'], published=i[1]['published'])
+            papers.append(paper)
+        return papers
+
     def load_between_dates(self, start, end):
         df = self.load_papers()
         print("Date filters (from, to): ", start, end)
