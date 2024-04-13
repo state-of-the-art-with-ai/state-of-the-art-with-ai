@@ -1,5 +1,5 @@
 import os
-
+import sys
 from state_of_the_art.config import config
 
 open_ai_cost = {
@@ -33,7 +33,7 @@ def call_chatgpt(prompt_str: str, input_str: str) -> str:
 
         prompt_template = PromptTemplate(template=prompt_str, input_variables=["text"])
         llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)
-        chain =LLMChain(llm=llm, prompt=prompt_template, verbose=True)
+        chain =LLMChain(llm=llm, prompt=prompt_template)
         # two weeks ago
 
         return chain.run(input_str)
@@ -51,10 +51,27 @@ class LLM:
             self.mock = True
 
 
-    def call(self, prompt, input):
+    def call(self, prompt, input, expected_ouput_len=4000, ask_cost_confirmation=True):
         if self.mock:
             return f"""Mocked llm return
 INPUT: {input}
 PROMPT: {prompt[0:200]}...
             """
+
+        self._cost_check(prompt, input, expected_ouput_len, ask_cost_confirmation)
+
+
         return call_chatgpt(prompt, input)
+
+    def _cost_check(self, prompt, input, expected_ouput_len=4000, ask_cost_confirmation=True):
+        if ask_cost_confirmation:
+            expected_cost = calculate_cost(chars_input=len(input) + len(prompt), chars_output=expected_ouput_len)
+            if expected_cost < 0.5:
+                print("Cost is low {}, continuing without asking for confirmation".format(expected_cost))
+                return
+
+            user_input = input(f"Do you want ton continue to call the AI at a cost of $ {expected_cost}? Type c to continue \n")
+
+            if user_input != 'c':
+                print("Aborting")
+                sys.exit(1)
