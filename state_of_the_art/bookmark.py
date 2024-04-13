@@ -2,6 +2,8 @@
 from typing import Optional
 from state_of_the_art.config import config
 import datetime
+
+from state_of_the_art.mail import Mail
 from state_of_the_art.paper import Paper
 
 
@@ -15,18 +17,29 @@ class Bookmark():
         dwh = config.get_datawharehouse()
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper.arxiv_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
 
-    def list(self):
+    def list(self, return_result=True):
         dwh = config.get_datawharehouse()
         dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
 
+
+        result  = ""
         for i in dict:
-            print(f"{str(dict[i]['bookmarked_date']).split(' ')[0]} {dict[i]['paper_url']} {dict[i]['comment']} ")
+            result += f"{str(dict[i]['bookmarked_date']).split(' ')[0]} {dict[i]['paper_url']} {dict[i]['comment']} \n"
+
+        if return_result:
+            return result
+
+        print(result)
 
     def open_latest_paper(self):
         dwh = config.get_datawharehouse()
         dict = dwh.event(self.EVENT_NAME).sort_values(by='bookmarked_date', ascending=False).to_dict(orient='record')
         latest = dict[0]
         Paper(arxiv_url=latest['paper_url']).download_and_open()
+
+
+    def send_to_email(self):
+        Mail().send(self.list(return_result=True), "SOTA Bookmarks as of " + datetime.date.today().isoformat())
 
 
 

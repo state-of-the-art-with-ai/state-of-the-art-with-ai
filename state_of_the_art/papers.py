@@ -8,12 +8,12 @@ import datetime
 
 class PapersData():
     TITLE_MAX_LENGH = 80
-    def display(self):
+    def display(self, from_date=None):
         """
         Entrypoint to display papers. We add options to this function to change the display logic 
         Rather than introducing more functions.
         """
-        self.print_from_most_recent()
+        self.print_from_most_recent(from_date=from_date)
 
     def load_papers(self):
         tdw = DataWharehouse()
@@ -50,6 +50,9 @@ class PapersData():
 
     def print_from_most_recent(self, from_date=None, to_date=None) -> pd.DataFrame:
 
+        if from_date and not to_date:
+            to_date = datetime.date.today().isoformat()
+
         if from_date and to_date:
             papers = self.load_between_dates(from_date, to_date)
         else:
@@ -72,6 +75,9 @@ class PapersData():
             if show_abstract:
                 abstract = i['abstract']
             print(str(i['published'])[0:10],' ', i['title'][0:self.TITLE_MAX_LENGH], ' ', i['url'], abstract)
+
+
+        print("Total papers: ", len(papers_dict))
     
     def sort_by_recently_published(self, df):
         return df.sort_values(by='published', ascending=False)

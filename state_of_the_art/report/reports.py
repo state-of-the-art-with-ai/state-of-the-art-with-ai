@@ -9,7 +9,7 @@ from state_of_the_art.ranker.paper_ranker import PaperRanker
 class Report():
     def __init__(self):
         pass
-    def generate(self, *, lookback_days=None, topic=None, from_date=None, skip_register=False, dry_run=False):
+    def generate(self, *, lookback_days=None, topic=None, from_date=None, skip_register=False, dry_run=False, batch=1):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
@@ -18,10 +18,12 @@ class Report():
         else:
             print("Skipping registering papers")
 
-        result = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date)
+        result = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date, batch=batch)
 
-        Mail().send(result, 'Sota summary')
+
+        Mail().send(result, f'Sota summary batch {batch}')
         return result
+
     def latest(self):
         return ReportsData().get_latest_summary()
 

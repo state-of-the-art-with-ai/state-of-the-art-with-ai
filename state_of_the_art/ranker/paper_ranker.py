@@ -11,7 +11,7 @@ from state_of_the_art.llm import calculate_cost
 class PaperRanker:
     MAX_ARTICLES_TO_RETURN = 25
 
-    def rank(self, *, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, dry_run=False, article_slices=None):
+    def rank(self, *, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, dry_run=False, article_slices=None, batch=1):
         """
         Ranks existing papers by relevance
         """
@@ -20,7 +20,9 @@ class PaperRanker:
 
         max_papers = config.sort_papers_max_to_compute
         if not article_slices:
-            article_slices = (0, max_papers)
+            article_slices = (max_papers * (batch - 1), max_papers * batch)
+
+
         print("Article slices ", article_slices)
 
 

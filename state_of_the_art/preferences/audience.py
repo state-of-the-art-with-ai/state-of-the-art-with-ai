@@ -59,8 +59,6 @@ No more than 10 sentences.
 """
 }
 
-
-
 class Audience:
     audience_description: str
     keywords: List[str]
