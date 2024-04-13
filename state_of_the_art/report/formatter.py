@@ -1,5 +1,5 @@
-from state_of_the_art.paper.papers import PapersExtractor
-from state_of_the_art.report.reports import ReportsData
+from state_of_the_art.paper.text_extractor import PapersExtractor
+from state_of_the_art.report.reports_data import ReportsData
 
 
 class SummaryFormatter:

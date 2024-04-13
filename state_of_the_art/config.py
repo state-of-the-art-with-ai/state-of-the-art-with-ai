@@ -8,6 +8,7 @@ class Config():
     MAX_ABSTRACT_SIZE_RANK=500
     MAX_PAPERS_TO_MINE_PER_QUERY=50
     DEFAULT_LOOK_BACK_DAYS = 2
+    MINIMAL_CONFIRMATION_COST = 0.35
 
     # the maximum number of papers to compute while sorting the batch of papers
     sort_papers_gpt_model = 'gpt-4-turbo-preview'

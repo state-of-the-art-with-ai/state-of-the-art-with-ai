@@ -1,19 +1,56 @@
-import os
 from typing import List, Optional
 
 from state_of_the_art.paper.paper import Paper
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime
+from state_of_the_art.config import config
 
 class PapersData():
     TITLE_MAX_LENGH = 80
-    def display(self, from_date=None):
+    def display(self, from_date=None, n=None):
         """
         Entrypoint to display papers. We add options to this function to change the display logic 
         Rather than introducing more functions.
         """
-        self.print_from_most_recent(from_date=from_date)
+        to_date = datetime.date.today().isoformat()
+
+        if from_date and to_date:
+            papers = self.load_between_dates(from_date, to_date)
+        else:
+            papers = self.load_papers()
+
+        if n:
+            papers = papers.head(n)
+
+        self.print_papers(self.sort_by_recently_published(papers))
+
+    def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1):
+        if not to_date and not lookback_days:
+            lookback_days = config.DEFAULT_LOOK_BACK_DAYS
+
+        max_papers = config.sort_papers_max_to_compute
+        if not article_slices:
+            article_slices = (max_papers * (batch - 1), max_papers * batch)
+
+
+        print("Article slices ", article_slices)
+        print("Look back days ", lookback_days)
+
+        from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=lookback_days)).isoformat()
+        to_date = to_date if to_date else datetime.date.today().isoformat()
+
+        articles = self.load_between_dates(from_date, to_date)
+        amount_of_articles = len(articles)
+        print("Found  ", amount_of_articles, f" articles with date filters but filtering down to {max_papers} ")
+
+        if amount_of_articles < max_papers:
+            article_slices = (0, amount_of_articles)
+        print("Slicing articles ", article_slices)
+
+        articles = articles[article_slices[0]:article_slices[1]]
+
+        return articles
 
     def load_papers(self):
         tdw = DataWharehouse()
@@ -60,17 +97,6 @@ class PapersData():
         print("Found ", len(result), " papers")
         return result
 
-    def print_from_most_recent(self, from_date=None, to_date=None) -> pd.DataFrame:
-
-        if from_date and not to_date:
-            to_date = datetime.date.today().isoformat()
-
-        if from_date and to_date:
-            papers = self.load_between_dates(from_date, to_date)
-        else:
-            papers = self.load_papers()
-
-        self.print_papers(self.sort_by_recently_published(papers))
 
     def df_to_papers(self, papers_df) -> List[Paper]:
         papers_dict = papers_df.to_dict(orient='records')
@@ -104,63 +130,9 @@ class PapersData():
 
         return self.load_papers_between_published_dates(from_date, to_date)
 
-class PapersFormatter():
-    """
-    Used to oncode papers as prompts
-    """
-
-    def papers_urls(self, papers: List[Paper]) -> str:
+    def papers_to_urls_str(self, papers: List[Paper]) -> str:
         urls = ""
         for i in papers:
             urls += i.url + '\n'
         return urls
-
-class PapersExtractor():
-    def extract_urls(self, data: str) -> List[str]:
-        if not type(data)==str:
-            raise Exception("Data to extract papers must be a string")
-
-        urls = []
-        for row in data.split('\n'):
-            for k, _  in enumerate(row):
-                if row[k] == 'h' and row[k + 1] == 't' and row[k + 2] == 't' and row[k + 3] == 'p':
-
-                    url_char = row[k]
-                    url = ''
-                    internal_k = k
-                    while url_char != ' ' and url_char != '\n' and internal_k<len(row):
-                        url_char = row[internal_k]
-                        url += url_char
-                        internal_k = internal_k+1
-
-                    urls.append(url)
-                    
-                    continue
-        return urls
-
-    def overlap_size(self, papers_a, papers_b):
-        overlap_size = 0 
-        for paper in papers_a:
-            if paper in papers_b:
-                overlap_size = overlap_size + 1
-            
-        total = len(papers_a) + len(papers_b)
-
-        return (2* overlap_size) / total
-        
-
-class BrowserPapers:
-    def fzf(self):
-        outoput = os.system('sota papers | /Users/jean.machado/.fzf/bin/fzf --layout=reverse  | sota browser_papers open_from_fzf')
-        print(outoput)
-
-    def open_from_fzf(self):
-        import sys
-        text = sys.stdin.readlines()[0]
-        paper_url = text.split(' ')[-2].strip()
-        print('"', paper_url,'"')
-        print('Opening paper: ', paper_url)
-        os.system(f"clipboard set_content {paper_url}")
-        Paper(arxiv_url=paper_url).download_and_open()
-
 

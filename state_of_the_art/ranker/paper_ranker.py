@@ -1,32 +1,24 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 
 from state_of_the_art.config import config
+from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.presenter import PaperHumanPresenter
-from state_of_the_art.paper.papers import PapersData, PapersFormatter, PapersExtractor
+from state_of_the_art.paper.papers_data import PapersData
+from state_of_the_art.paper.text_extractor import PapersExtractor
 from state_of_the_art.llm import LLM
 from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
+from state_of_the_art.report.report_parameters import ReportParemeters
 from state_of_the_art.utils.mail import Mail
 
 
 class PaperRanker:
     MAX_ARTICLES_TO_RETURN = 25
 
-    def rank(self, *, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, dry_run=False, article_slices=None, batch=1):
+    def rank(self, *, articles: List[Paper], parameters: ReportParemeters, dry_run=False):
         """
         Ranks existing papers by relevance
         """
-        if not to_date and not lookback_days:
-            lookback_days = config.DEFAULT_LOOK_BACK_DAYS
-
-        max_papers = config.sort_papers_max_to_compute
-        if not article_slices:
-            article_slices = (max_papers * (batch - 1), max_papers * batch)
-
-
-        print("Article slices ", article_slices)
-        print("Look back days ", lookback_days)
-
         prompt = f"""You are an world class expert in Data Science and computer science.
 Your task is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you..
 Highlight only topics that are exciting or import for yoru target audience
@@ -62,19 +54,6 @@ Ranked output of articles: ##start """
         if dry_run:
             print(prompt)
 
-        # two weeks ago
-        from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=lookback_days)).isoformat()
-        to_date = to_date if to_date else datetime.date.today().isoformat()
-
-        articles = PapersData().load_between_dates(from_date, to_date)
-        amount_of_articles = len(articles)
-        print("Found  ", amount_of_articles, f" articles with date filters but filtering down to {max_papers} ")
-
-        if amount_of_articles < max_papers:
-            article_slices = (0, amount_of_articles)
-        print("Slicing articles ", article_slices)
-
-        articles = articles[article_slices[0]:article_slices[1]]
         articles_str = self.get_articles_str(articles)
 
         if dry_run:
@@ -82,9 +61,6 @@ Ranked output of articles: ##start """
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
 
-        now = datetime.datetime.now().isoformat()
-        header = f"Results generated at {now} for period ({from_date}, {to_date}) analysed {amount_of_articles} papers: \n\n"
-        result = header + result
 
         urls = PapersExtractor().extract_urls(result)
         formatted_result = ""
@@ -94,18 +70,21 @@ Ranked output of articles: ##start """
             formatted_result+= f"{counter}. {presenter.present()} \n\n"
             counter = counter + 1
 
+        now = datetime.datetime.now().isoformat()
+        header = f"Results generated at {now} for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
+        result = header + result
         formatted_result = header + formatted_result
+        papers_str = PapersData().papers_to_urls_str(PapersData().df_to_papers(articles))
 
-        papers_str = PapersFormatter().papers_urls(PapersData().df_to_papers(articles))
-
-        ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
+        ranking_data = RankGeneratedData(from_date=parameters.from_date, to_date=parameters.to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
         print("Writing event")
         config.get_datawharehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
 
         print("Sending email")
-        Mail().send(formatted_result, f'Sota summary batch {batch} at {now}')
+        Mail().send(formatted_result, f'Sota summary batch {parameters.batch} at {now}')
 
         return formatted_result
+
 
     def get_articles_str(self, papers)->str:
         papers_str = " "

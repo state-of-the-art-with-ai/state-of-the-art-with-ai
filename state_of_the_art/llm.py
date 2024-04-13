@@ -68,7 +68,7 @@ PROMPT: {prompt[0:200]}...
     def _cost_check(self, prompt: str, prompt_input:str, expected_ouput_len=4000, ask_cost_confirmation=True):
         if ask_cost_confirmation:
             expected_cost = calculate_cost(chars_input=len(prompt_input) + len(prompt), chars_output=expected_ouput_len)
-            if expected_cost < 0.5:
+            if expected_cost < config.MINIMAL_CONFIRMATION_COST:
                 print("Cost is low {}, continuing without asking for confirmation".format(expected_cost))
                 return
 
