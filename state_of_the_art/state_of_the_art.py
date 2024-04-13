@@ -4,7 +4,7 @@ from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.papers import PapersData
 from state_of_the_art.papers import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight.paper_insight import InsightExtractor
-from state_of_the_art.paper import Paper
+from state_of_the_art.paper import Paper, PaperPresenter
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.report.reports import Report
@@ -29,6 +29,7 @@ class Sota:
         self.topic_search = TopicSearch
         self.SummaryFormatter = SummaryFormatter
         self.SummariesData = ReportsData
+        self.PaperPresenter = PaperPresenter
 
 
 

@@ -44,7 +44,7 @@ class TopicSearch:
         self.print_papers(papers)
 
     def print_papers(self, papers):
-        result = [ p.published_str() + ' ' + p.title[0:100] + ' ' + p.url for p in papers]
+        result = [p.published_date_str() + ' ' + p.title[0:100] + ' ' + p.url for p in papers]
         for r in result:
             print(r)
 

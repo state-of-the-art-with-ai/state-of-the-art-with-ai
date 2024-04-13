@@ -1,13 +1,15 @@
 
 import os
 from state_of_the_art.config import config
+
+
 class Paper():
     """
     Main dto to acceess papers functionality
 
     """
     def __init__(self,*, arxiv_url, published=None, title=None, abstract=None):
-        self._validate_arxiv_url(arxiv_url)
+        self.validate_abstract_url(arxiv_url)
         self.arxiv_url = arxiv_url
 
         self.url = arxiv_url
@@ -15,6 +17,15 @@ class Paper():
         self.title = title
         self.abstract = abstract
 
+
+    @staticmethod
+    def load_url_from_db(url) -> 'Paper':
+        from state_of_the_art.papers import PapersData
+        result = PapersData().load_from_url(url)
+        if result is None:
+            raise Exception(f"Paper with url {url} not found")
+        result = result.iloc[0].to_dict()
+        return Paper(arxiv_url=result['url'], published=result['published'], title=result['title'], abstract=result['abstract'])
 
     def to_dict(self):
         return {
@@ -24,11 +35,16 @@ class Paper():
             'abstract': self.abstract
         }
 
-    def published_str(self):
+    def published_date_str(self) -> str:
         return str(self.published)[0:10]
 
-    def _validate_arxiv_url(self, url):
-        if not url.startswith("https://arxiv.org") and not url.startswith("http://arxiv.org") :
+    @staticmethod
+    def validate_abstract_url(url):
+        if url.startswith("https://arxiv.org"):
+            raise Exception(f'The url via arxiv api is usually http we got: "{url}"')
+        if url.endswith(".pdf"):
+            raise Exception(f'This url is meant to be the abstract url, not the pdf url: "{url}"')
+        if not url.startswith("http://arxiv.org"):
             raise Exception(f'"{url}" not a valid arxiv url example')
 
     @staticmethod
@@ -87,3 +103,19 @@ class Paper():
         :return:
         """
         os.system(f"open {self.get_destination(self.url)}")
+
+
+class PaperPresenter:
+    def __init__(self, url):
+        self.paper = Paper.load_url_from_db(url)
+
+    @staticmethod
+    def present_from_url(url):
+        return PaperPresenter(url).present()
+
+    def present(self) -> str:
+        return f"""
+        Title: {self.paper.title}
+        Published: {self.paper.published_date_str()}
+        Abstract: {self.paper.abstract}
+        """

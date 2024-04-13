@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 from state_of_the_art.paper import Paper
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
@@ -29,7 +29,7 @@ class PapersData():
         from state_of_the_art.summaries import SummariesData
         latest_date = SummariesData().get_latest_date_covered_by_summary()
         print("Latest date covered by summary: ", latest_date)
-        today =  datetime.date.today().isoformat()
+        today = datetime.date.today().isoformat()
         papers = self.load_between_dates(latest_date, today)
 
         self.print_papers(papers)
@@ -37,9 +37,14 @@ class PapersData():
     def papers_schema(self):
         return list(self.load_papers().columns)
     
-    def load_from_url(self, url):
+    def load_from_url(self, url) -> Optional[pd.DataFrame]:
         papers = self.load_papers()
-        return papers[papers['url'] == url].to_string()
+        result = papers[papers['url'] == url]
+
+        if result.empty:
+            return None
+
+        return result
 
     def load_from_urls(self, urls):
         papers = self.load_papers()
@@ -136,8 +141,6 @@ class PapersExtractor():
 
         return (2* overlap_size) / total
         
-        
-
 
 class BrowserPapers:
     def fzf(self):

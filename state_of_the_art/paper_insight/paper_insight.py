@@ -39,9 +39,6 @@ class InsightExtractor:
         tdw = DataWharehouse()
         tdw.write_event('sota_paper_insight', {'pdf_url': url, 'insights': result, 'prompt': prompt})
     def _get_prompt(self, question_topic=None) -> str:
-
-
-
         QUESTIONS = ""
 
         counter = 1
