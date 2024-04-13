@@ -1,11 +1,12 @@
-
-import sys
 import datetime
-from typing import Optional, Any
+from typing import Optional
 
 from state_of_the_art.config import config
-from state_of_the_art.papers import PapersData, PapersFormatter
+from state_of_the_art.paper.presenter import PaperHumanPresenter
+from state_of_the_art.papers import PapersData, PapersFormatter, PapersExtractor
 from state_of_the_art.llm import LLM
+from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
+from state_of_the_art.utils.mail import Mail
 
 
 class PaperRanker:
@@ -24,8 +25,6 @@ class PaperRanker:
 
 
         print("Article slices ", article_slices)
-
-
         print("Look back days ", lookback_days)
 
         prompt = f"""You are an world class expert in Data Science and computer science.
@@ -83,17 +82,30 @@ Ranked output of articles: ##start """
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
 
-        header =  f"Results generated at {datetime.datetime.now().isoformat()} for period ({from_date}, {to_date}) analysed {amount_of_articles} papers: \n\n"
+        now = datetime.datetime.now().isoformat()
+        header = f"Results generated at {now} for period ({from_date}, {to_date}) analysed {amount_of_articles} papers: \n\n"
         result = header + result
-        from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-        tdw = DataWharehouse()
+
+        urls = PapersExtractor().extract_urls(result)
+        formatted_result = ""
+        counter = 1
+        for url in urls:
+            presenter = PaperHumanPresenter(url)
+            formatted_result+= f"{counter}. {presenter.present()} \n\n"
+            counter = counter + 1
+
+        formatted_result = header + formatted_result
 
         papers_str = PapersFormatter().papers_urls(PapersData().df_to_papers(articles))
-        ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=result, papers_analysed=papers_str)
-        if not dry_run:
-            tdw.write_event('state_of_the_art_summary', ranking_data.to_dict())
-        return result, header
 
+        ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
+        print("Writing event")
+        config.get_datawharehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
+
+        print("Sending email")
+        Mail().send(formatted_result, f'Sota summary batch {batch} at {now}')
+
+        return formatted_result
 
     def get_articles_str(self, papers)->str:
         papers_str = " "
@@ -105,22 +117,6 @@ Ranked output of articles: ##start """
             """
         return papers_str
 
-class RankGeneratedData:
-    prompt: str
-    from_date: Any
-    to_date: Any
-    summary: str
-
-
-    def __init__(self, from_date, to_date, prompt, summary, papers_analysed) -> None:
-        self.from_date = from_date
-        self.to_date = to_date
-        self.prompt = prompt
-        self.summary = summary
-        self.papers_analysed = papers_analysed
-
-    def to_dict(self):
-        return {'summary': self.summary, 'from_date': self.from_date, 'to_date': self.to_date, 'prompt': self.prompt, 'papers_analysed': self.papers_analysed}
 
 if __name__ == "__main__":
     import fire

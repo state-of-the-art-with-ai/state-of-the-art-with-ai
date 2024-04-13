@@ -9,8 +9,8 @@ class PaperHumanPresenter:
         return PaperHumanPresenter(url).present()
 
     def present(self) -> str:
-        return f"""Title: {self.paper.title}
-Published: {self.paper.published_date_str()}
-Abstract: {self.paper.abstract}
-URL: {self.paper.arxiv_url}
+        return f"""\n{self.paper.title}
+{self.paper.arxiv_url}
+Published: {self.paper.published_date_str()}\n
+Abstract: {self.paper.safe_abstract()}
         """

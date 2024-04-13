@@ -35,6 +35,10 @@ class Paper():
             'abstract': self.abstract
         }
 
+
+    def safe_abstract(self):
+         return ''.join(c for c in self.abstract if c.isalnum() or c in [' ', '\n', '.', ','])
+
     def published_date_str(self) -> str:
         return str(self.published)[0:10]
 

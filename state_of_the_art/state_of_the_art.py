@@ -12,6 +12,7 @@ from state_of_the_art.report.reports import Report
 from state_of_the_art.topic_deepdive.search import TopicSearch
 from state_of_the_art.report.formatter import SummaryFormatter
 from state_of_the_art.report.reports import ReportsData
+from state_of_the_art.utils.mail import Mail
 
 
 class Sota:
@@ -31,6 +32,7 @@ class Sota:
         self.SummaryFormatter = SummaryFormatter
         self.SummariesData = ReportsData
         self.PaperHumanPresenter = PaperHumanPresenter
+        self.Mail = Mail
 
 
 

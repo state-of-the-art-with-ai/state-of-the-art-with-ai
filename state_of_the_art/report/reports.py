@@ -23,21 +23,9 @@ class Report():
         else:
             print("Skipping registering papers")
 
-        result, header = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date, batch=batch)
+        result = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date, batch=batch)
 
-        urls = PapersExtractor().extract_urls(result)
-        formatted_result = ""
-        counter = 1
-        for url in urls:
-            presenter = PaperHumanPresenter(url)
-            formatted_result+= f"{counter}. {presenter.present()} \n\n"
-            counter = counter + 1
-
-
-        formatted_result = header + formatted_result
-
-        Mail().send(formatted_result, f'Sota summary batch {batch}')
-        return formatted_result
+        return result
 
     def latest(self):
         return ReportsData().get_latest_summary()
