@@ -20,10 +20,11 @@ class PapersData():
         else:
             papers = self.load_papers()
 
+        papers = self.sort_by_recently_published(papers)
         if n:
             papers = papers.head(n)
 
-        self.print_papers(self.sort_by_recently_published(papers))
+        self.print_papers(papers)
 
     def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1):
         if not to_date and not lookback_days:
@@ -51,7 +52,6 @@ class PapersData():
         articles = articles[article_slices[0]:article_slices[1]]
 
         return articles
-
     def load_papers(self):
         tdw = DataWharehouse()
         df = tdw.event('arxiv_papers')
