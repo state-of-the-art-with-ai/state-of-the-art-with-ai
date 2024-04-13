@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, List
+from typing import List
 
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
@@ -15,6 +15,8 @@ from state_of_the_art.utils.mail import Mail
 class PaperRanker:
     MAX_ARTICLES_TO_RETURN = 25
 
+    def __init__(self):
+        self._enable_abstract_in_ranking = False
     def rank(self, *, articles: List[Paper], parameters: ReportParemeters, dry_run=False):
         """
         Ranks existing papers by relevance
@@ -61,14 +63,17 @@ Ranked output of articles: ##start """
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
 
-
         urls = PapersExtractor().extract_urls(result)
         formatted_result = ""
         counter = 1
         for url in urls:
-            presenter = PaperHumanPresenter(url)
-            formatted_result+= f"{counter}. {presenter.present()} \n\n"
-            counter = counter + 1
+            try:
+                presenter = PaperHumanPresenter(url)
+                formatted_result+= f"{counter}. {presenter.present()} \n\n"
+                counter = counter + 1
+            except Exception as e:
+                print(f"Error processing url {url}: {e}")
+                continue
 
         now = datetime.datetime.now().isoformat()
         header = f"Results generated at {now} for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
@@ -89,11 +94,13 @@ Ranked output of articles: ##start """
     def get_articles_str(self, papers)->str:
         papers_str = " "
         for i in papers.iterrows():
+            abstract_row =   f'Abstract: {i[1]['abstract'][0:config.MAX_ABSTRACT_SIZE_RANK]}' if self._enable_abstract_in_ranking else ''
             papers_str += f"""
-    Title: {i[1]['title']}
-    Abstract: {i[1]['abstract'][0:config.MAX_ABSTRACT_SIZE_RANK]}
-    Arxiv URL: {i[1]['url']}
-            """
+Title: {i[1]['title']}
+Arxiv URL: {i[1]['url']}
+Published: {i[1]['published']}
+{abstract_row}
+"""
         return papers_str
 
 

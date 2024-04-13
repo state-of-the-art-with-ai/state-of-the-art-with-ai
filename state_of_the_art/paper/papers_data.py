@@ -30,7 +30,7 @@ class PapersData():
         if not to_date and not lookback_days:
             lookback_days = config.DEFAULT_LOOK_BACK_DAYS
 
-        max_papers = config.sort_papers_max_to_compute
+        max_papers = config.RANK_MAX_PAPERS_TO_COMPUTE
         if not article_slices:
             article_slices = (max_papers * (batch - 1), max_papers * batch)
 

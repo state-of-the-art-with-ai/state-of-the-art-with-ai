@@ -11,11 +11,11 @@ class Config():
     MINIMAL_CONFIRMATION_COST = 0.35
 
     # the maximum number of papers to compute while sorting the batch of papers
-    sort_papers_gpt_model = 'gpt-4-turbo-preview'
-    sort_papers_max_to_compute = 800 
+    GPT_MODEL = 'gpt-4-turbo-preview'
+    RANK_MAX_PAPERS_TO_COMPUTE = 2000
     # the maximum allowed context lenght for the open-ai model
     MAX_CHARS_CONTEXT_LENGHT = 128000 * 4 
-    open_ai_key = os.environ['SOTA_OPENAI_KEY']
+    OPEN_API_KEY = os.environ['SOTA_OPENAI_KEY']
 
     def get_current_audience(self) -> Audience:
         from state_of_the_art.preferences.audience import get_current_audience

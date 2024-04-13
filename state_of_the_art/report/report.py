@@ -12,7 +12,7 @@ class Report():
     """
     def __init__(self):
         pass
-    def generate(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1):
+    def generate(self, *, lookback_days=None,  from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
@@ -31,7 +31,6 @@ class Report():
         result = PaperRanker().rank(articles=articles, parameters=parameters)
 
         return result
-
 
     def latest(self):
         return ReportsData().get_latest_summary()
