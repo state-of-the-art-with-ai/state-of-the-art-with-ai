@@ -4,7 +4,7 @@ from state_of_the_art.config import config
 import datetime
 
 from state_of_the_art.utils.mail import Mail
-from state_of_the_art.paper import Paper
+from state_of_the_art.paper.paper import Paper
 
 
 class Bookmark():

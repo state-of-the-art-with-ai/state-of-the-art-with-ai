@@ -1,5 +1,6 @@
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 
+from state_of_the_art.paper.presenter import PaperHumanPresenter
 from state_of_the_art.utils.mail import Mail
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.papers import PapersExtractor, PapersData
@@ -7,6 +8,10 @@ from state_of_the_art.ranker.paper_ranker import PaperRanker
 
 
 class Report():
+    """
+    Class responsible to the entire generation pipeline
+
+    """
     def __init__(self):
         pass
     def generate(self, *, lookback_days=None, topic=None, from_date=None, skip_register=False, dry_run=False, batch=1):
@@ -18,11 +23,21 @@ class Report():
         else:
             print("Skipping registering papers")
 
-        result = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date, batch=batch)
+        result, header = PaperRanker().rank(lookback_days=lookback_days, from_date=from_date, batch=batch)
+
+        urls = PapersExtractor().extract_urls(result)
+        formatted_result = ""
+        counter = 1
+        for url in urls:
+            presenter = PaperHumanPresenter(url)
+            formatted_result+= f"{counter}. {presenter.present()} \n\n"
+            counter = counter + 1
 
 
-        Mail().send(result, f'Sota summary batch {batch}')
-        return result
+        formatted_result = header + formatted_result
+
+        Mail().send(formatted_result, f'Sota summary batch {batch}')
+        return formatted_result
 
     def latest(self):
         return ReportsData().get_latest_summary()

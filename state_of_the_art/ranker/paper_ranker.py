@@ -5,7 +5,7 @@ from typing import Optional, Any
 
 from state_of_the_art.config import config
 from state_of_the_art.papers import PapersData, PapersFormatter
-from state_of_the_art.llm import calculate_cost
+from state_of_the_art.llm import LLM
 
 
 class PaperRanker:
@@ -63,13 +63,6 @@ Ranked output of articles: ##start """
         if dry_run:
             print(prompt)
 
-        from langchain import PromptTemplate, LLMChain
-        from langchain_community.chat_models import ChatOpenAI
-
-        prompt_template = PromptTemplate(template=prompt, input_variables=["text"])
-        llm = ChatOpenAI(temperature=0.0, model=config.sort_papers_gpt_model, openai_api_key=config.open_ai_key)
-        chain =LLMChain(llm=llm, prompt=prompt_template,verbose=True)
-
         # two weeks ago
         from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=lookback_days)).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()
@@ -84,33 +77,25 @@ Ranked output of articles: ##start """
 
         articles = articles[article_slices[0]:article_slices[1]]
         articles_str = self.get_articles_str(articles)
-        cost = calculate_cost(chars_input=len(articles), chars_output=4000)
 
-        user_input = input(f"""Ranking generation of ({len(articles.index)}) articles from {from_date} to {to_date} cost estimate ${cost}.
-    Press c to continue: """)
-        if user_input != 'c':
-            print("Aborting")
-            sys.exit(1)
+        if dry_run:
+            return "Dry run result"
 
-        if not dry_run:
-            result = chain.run(articles_str)
-        else:
-            result = "Dry run result"
+        result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
 
-        result = f"Results generated at {datetime.datetime.now().isoformat()} for period ({from_date}, {to_date}) analysed {amount_of_articles} papers: \n\n" + result
+        header =  f"Results generated at {datetime.datetime.now().isoformat()} for period ({from_date}, {to_date}) analysed {amount_of_articles} papers: \n\n"
+        result = header + result
         from tiny_data_wharehouse.data_wharehouse import DataWharehouse
         tdw = DataWharehouse()
 
         papers_str = PapersFormatter().papers_urls(PapersData().df_to_papers(articles))
-        print(papers_str)
         ranking_data = RankGeneratedData(from_date=from_date, to_date=to_date, prompt=prompt, summary=result, papers_analysed=papers_str)
         if not dry_run:
             tdw.write_event('state_of_the_art_summary', ranking_data.to_dict())
-        return result
+        return result, header
 
 
     def get_articles_str(self, papers)->str:
-
         papers_str = " "
         for i in papers.iterrows():
             papers_str += f"""

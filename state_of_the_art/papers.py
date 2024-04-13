@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 
-from state_of_the_art.paper import Paper
+from state_of_the_art.paper.paper import Paper
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime

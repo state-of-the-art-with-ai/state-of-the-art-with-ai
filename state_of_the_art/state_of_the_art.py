@@ -4,7 +4,8 @@ from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.papers import PapersData
 from state_of_the_art.papers import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight.paper_insight import InsightExtractor
-from state_of_the_art.paper import Paper, PaperPresenter
+from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.presenter import PaperHumanPresenter
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.report.reports import Report
@@ -15,6 +16,7 @@ from state_of_the_art.report.reports import ReportsData
 
 class Sota:
     def __init__(self):
+        self.report = Report
         self.browser_papers = browser_papers
         self.papers_ui = browser_papers().fzf
         self.papers = PapersData().display
@@ -22,14 +24,13 @@ class Sota:
         self.paper_miner = ArxivPaperMiner()
         self.arxiv = self.paper_miner
         self.find_latest_papers = self.paper_miner.find_latest_papers
-        self.report = Report
         self.InsightExtractor = InsightExtractor
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
         self.topic_search = TopicSearch
         self.SummaryFormatter = SummaryFormatter
         self.SummariesData = ReportsData
-        self.PaperPresenter = PaperPresenter
+        self.PaperHumanPresenter = PaperHumanPresenter
 
 
 

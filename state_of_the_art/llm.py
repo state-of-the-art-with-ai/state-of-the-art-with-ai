@@ -23,6 +23,8 @@ def calculate_cost(*, chars_input=None, chars_output=None, tokens_input=None, to
 
     input_cost = (tokens_input / 1000000) * input_cost_per_million
     output_cost = (tokens_output / 1000000) * output_cost_per_million
+    print(f"Input cost {input_cost} for {tokens_input} tokens ({chars_input} chars)")
+    print(f"Output cost {output_cost} for {tokens_output} tokens ({chars_output} chars)")
 
     return input_cost + output_cost
 
@@ -51,21 +53,21 @@ class LLM:
             self.mock = True
 
 
-    def call(self, prompt, input, expected_ouput_len=4000, ask_cost_confirmation=True):
+    def call(self, prompt: str, prompt_input: str, expected_ouput_len=4000, ask_cost_confirmation=True) -> str:
         if self.mock:
             return f"""Mocked llm return
-INPUT: {input}
+INPUT: {prompt_input}
 PROMPT: {prompt[0:200]}...
             """
 
-        self._cost_check(prompt, input, expected_ouput_len, ask_cost_confirmation)
+        self._cost_check(prompt, prompt_input, expected_ouput_len, ask_cost_confirmation)
 
 
-        return call_chatgpt(prompt, input)
+        return call_chatgpt(prompt, prompt_input)
 
-    def _cost_check(self, prompt, input, expected_ouput_len=4000, ask_cost_confirmation=True):
+    def _cost_check(self, prompt: str, prompt_input:str, expected_ouput_len=4000, ask_cost_confirmation=True):
         if ask_cost_confirmation:
-            expected_cost = calculate_cost(chars_input=len(input) + len(prompt), chars_output=expected_ouput_len)
+            expected_cost = calculate_cost(chars_input=len(prompt_input) + len(prompt), chars_output=expected_ouput_len)
             if expected_cost < 0.5:
                 print("Cost is low {}, continuing without asking for confirmation".format(expected_cost))
                 return

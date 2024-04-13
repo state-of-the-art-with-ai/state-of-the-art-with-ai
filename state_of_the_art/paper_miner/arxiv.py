@@ -2,7 +2,7 @@ import arxiv
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal
 from state_of_the_art.config import config
-from state_of_the_art.paper import Paper
+from state_of_the_art.paper.paper import Paper
 class ArxivPaperMiner():
     """
     Looks at arxiv api for papers

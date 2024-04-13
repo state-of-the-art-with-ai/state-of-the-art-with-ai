@@ -1,8 +1,8 @@
 
 from state_of_the_art.config import config
 import sys
-from state_of_the_art.llm import calculate_cost, call_chatgpt, LLM
-from state_of_the_art.paper import Paper
+from state_of_the_art.llm import LLM
+from state_of_the_art.paper.paper import Paper
 
 
 class InsightExtractor:
