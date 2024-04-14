@@ -71,6 +71,13 @@ class Paper():
         result += '.pdf'
         return result
 
+    @staticmethod
+    def convert_pdf_to_abstract(url):
+        url = url.replace('.pdf', '')
+        url = url.replace('pdf', 'abs')
+        url = url.replace('https://', 'http://')
+        return url
+
     def download(self) -> str:
         """
         Downloads a paper from a given url

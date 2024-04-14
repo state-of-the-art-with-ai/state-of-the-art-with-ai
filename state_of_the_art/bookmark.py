@@ -21,20 +21,23 @@ class Bookmark():
         dwh = config.get_datawharehouse()
         dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
 
-        result  = ""
+        result  = "Bookmarks: \n\n"
+        counter = 1
         for i in dict:
             paper_title = "Title not found"
+            paper_url = Paper.convert_pdf_to_abstract(dict[i]['paper_url'])
             try:
-                paper = Paper.load_paper_from_url(dict[i]['paper_url'])
+                paper = Paper.load_paper_from_url(paper_url)
                 paper_title = paper.title
             except Exception as e:
                 pass
-            result += f"""{str(dict[i]['bookmarked_date']).split(' ')[0]} {dict[i]['paper_url']}
+            result += f"""{counter}. Title: {paper_title} 
+{paper_url}
+Date bookmark: {str(dict[i]['bookmarked_date']).split(' ')[0]}
 Comment: {dict[i]['comment']} 
-Title: {paper_title} 
-
 
 """
+            counter += 1
 
         if return_result:
             return result

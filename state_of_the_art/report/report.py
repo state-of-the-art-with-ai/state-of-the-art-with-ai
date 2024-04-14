@@ -1,9 +1,10 @@
 from state_of_the_art.paper.papers_data import PapersData
+from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.report.report_parameters import ReportParemeters
 from state_of_the_art.report.reports_data import ReportsData
-
+import sys
 
 class Report():
     """
@@ -12,7 +13,7 @@ class Report():
     """
     def __init__(self):
         pass
-    def generate(self, *, lookback_days=None,  from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1):
+    def generate(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
@@ -23,7 +24,16 @@ class Report():
         else:
             print("Skipping registering papers")
 
-        articles = PapersData().get_latest_articles(lookback_days=lookback_days, from_date=from_date, batch=batch)
+
+        if not sys.stdin.isatty():
+            print("Reading from stdin")
+            data = sys.stdin.readlines()
+            text = "".join(data)
+            urls = PapersUrlsExtractor().extract_urls(text)
+            articles = PapersData().load_from_urls(urls)
+            print(urls)
+        else:
+            articles = PapersData().get_latest_articles(lookback_days=lookback_days, from_date=from_date, batch=batch)
         print(f"Found {len(articles)} articles")
         if len(articles) == 0:
             return "No articles found"

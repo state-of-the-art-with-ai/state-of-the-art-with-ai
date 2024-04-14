@@ -5,7 +5,7 @@ from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.presenter import PaperHumanPresenter
 from state_of_the_art.paper.papers_data import PapersData
-from state_of_the_art.paper.text_extractor import PapersExtractor
+from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.llm import LLM
 from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
 from state_of_the_art.report.report_parameters import ReportParemeters
@@ -63,7 +63,7 @@ Ranked output of articles: ##start """
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
 
-        urls = PapersExtractor().extract_urls(result)
+        urls = PapersUrlsExtractor().extract_urls(result)
         formatted_result = ""
         counter = 1
         for url in urls:

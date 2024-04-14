@@ -1,7 +1,7 @@
 from typing import List
 
 
-class PapersExtractor():
+class PapersUrlsExtractor():
     def extract_urls(self, data: str) -> List[str]:
         if not type(data)==str:
             raise Exception("Data to extract papers must be a string")

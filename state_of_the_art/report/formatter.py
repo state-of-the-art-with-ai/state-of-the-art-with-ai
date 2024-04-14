@@ -1,4 +1,4 @@
-from state_of_the_art.paper.text_extractor import PapersExtractor
+from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.report.reports_data import ReportsData
 
 
@@ -7,7 +7,7 @@ class SummaryFormatter:
     def format_latest_summary(self):
         return self.format(ReportsData().get_latest_summary())
     def format(self, base_summary):
-        urls = PapersExtractor().extract_urls(base_summary)
+        urls = PapersUrlsExtractor().extract_urls(base_summary)
         result = ""
 
         for url in urls:

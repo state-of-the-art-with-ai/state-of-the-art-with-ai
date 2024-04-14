@@ -94,7 +94,9 @@ class PapersData():
         papers = self.load_papers()
         result = papers[papers['url'].isin(urls)]
 
-        print("Found ", len(result), " papers")
+        if len(result) != len(urls):
+            raise Exception(f"Found {len(result)} papers but expected {len(urls)}")
+
         return result
 
 

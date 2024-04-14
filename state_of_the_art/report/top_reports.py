@@ -1,5 +1,5 @@
 from state_of_the_art.paper.papers import PapersData
-from state_of_the_art.paper.text_extractor import PapersExtractor
+from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.report.reports_data import ReportsData
 
 
@@ -10,7 +10,7 @@ class TopReports():
         for i in range(-1,-(extractions+1),-1):
             try:
                 summary = ReportsData().get_latest_summary(i)
-                extracted_papers = PapersExtractor().extract_urls(summary)[0:top_n]
+                extracted_papers = PapersUrlsExtractor().extract_urls(summary)[0:top_n]
             except:  # catch the exception
                 print(" Extraction error ")
                 continue
