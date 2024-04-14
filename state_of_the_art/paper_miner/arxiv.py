@@ -40,6 +40,11 @@ class ArxivPaperMiner():
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
+    def inspect_latest(self, *, query=None, n=10):
+        """"
+        Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
+        """
+        self._find_papers(query=query, number_of_papers=n, sort_by='submitted', only_print=True)
 
     def register_papers_by_topic(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance' ] = 'submitted', dry_run=False):
         """
@@ -85,11 +90,6 @@ class ArxivPaperMiner():
             return
         return result
 
-    def find_latest_papers(self, *, query=None):
-        """"
-        Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
-        """
-        self._find_papers(query=query, number_of_papers=30, sort_by='submitted', only_print=True)
 
     def _register_given_papers(self, papers):
         tdw = DataWharehouse()

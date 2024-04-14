@@ -21,9 +21,8 @@ class Sota:
         self.papers_ui = browser_papers().fzf
         self.papers = PapersData().display
         self.rank = PaperRanker().rank
-        self.paper_miner = ArxivPaperMiner()
-        self.arxiv = self.paper_miner
-        self.find_latest_papers = self.paper_miner.find_latest_papers
+        self.ArxivPaperMiner = ArxivPaperMiner()
+        self.find_latest_papers = self.ArxivPaperMiner.inspect_latest
         self.InsightExtractor = InsightExtractor
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
