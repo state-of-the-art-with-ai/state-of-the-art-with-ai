@@ -91,6 +91,7 @@ class PapersData():
         return result
 
     def load_from_urls(self, urls):
+        urls = list(set(urls))
         papers = self.load_papers()
         result = papers[papers['url'].isin(urls)]
 

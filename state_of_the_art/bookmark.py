@@ -6,7 +6,6 @@ import datetime
 from state_of_the_art.utils.mail import Mail
 from state_of_the_art.paper.paper import Paper
 
-
 class Bookmark():
 
     EVENT_NAME = 'paper_bookmarks'

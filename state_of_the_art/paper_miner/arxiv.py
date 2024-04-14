@@ -1,6 +1,6 @@
 import arxiv
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-from typing import Literal
+from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
 class ArxivPaperMiner():
@@ -40,6 +40,10 @@ class ArxivPaperMiner():
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
+    def register_by_id(self, id):
+        papers = self._find_papers(id_list=[id], only_print=False)
+        return self._register_given_papers(papers)
+
     def inspect_latest(self, *, query=None, n=10):
         """"
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
@@ -60,8 +64,8 @@ class ArxivPaperMiner():
 
     def query_papers(self, query):
         self._find_papers(query, number_of_papers=15, sort_by='relevance', only_print=True)
-    def _find_papers(self, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False):
-        if not query:
+    def _find_papers(self, id_list=None, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False)->List[Paper]:
+        if not query and not id_list:
             print("No query provided, using default query")
             query = self.DEFAULT_QUERY
 
@@ -70,12 +74,20 @@ class ArxivPaperMiner():
 
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 
-        print({'query': query, 'sort_by': sort_by})
-        search = arxiv.Search(
-            query=query,
-            max_results = number_of_papers,
-            sort_by = sort
-        )
+        print({'query': query, 'sort_by': sort_by, 'id_list': id_list, 'number_of_papers': number_of_papers})
+
+        if id_list:
+            search = arxiv.Search(
+                id_list=id_list,
+                max_results = number_of_papers,
+                sort_by = sort
+            )
+        else:
+            search = arxiv.Search(
+                query=query,
+                max_results = number_of_papers,
+                sort_by = sort
+            )
 
         result = []
         order_counter = 1
@@ -83,15 +95,15 @@ class ArxivPaperMiner():
             paper = Paper(title=r.title, abstract=r.summary, arxiv_url=r.entry_id, published=r.published)
             result.append(paper)
             print(order_counter, paper.published, paper.title, paper.url)
-
             order_counter += 1
+        print("Found ", len(result), " papers")
 
         if only_print:
             return
         return result
 
 
-    def _register_given_papers(self, papers):
+    def _register_given_papers(self, papers: List[Paper]):
         tdw = DataWharehouse()
 
         arxiv_papers = tdw.event('arxiv_papers')
@@ -109,6 +121,7 @@ class ArxivPaperMiner():
             registered+=1
             tdw.write_event('arxiv_papers', paper.to_dict())
 
+        print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
         return registered, skipped
 
 
