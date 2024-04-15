@@ -3,7 +3,7 @@ from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
-class ArxivPaperMiner():
+class ArxivMiner():
     """
     Looks at arxiv api for papers
     """
@@ -13,7 +13,7 @@ class ArxivPaperMiner():
     def __init__(self):
         self.config = config
 
-    def register_papers(self, dry_run=False, disable_relevance_miner=False):
+    def register_new_papers(self, dry_run=False, disable_relevance_miner=False):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:

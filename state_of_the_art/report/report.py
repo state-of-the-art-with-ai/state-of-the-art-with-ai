@@ -1,6 +1,6 @@
 from state_of_the_art.paper.papers_data import PapersData
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
-from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
+from state_of_the_art.paper_miner.arxiv import ArxivMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.report.report_parameters import ReportParemeters
 from state_of_the_art.report.reports_data import ReportsData
@@ -20,7 +20,7 @@ class Report():
         parameters = ReportParemeters(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch)
 
         if not skip_register:
-            ArxivPaperMiner().register_papers(dry_run=dry_run)
+            ArxivMiner().register_new_papers(dry_run=dry_run)
         else:
             print("Skipping registering papers")
 
