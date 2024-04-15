@@ -27,16 +27,15 @@ class PapersData():
         self.print_papers(papers)
 
     def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1):
-        if not to_date and not lookback_days:
+        if not from_date and not lookback_days:
             lookback_days = config.DEFAULT_LOOK_BACK_DAYS
 
         max_papers = config.RANK_MAX_PAPERS_TO_COMPUTE
         if not article_slices:
             article_slices = (max_papers * (batch - 1), max_papers * batch)
 
-
-        print("Article slices ", article_slices)
         print("Look back days ", lookback_days)
+        print("Article slices ", article_slices)
 
         from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=lookback_days)).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()

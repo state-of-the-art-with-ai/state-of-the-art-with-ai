@@ -1,4 +1,5 @@
 
+import os
 from typing import Optional
 from state_of_the_art.config import config
 import datetime
@@ -15,6 +16,19 @@ class Bookmark():
 
         dwh = config.get_datawharehouse()
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper.arxiv_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
+
+
+    def add_from_clipboard(self):
+        import subprocess
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        url = url.strip()
+
+        if not Paper.is_valid_abstract_url(url):
+            return f"Invalid url {url}"
+
+        self.add(url, 'regisered interest')
+
+
 
     def list(self, return_result=True):
         dwh = config.get_datawharehouse()

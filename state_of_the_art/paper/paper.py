@@ -59,6 +59,16 @@ class Paper():
             raise Exception(f'"{url}" not a valid arxiv url example')
 
     @staticmethod
+    def is_valid_abstract_url(url) -> bool:
+        try:
+            Paper.validate_abstract_url(url)
+            return True
+        except Exception as e:
+            print(f"Error validating url {url}: {e}")
+            return False
+
+
+    @staticmethod
     def is_abstract_url(url):
         if (url.startswith("https://arxiv.org") or url.startswith("http://arxiv.org")) and 'abs' in url:
             return True

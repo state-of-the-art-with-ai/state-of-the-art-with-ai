@@ -1,6 +1,8 @@
 from typing import Any, List
 import os
 
+from state_of_the_art.preferences.paper_questions import PAPER_TASKS
+
 COMMON_KEYWORDS = [
     'cs.AI', 'cs.LG', 'cs.SI', 'stat.ML',
     'ai', 'machine learning',
@@ -21,36 +23,6 @@ keywords that did not work well
 KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
                    'construction engineering', 'material science', 'robotics', 'mobility', 'geology']
 
-
-PAPER_TASKS = {
-    'top_insights': """What are the key insights of the paper?
-Highlight only key insights, ideally actionable ones.
-The insights can come form the results of the paper or form literature review
-Highlight 3 insights.
-Avoid trivial insights that are common knowledge for your audience.
-Avoid salesly insights that are not backed up by data.
-Highlight also insights from the literature review in the paper.
-Follow the following example structure when reporting your insights:
-
-Structure example stars:
-Insight example 1: "One can understand if networks are modular in neural nets by using a a method using differentiable weight masks" 
-More details on how: "using binary weight masks to identify individual weights and subnets
-responsible for specific functions testing several standard architectures
-and datasets demonstrate how common NNs fail to reuse submodules and offer
-new insights into the related issue of systematic generalization on language tasks"
-Institution : Microsoft 
-Authors: Róbert Csordás, Alex lamb
-Relevance: Explain why its relevant
-Exact part in text: mention here a few words from the text that support the insight
-    """,
-    'methodology': """Is the methodoloy and claims of the  paper sound? What are the weaknessess? Act like a scientific reviewer and provide a critique of the methodology of the paper""",
-    'literature_review': 'What is the most interesting part of this paper in the literature review?',
-    'hardest_part': """What is the more complex part of the paper?
-First identify what it is and define it well. Explain terms that are not necessarily explained in the paper but are crucial to understand the hardest part.
-Then break down the topic on its parts and explain them as well.
-First explain it normally and then explain it in analogies.
-"""
-}
 
 class Audience:
     audience_description: str

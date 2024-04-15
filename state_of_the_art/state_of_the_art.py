@@ -3,7 +3,7 @@ from state_of_the_art.paper_miner.arxiv import ArxivPaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.paper.papers_data import PapersData
 from state_of_the_art.paper.browser import BrowserPapers as browser_papers
-from state_of_the_art.paper_insight.paper_insight import InsightExtractor
+from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.presenter import PaperHumanPresenter
 
@@ -23,7 +23,7 @@ class Sota:
         self.rank = PaperRanker().rank
         self.ArxivPaperMiner = ArxivPaperMiner()
         self.find_latest_papers = self.ArxivPaperMiner.inspect_latest
-        self.InsightExtractor = InsightExtractor
+        self.PaperInsightExtractor = PaperInsightExtractor
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
         self.topic_search = TopicSearch
