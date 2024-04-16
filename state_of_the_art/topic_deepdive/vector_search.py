@@ -1,5 +1,6 @@
 import os
 
+import sys
 from state_of_the_art.paper.papers_data import PapersData
 
 
@@ -40,7 +41,13 @@ class VectorSearch:
 
         return collection
 
-    def search(self, query, n=20):
+    def search(self, query=None, n=20):
+
+        if not query:
+            if not sys.stdin.isatty():
+                data = sys.stdin.readlines()
+                query = "".join(data)
+
         ids = self.collection.query(query_texts=[query], n_results=n)['ids'][0]
         print(ids)
 

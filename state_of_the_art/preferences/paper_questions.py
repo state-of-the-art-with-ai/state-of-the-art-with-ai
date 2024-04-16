@@ -4,7 +4,7 @@ PAPER_TASKS = {
     'top_insights': """What are the key insights of the paper?
 Highlight only key insights, ideally actionable ones.
 The insights can come form the results of the paper or form literature review
-Highlight 2 insights.
+Highlight 3-4 insights.
 Avoid trivial insights that are common knowledge for your audience.
 Avoid salesly insights that are not backed up by data.
 Highlight also insights from the literature review in the paper.
