@@ -19,6 +19,7 @@ nltk = "^3.8.1"
 rank-bm25 = "^0.2.2"
 jupyter = "^1.0.0"
 langchain-core = "^0.1.42"
+chromadb = "^0.4.24"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"

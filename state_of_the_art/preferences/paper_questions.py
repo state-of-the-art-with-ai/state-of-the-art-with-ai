@@ -19,5 +19,5 @@ First explain it normally and then explain it in analogies.
 """,
     'methodology': """Is the methodoloy and claims of the  paper sound? What are the weaknessess? Be skeptical, act like a scientific reviewer and provide a critique of the methodology of the paper""",
     'main_finding': """What is the main finding of this paper? """,
-    'opportunity_cost': 'As a human being with limited time should i read this paper or should I look into others instead? You should say no to at least 70% of the papers you see. Would it fit my interests and goals?',
+    'do_i_want_to_read_this': 'As a human being with limited time should i read this paper or should I look into others instead? Give a confidence score from 0 to 100 if i should read it and explain why',
 }

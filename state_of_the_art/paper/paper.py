@@ -43,6 +43,10 @@ class Paper():
         }
 
 
+    def __str__(self):
+        return f"Title: {self.title} \nPublished: {self.published} \nUrl: {self.url}\n"
+
+
     def safe_abstract(self):
          return ''.join(c for c in self.abstract if c.isalnum() or c in [' ', '\n', '.', ','])
 
@@ -51,8 +55,6 @@ class Paper():
 
     @staticmethod
     def validate_abstract_url(url):
-        if url.startswith("https://arxiv.org"):
-            raise Exception(f'The url via arxiv api is usually http we got: "{url}"')
         if url.endswith(".pdf"):
             raise Exception(f'This url is meant to be the abstract url, not the pdf url: "{url}"')
         if not url.startswith("http://arxiv.org"):

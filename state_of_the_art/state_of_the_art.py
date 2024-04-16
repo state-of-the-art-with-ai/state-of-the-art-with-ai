@@ -9,7 +9,7 @@ from state_of_the_art.paper.presenter import PaperHumanPresenter
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.report.report import Report
-from state_of_the_art.topic_deepdive.search import TopicSearch
+from state_of_the_art.topic_deepdive.bm25_search import TopicSearch
 from state_of_the_art.report.formatter import SummaryFormatter
 from state_of_the_art.report.reports_data import ReportsData
 from state_of_the_art.utils.mail import Mail

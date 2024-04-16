@@ -56,6 +56,12 @@ class PapersData():
         df = tdw.event('arxiv_papers')
         return df
 
+
+    def get_all_papers(self) -> List[Paper]:
+        df = self.load_papers()
+        return self.to_papers(df)
+
+
     def to_papers(self, df) -> List[Paper]:
         papers = []
         for i in df.iterrows():

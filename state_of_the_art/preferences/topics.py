@@ -13,7 +13,7 @@ xsell = Topic(
 
 
 bidding = Topic(
-    synonyms=['bidding', 'google ads', 'paid search', 'bid optimization', 'bidding', 'bid management', 'bid optimization', 'search engine marketing', 'paid advertising', 'bid', 'portifolio optimization'],
+    synonyms=['bidding', 'auction', 'google ads', 'paid search', 'bid optimization', 'bidding', 'bid management', 'bid optimization', 'search engine marketing', 'paid advertising', 'bid', 'portifolio optimization'],
     subtopics=[]
 )
 
