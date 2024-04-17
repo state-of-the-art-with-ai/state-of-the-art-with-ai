@@ -5,7 +5,6 @@ from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.paper.browser import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
 from state_of_the_art.paper.paper import Paper
-from state_of_the_art.paper.presenter import PaperHumanPresenter
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.report.report import Report
@@ -29,7 +28,6 @@ class Sota:
         self.topic_search = TopicSearch
         self.SummaryFormatter = SummaryFormatter
         self.SummariesData = ReportsData
-        self.PaperHumanPresenter = PaperHumanPresenter
         self.Mail = Mail
         self.VectorSearch = VectorSearch
 

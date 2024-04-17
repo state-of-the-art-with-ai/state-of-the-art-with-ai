@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from state_of_the_art.paper.paper import Paper
 from tiny_data_wharehouse.data_wharehouse import DataWharehouse
@@ -56,32 +56,25 @@ class Papers():
         df = tdw.event('arxiv_papers')
         return df
 
-
     def get_all_papers(self) -> List[Paper]:
         df = self.load_papers()
         return self.to_papers(df)
 
+    def to_papers(self, df, as_dict=False) -> Union[List[Paper], dict[str, Paper]]:
 
-    def to_papers(self, df) -> List[Paper]:
+        if as_dict:
+            papers = {}
+            return papers
+
         papers = []
         for i in df.iterrows():
-            paper = Paper(title=i[1]['title'], abstract=i[1]['abstract'], arxiv_url=i[1]['url'], published=i[1]['published'])
-            papers.append(paper)
+            papers.append(Paper.load_from_dict(i))
         return papers
 
     def load_between_dates(self, start, end):
         df = self.load_papers()
         print("Date filters (from, to): ", start, end)
         return df[(df['published'].dt.strftime('%Y-%m-%d') >= start) & (df['published'].dt.strftime('%Y-%m-%d') <= end)].sort_values(by='published', ascending=False)
-
-    def load_since_last_summary_execution(self):
-        from state_of_the_art.summaries import SummariesData
-        latest_date = SummariesData().get_latest_date_covered_by_summary()
-        print("Latest date covered by summary: ", latest_date)
-        today = datetime.date.today().isoformat()
-        papers = self.load_between_dates(latest_date, today)
-
-        self.print_papers(papers)
 
     def papers_schema(self):
         return list(self.load_papers().columns)
@@ -95,17 +88,30 @@ class Papers():
 
         return result
 
-    def load_from_urls(self, urls):
+    def load_from_urls(self, urls, as_dict=False):
         urls = list(set(urls))
         papers = self.load_papers()
-        result = papers[papers['url'].isin(urls)]
+        if as_dict:
+            result = {}
+            for url in urls:
+                result[url] = papers[papers['url'] == url]
+            result_len = len(result.keys())
+        else:
+            result = papers[papers['url'].isin(urls)]
+            result_len = len(result)
 
-        if len(result) != len(urls):
-            raise Exception(f"Found {len(result)} papers but expected {len(urls)}")
+        if result_len != len(urls):
+                raise Exception(f"Found {len(result)} papers but expected {len(urls)}")
 
         return result
 
-
+    def load_papers_from_urls(self, urls) -> List[Paper]:
+        papers = self.load_from_urls(urls, as_dict=True)
+        breakpoint()
+        result = []
+        for i in urls:
+            result.append(Paper.load_from_dict(papers[i].to_dict(orient='records')[0]))
+        return result
     def df_to_papers(self, papers_df) -> List[Paper]:
         papers_dict = papers_df.to_dict(orient='records')
         result = []

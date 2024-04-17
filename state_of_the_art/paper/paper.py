@@ -20,6 +20,9 @@ class Paper():
 
 
     @staticmethod
+    def load_from_dict(data):
+        return Paper(arxiv_url=data['url'], published=data['published'], title=data['title'], abstract=data['abstract'])
+    @staticmethod
     def load_paper_from_url(url) -> 'Paper':
         from state_of_the_art.paper.papers_data import Papers
         result = Papers().load_from_url(url)
@@ -44,7 +47,9 @@ class Paper():
 
 
     def __str__(self):
-        return f"Title: {self.title} \nPublished: {self.published} \nUrl: {self.url}\n"
+        return f"""Title: {self.title}\n
+Published: {self.published_date_str()}
+Url: {self.url}\n"""
 
 
     def safe_abstract(self):

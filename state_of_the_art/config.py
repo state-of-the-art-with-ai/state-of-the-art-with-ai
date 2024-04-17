@@ -3,11 +3,10 @@ from state_of_the_art.preferences.audience import Audience
 
 class Config():
     HOME = os.path.expanduser("~")
-    PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
     NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"
     MAX_ABSTRACT_SIZE_RANK=500
     MAX_PAPERS_TO_MINE_PER_QUERY = 100
-    DEFAULT_LOOK_BACK_DAYS = 2
+    DEFAULT_LOOK_BACK_DAYS = 1
     MINIMAL_CONFIRMATION_COST = 0.35
 
     # the maximum number of papers to compute while sorting the batch of papers

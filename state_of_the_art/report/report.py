@@ -17,14 +17,18 @@ class Report():
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
-        parameters = ReportParemeters(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch)
 
         if not skip_register:
             PaperMiner().register_new(dry_run=dry_run)
         else:
             print("Skipping registering papers")
 
+        result =self.rank(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch)
 
+        return result
+
+    def rank(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1) -> str:
+        parameters = ReportParemeters(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch)
         if not sys.stdin.isatty():
             print("Reading from stdin")
             data = sys.stdin.readlines()
@@ -39,7 +43,6 @@ class Report():
             return "No articles found"
 
         result = PaperRanker().rank(articles=articles, parameters=parameters)
-
         return result
 
     def latest(self):

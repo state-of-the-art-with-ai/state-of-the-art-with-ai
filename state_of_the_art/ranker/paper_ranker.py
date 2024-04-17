@@ -2,15 +2,14 @@ import datetime
 from typing import List
 
 from state_of_the_art.config import config
+from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import Paper
-from state_of_the_art.paper.presenter import PaperHumanPresenter
 from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.llm import LLM
 from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
 from state_of_the_art.report.report_parameters import ReportParemeters
 from state_of_the_art.utils.mail import Mail
-
 
 class PaperRanker:
     MAX_ARTICLES_TO_RETURN = 25
@@ -62,18 +61,7 @@ Ranked output of articles: ##start """
             return "Dry run result"
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
-
-        urls = PapersUrlsExtractor().extract_urls(result)
-        formatted_result = ""
-        counter = 1
-        for url in urls:
-            try:
-                presenter = PaperHumanPresenter(url)
-                formatted_result+= f"{counter}. {presenter.present()} \n\n"
-                counter = counter + 1
-            except Exception as e:
-                print(f"Error processing url {url}: {e}")
-                continue
+        formatted_result = PapersFormatter().from_str(result)
 
         now = datetime.datetime.now().isoformat()
         header = f"Results generated at {now} for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
