@@ -60,15 +60,11 @@ class Papers():
         df = self.load_papers()
         return self.to_papers(df)
 
-    def to_papers(self, df, as_dict=False) -> Union[List[Paper], dict[str, Paper]]:
-
-        if as_dict:
-            papers = {}
-            return papers
+    def to_papers(self, df) -> Union[List[Paper], dict[str, Paper]]:
 
         papers = []
         for i in df.iterrows():
-            papers.append(Paper.load_from_dict(i))
+            papers.append(Paper.load_from_dict(i[1].to_dict()))
         return papers
 
     def load_between_dates(self, start, end):

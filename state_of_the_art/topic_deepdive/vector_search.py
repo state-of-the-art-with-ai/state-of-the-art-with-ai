@@ -1,6 +1,8 @@
 import os
 
 import sys
+
+from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.papers_data import Papers
 
 
@@ -54,10 +56,7 @@ class VectorSearch:
         papers_data = Papers()
         papers = papers_data.to_papers(papers_data.load_from_urls(ids))
 
-        counter = 1
-        for paper in papers:
-            print(f"{counter}. ", paper)
-            counter+=1
+        print(PapersFormatter(disable_abstract=True).from_papers(papers))
 
 
 

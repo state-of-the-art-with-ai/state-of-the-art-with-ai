@@ -11,6 +11,7 @@ from state_of_the_art.report.report import Report
 from state_of_the_art.topic_deepdive.bm25_search import TopicSearch
 from state_of_the_art.report.formatter import SummaryFormatter
 from state_of_the_art.report.reports_data import ReportsData
+from state_of_the_art.topic_deepdive.topic_extractor import TopicExtractor
 from state_of_the_art.topic_deepdive.vector_search import VectorSearch
 from state_of_the_art.utils.mail import Mail
 
@@ -30,6 +31,7 @@ class Sota:
         self.SummariesData = ReportsData
         self.Mail = Mail
         self.VectorSearch = VectorSearch
+        self.TopicExtractor = TopicExtractor
 
 
 
