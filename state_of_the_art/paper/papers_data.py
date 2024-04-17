@@ -84,7 +84,7 @@ class Papers():
 
         return result
 
-    def load_from_urls(self, urls, as_dict=False):
+    def load_from_urls(self, urls: List[str], as_dict=False, fail_on_missing_ids=True) -> pd.DataFrame:
         urls = list(set(urls))
         papers = self.load_papers()
         if as_dict:
@@ -97,11 +97,14 @@ class Papers():
             result_len = len(result)
 
         if result_len != len(urls):
-                raise Exception(f"""
+            message = f"""
                 Found {len(result)} papers but expected {len(urls)}
-                Expected urls: {urls}
-                Found urls: {result['url'].to_list()}
-""")
+                Missing urls: {[i for i in urls if i not in result['url'].to_list()]}
+"""
+            if fail_on_missing_ids:
+                raise ValueError(message)
+            else:
+                print(message)
 
         return result
 

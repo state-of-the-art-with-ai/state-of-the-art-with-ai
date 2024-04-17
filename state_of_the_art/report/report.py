@@ -1,6 +1,8 @@
+from typing import Optional
+
 from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
-from state_of_the_art.paper_miner.arxiv import PaperMiner
+from state_of_the_art.paper_miner.arxiv_miner import PaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.report.report_parameters import ReportParemeters
 from state_of_the_art.report.reports_data import ReportsData
@@ -27,24 +29,29 @@ class Report():
 
         return result
 
-    def rank(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1) -> str:
+    def rank(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1, given_data:Optional[str]=None) -> str:
         parameters = ReportParemeters(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch)
-        if not sys.stdin.isatty():
+        if given_data:
+            articles  = self._load_papers_from_str(given_data)
+        elif not sys.stdin.isatty():
             print("Reading from stdin")
-            data = sys.stdin.readlines()
-            text = "\n".join(data)
-            urls = PapersUrlsExtractor().extract_urls(text)
-            print("Urls found in stdin", urls)
-            articles = Papers().load_from_urls(urls)
-            print(urls)
+            stdindata = sys.stdin.readlines()
+            stdindata = "\n".join(stdindata)
+            articles  = self._load_papers_from_str(stdindata)
         else:
             articles = Papers().get_latest_articles(lookback_days=lookback_days, from_date=from_date, batch=batch)
-        print(f"Found {len(articles)} articles")
+            print(f"Found {len(articles)} articles")
+
         if len(articles) == 0:
             return "No articles found"
 
         result = PaperRanker().rank(articles=articles, parameters=parameters)
         return result
+
+    def _load_papers_from_str(self, papers_str: str):
+        urls = PapersUrlsExtractor().extract_urls(papers_str)
+
+        return Papers().load_from_urls(urls, fail_on_missing_ids=False)
 
     def latest(self):
         return ReportsData().get_latest_summary()

@@ -1,5 +1,5 @@
 
-from state_of_the_art.paper_miner.arxiv import PaperMiner
+from state_of_the_art.paper_miner.arxiv_miner import PaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
 from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.paper.browser import BrowserPapers as browser_papers

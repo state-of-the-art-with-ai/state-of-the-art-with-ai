@@ -53,7 +53,7 @@ class PaperMiner():
         self._find_papers(query=query, number_of_papers=n, sort_by='submitted', only_print=True)
 
     def register_by_id(self, id):
-        papers = self._find_papers(id_list=[id], only_print=False)
+        papers = self._find_papers(id_list=[str(id)], only_print=False)
         return self._register_given_papers(papers)
 
     def query_papers(self, query):
@@ -71,6 +71,7 @@ class PaperMiner():
         print({'query': query, 'sort_by': sort_by, 'id_list': id_list, 'number_of_papers': number_of_papers})
 
         if id_list:
+            print("Searching by id list: ", id_list)
             search = arxiv.Search(
                 id_list=id_list,
                 max_results = number_of_papers,
