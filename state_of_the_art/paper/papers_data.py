@@ -101,13 +101,16 @@ class Papers():
             result_len = len(result)
 
         if result_len != len(urls):
-                raise Exception(f"Found {len(result)} papers but expected {len(urls)}")
+                raise Exception(f"""
+                Found {len(result)} papers but expected {len(urls)}
+                Expected urls: {urls}
+                Found urls: {result['url'].to_list()}
+""")
 
         return result
 
     def load_papers_from_urls(self, urls) -> List[Paper]:
         papers = self.load_from_urls(urls, as_dict=True)
-        breakpoint()
         result = []
         for i in urls:
             result.append(Paper.load_from_dict(papers[i].to_dict(orient='records')[0]))

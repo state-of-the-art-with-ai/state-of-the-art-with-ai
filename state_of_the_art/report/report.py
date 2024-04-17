@@ -32,8 +32,9 @@ class Report():
         if not sys.stdin.isatty():
             print("Reading from stdin")
             data = sys.stdin.readlines()
-            text = "".join(data)
+            text = "\n".join(data)
             urls = PapersUrlsExtractor().extract_urls(text)
+            print("Urls found in stdin", urls)
             articles = Papers().load_from_urls(urls)
             print(urls)
         else:

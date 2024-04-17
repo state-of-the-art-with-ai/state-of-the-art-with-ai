@@ -7,9 +7,9 @@ class PapersUrlsExtractor():
             raise Exception("Data to extract papers must be a string")
 
         urls = []
-        for row in data.split('\n'):
+        for row in data.split("\n"):
             for k, _  in enumerate(row):
-                if row[k] == 'h' and row[k + 1] == 't' and row[k + 2] == 't' and row[k + 3] == 'p':
+                if len(row)>k+4 and row[k] == 'h' and row[k + 1] == 't' and row[k + 2] == 't' and row[k + 3] == 'p':
 
                     url_char = row[k]
                     url = ''
