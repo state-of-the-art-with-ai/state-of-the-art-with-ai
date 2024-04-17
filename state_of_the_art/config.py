@@ -6,7 +6,7 @@ class Config():
     PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers"
     NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"
     MAX_ABSTRACT_SIZE_RANK=500
-    MAX_PAPERS_TO_MINE_PER_QUERY=50
+    MAX_PAPERS_TO_MINE_PER_QUERY = 100
     DEFAULT_LOOK_BACK_DAYS = 2
     MINIMAL_CONFIRMATION_COST = 0.35
 

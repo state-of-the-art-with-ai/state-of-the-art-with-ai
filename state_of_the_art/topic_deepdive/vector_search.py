@@ -1,7 +1,7 @@
 import os
 
 import sys
-from state_of_the_art.paper.papers_data import PapersData
+from state_of_the_art.paper.papers_data import Papers
 
 
 class VectorSearch:
@@ -23,7 +23,7 @@ class VectorSearch:
         return self.client
     def setup_papers(self):
         print('Setting up documents')
-        papers = PapersData().get_all_papers()
+        papers = Papers().get_all_papers()
         documents = []
         ids = []
         for paper in papers:
@@ -51,7 +51,7 @@ class VectorSearch:
         ids = self.collection.query(query_texts=[query], n_results=n)['ids'][0]
         print(ids)
 
-        papers_data = PapersData()
+        papers_data = Papers()
         papers = papers_data.to_papers(papers_data.load_from_urls(ids))
 
         counter = 1

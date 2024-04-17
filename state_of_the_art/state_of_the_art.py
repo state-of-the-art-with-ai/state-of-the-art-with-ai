@@ -1,7 +1,7 @@
 
-from state_of_the_art.paper_miner.arxiv import ArxivMiner
+from state_of_the_art.paper_miner.arxiv import PaperMiner
 from state_of_the_art.ranker.paper_ranker import PaperRanker
-from state_of_the_art.paper.papers_data import PapersData
+from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.paper.browser import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
 from state_of_the_art.paper.paper import Paper
@@ -20,11 +20,9 @@ class Sota:
         self.report = Report
         self.browser_papers = browser_papers
         self.papers_ui = browser_papers().fzf
-        self.papers = PapersData().display
+        self.papers = Papers()
         self.rank = PaperRanker().rank
-        self.ArxivMiner = ArxivMiner()
-        self.register_new_papers = self.ArxivMiner.register_new_papers
-        self.find_latest_papers = self.ArxivMiner.inspect_latest
+        self.PaperMiner = PaperMiner()
         self.PaperInsightExtractor = PaperInsightExtractor
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()

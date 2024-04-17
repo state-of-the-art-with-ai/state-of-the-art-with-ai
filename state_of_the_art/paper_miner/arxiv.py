@@ -1,9 +1,8 @@
 import arxiv
-from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
-class ArxivMiner():
+class PaperMiner():
     """
     Looks at arxiv api for papers
     """
@@ -12,8 +11,13 @@ class ArxivMiner():
 
     def __init__(self):
         self.config = config
+        tdw = config.get_datawharehouse()
+        arxiv_papers = tdw.event('arxiv_papers')
+        self.existing_papers_urls = arxiv_papers['url'].values
+        self.tdw = config.get_datawharehouse()
+        self.existing_papers_urls = self.load_existing_papers_urls()
 
-    def register_new_papers(self, dry_run=False, disable_relevance_miner=False):
+    def register_new(self, dry_run=False, disable_relevance_miner=False):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
@@ -25,24 +29,22 @@ class ArxivMiner():
 
         topics = config.get_current_audience().keywords
         print("Registering papers for the following keywords: ", topics)
-        total_skipped = 0
-        total_registered = 0
 
+        papers = []
         for topic in topics:
-            if not disable_relevance_miner:
-                registered, skipped = self.register_papers_by_topic(query=topic, sort_by='relevance', dry_run=dry_run)
-                total_skipped += skipped
-                total_registered += registered
-            registered, skipped = self.register_papers_by_topic(query=topic, sort_by='submitted', dry_run=dry_run)
-            total_skipped += skipped
-            total_registered += registered
+            papers = papers + self._find_papers(query=topic, sort_by='relevance')
+            papers = papers + self._find_papers(query=topic, sort_by='submitted')
 
+        print("Found ", len(papers), " papers")
+        papers = [p for p in papers if p.url not in self.existing_papers_urls]
+        print("Found ", len(papers), " new papers")
+
+        if dry_run:
+            return len(papers), 0
+
+        total_registered, total_skipped = self._register_given_papers(papers)
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
-
-    def register_by_id(self, id):
-        papers = self._find_papers(id_list=[id], only_print=False)
-        return self._register_given_papers(papers)
 
     def inspect_latest(self, *, query=None, n=10):
         """"
@@ -50,16 +52,8 @@ class ArxivMiner():
         """
         self._find_papers(query=query, number_of_papers=n, sort_by='submitted', only_print=True)
 
-    def register_papers_by_topic(self, *, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance' ] = 'submitted', dry_run=False):
-        """
-        Loads papers from arxiv and store them into the tiny data wharehouse
-        """
-        print(f"Registering new papers with query '{query}' and sorting by '{sort_by}'")
-
-        papers = self._find_papers(query=query, number_of_papers=number_of_papers, sort_by=sort_by)
-
-        if dry_run:
-            return len(papers), 0
+    def register_by_id(self, id):
+        papers = self._find_papers(id_list=[id], only_print=False)
         return self._register_given_papers(papers)
 
     def query_papers(self, query):
@@ -102,24 +96,24 @@ class ArxivMiner():
             return
         return result
 
+    def load_existing_papers_urls(self):
+        arxiv_papers = self.tdw.event('arxiv_papers')
+        return arxiv_papers['url'].values
+
 
     def _register_given_papers(self, papers: List[Paper]):
-        tdw = DataWharehouse()
-
-        arxiv_papers = tdw.event('arxiv_papers')
-        existing_papers_urls = arxiv_papers['url'].values
-
         counter = 0
         skipped = 0
         registered = 0
+        self.existing_papers_urls = self.load_existing_papers_urls()
         for paper in papers:
             counter = counter+1
-            if paper.url in existing_papers_urls:
+            if paper.url in self.existing_papers_urls:
                 skipped += 1
                 continue
 
             registered+=1
-            tdw.write_event('arxiv_papers', paper.to_dict())
+            self.tdw.write_event('arxiv_papers', paper.to_dict())
 
         print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
         return registered, skipped

@@ -4,7 +4,7 @@ from typing import List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.presenter import PaperHumanPresenter
-from state_of_the_art.paper.papers_data import PapersData
+from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.llm import LLM
 from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
@@ -79,7 +79,7 @@ Ranked output of articles: ##start """
         header = f"Results generated at {now} for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
         result = header + result
         formatted_result = header + formatted_result
-        papers_str = PapersData().papers_to_urls_str(PapersData().df_to_papers(articles))
+        papers_str = Papers().papers_to_urls_str(Papers().df_to_papers(articles))
 
         ranking_data = RankGeneratedData(from_date=parameters.from_date, to_date=parameters.to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
         print("Writing event")

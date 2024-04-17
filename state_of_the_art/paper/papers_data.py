@@ -6,9 +6,9 @@ import pandas as pd
 import datetime
 from state_of_the_art.config import config
 
-class PapersData():
+class Papers():
     TITLE_MAX_LENGH = 80
-    def display(self, from_date=None, n=None):
+    def print(self, from_date=None, n=None):
         """
         Entrypoint to display papers. We add options to this function to change the display logic 
         Rather than introducing more functions.

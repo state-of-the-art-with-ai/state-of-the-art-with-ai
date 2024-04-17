@@ -1,7 +1,7 @@
 from typing import List
 
 from state_of_the_art.paper.paper import Paper
-from state_of_the_art.paper.papers_data import PapersData
+from state_of_the_art.paper.papers_data import Papers
 from state_of_the_art.preferences.topics import topics
 from rank_bm25 import BM25Okapi as BM25
 import nltk
@@ -12,7 +12,7 @@ MAX_PAPERS = 30
 
 class TopicSearch:
     def __init__(self):
-        papers_data = PapersData()
+        papers_data = Papers()
         papers = papers_data.load_papers()
         papers_list = papers_data.df_to_papers(papers)
         self.search = Bm25Search(papers_list)
