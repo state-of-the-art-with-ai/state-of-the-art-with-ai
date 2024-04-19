@@ -17,13 +17,14 @@ class PaperMiner():
         self.tdw = config.get_datawharehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
-    def register_new(self, dry_run=False, disable_relevance_miner=False):
+    def register_new(self, dry_run=False, max_papers_per_query=None):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
         :param disable_relevance_miner:
         :return:
         """
+        self.max_papers_per_query = max_papers_per_query
         if dry_run:
             print("Dry run, just printing, not registering them")
 
@@ -64,7 +65,7 @@ class PaperMiner():
             query = self.DEFAULT_QUERY
 
         if not number_of_papers:
-            number_of_papers = self.config.MAX_PAPERS_TO_MINE_PER_QUERY
+            number_of_papers = self.max_papers_per_query if self.max_papers_per_query else self.config.MAX_PAPERS_TO_MINE_PER_QUERY
 
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 
