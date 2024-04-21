@@ -1,7 +1,6 @@
 from typing import List, Optional, Union
 
 from state_of_the_art.paper.paper import Paper
-from tiny_data_wharehouse.data_wharehouse import DataWharehouse
 import pandas as pd
 import datetime
 from state_of_the_art.config import config

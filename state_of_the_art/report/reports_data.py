@@ -1,10 +1,10 @@
-from tiny_data_wharehouse.data_wharehouse import DataWharehouse
+from state_of_the_art.config import config
 
 
 class ReportsData():
     def get_summary(self):
-        tdw = DataWharehouse()
-        return tdw.event('state_of_the_art_summary')
+
+        return config.get_datawharehouse().event('state_of_the_art_summary')
     def schema(self):
         return self.get_summary().dtypes
     def get_latest_summary(self, as_json=False, as_dict=False):

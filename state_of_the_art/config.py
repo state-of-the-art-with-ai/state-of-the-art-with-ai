@@ -24,8 +24,8 @@ class Config():
         return Config()
 
     def get_datawharehouse(self):
-        from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-        return DataWharehouse()
+        from tiny_data_warehouse.data_warehouse import DataWarehouse
+        return DataWarehouse()
 
 
 
