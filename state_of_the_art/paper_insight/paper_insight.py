@@ -41,7 +41,7 @@ class PaperInsightExtractor:
         QUESTIONS = ""
 
         counter = 1
-        for key, question in self.profile.paper_tasks.items():
+        for key, question in self.profile.paper_questions.items():
             QUESTIONS+=f"""===
 Question {counter} (Topic: {key})
 {question}
@@ -49,7 +49,7 @@ Question {counter} (Topic: {key})
             counter+=1
 
         if question_topic:
-            QUESTIONS = self.profile.paper_tasks[question_topic]
+            QUESTIONS = self.profile.paper_questions[question_topic]
 
 
         prompt = f"""You are an world class expert in Data Science and computer science.

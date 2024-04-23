@@ -1,18 +1,13 @@
-from typing import Any, List, Optional
+from typing import Optional
 import os
 
 from state_of_the_art.preferences.audience import Audience
 
 class SotaPreferences():
     audiences: dict[str, Audience]
-    keywords: List[str]
-    keywords_to_exclude: List[str]
-    time_frame: Any = None
-    paper_tasks: Optional[dict] = None
 
-    def __init__(self, *, audiences: Optional[dict[str, Audience]]=None, paper_tasks=None) -> None:
+    def __init__(self, *, audiences: Optional[dict[str, Audience]]=None) -> None:
         self.audiences = audiences
-        self.paper_tasks = paper_tasks
 
 
     @staticmethod
