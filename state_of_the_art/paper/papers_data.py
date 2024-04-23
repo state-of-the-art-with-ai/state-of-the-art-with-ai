@@ -51,8 +51,8 @@ class Papers():
 
         return articles
     def load_papers(self):
-        tdw = DataWharehouse()
-        df = tdw.event('arxiv_papers')
+        
+        df = config.get_datawarehouse().event('arxiv_papers')
         return df
 
     def get_all_papers(self) -> List[Paper]:

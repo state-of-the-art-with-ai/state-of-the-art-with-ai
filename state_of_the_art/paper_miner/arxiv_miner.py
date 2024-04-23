@@ -2,6 +2,8 @@ import arxiv
 from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
+from tqdm import tqdm
+
 class PaperMiner():
     """
     Looks at arxiv api for papers
@@ -11,10 +13,10 @@ class PaperMiner():
 
     def __init__(self):
         self.config = config
-        tdw = config.get_datawharehouse()
+        tdw = config.get_datawarehouse()
         arxiv_papers = tdw.event('arxiv_papers')
         self.existing_papers_urls = arxiv_papers['url'].values
-        self.tdw = config.get_datawharehouse()
+        self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
     def register_new(self, dry_run=False, max_papers_per_query=None):
@@ -102,13 +104,14 @@ class PaperMiner():
         arxiv_papers = self.tdw.event('arxiv_papers')
         return arxiv_papers['url'].values
 
-
     def _register_given_papers(self, papers: List[Paper]):
         counter = 0
         skipped = 0
         registered = 0
         self.existing_papers_urls = self.load_existing_papers_urls()
-        for paper in papers:
+
+
+        for paper in tqdm(papers):
             counter = counter+1
             if paper.url in self.existing_papers_urls:
                 skipped += 1

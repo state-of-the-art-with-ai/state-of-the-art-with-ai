@@ -1,4 +1,5 @@
 from typing import List
+from urlextract import URLExtract
 
 
 class PapersUrlsExtractor():
@@ -7,7 +8,6 @@ class PapersUrlsExtractor():
         if not type(data)==str:
             raise Exception("Data to extract papers must be a string")
 
-        from urlextract import URLExtract
 
         extractor = URLExtract()
         return extractor.find_urls(data)

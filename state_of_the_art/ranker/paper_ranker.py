@@ -71,7 +71,7 @@ Ranked output of articles: ##start """
 
         ranking_data = RankGeneratedData(from_date=parameters.from_date, to_date=parameters.to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
         print("Writing event")
-        config.get_datawharehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
+        config.get_datawarehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
 
         print("Sending email")
         Mail().send(formatted_result, f'Sota summary batch {parameters.batch} at {now}')

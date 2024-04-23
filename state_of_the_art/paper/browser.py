@@ -2,7 +2,6 @@ import os
 
 from state_of_the_art.paper.paper import Paper
 
-
 class BrowserPapers:
     def fzf(self):
         outoput = os.system('sota papers | /Users/jean.machado/.fzf/bin/fzf --layout=reverse  | sota browser_papers open_from_fzf')

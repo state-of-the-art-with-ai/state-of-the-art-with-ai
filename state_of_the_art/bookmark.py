@@ -14,7 +14,7 @@ class Bookmark():
         print(f"Registering paper {paper_url} in bookmarks")
         paper = Paper(arxiv_url=Paper.convert_pdf_to_abstract(paper_url))
 
-        dwh = config.get_datawharehouse()
+        dwh = config.get_datawarehouse()
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper.arxiv_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
 
 
@@ -31,7 +31,7 @@ class Bookmark():
 
 
     def list(self, return_result=True):
-        dwh = config.get_datawharehouse()
+        dwh = config.get_datawarehouse()
         dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
 
         result  = "Bookmarks: \n\n"
@@ -58,7 +58,7 @@ Comment: {dict[i]['comment']}
         print(result)
 
     def open_latest_paper(self):
-        dwh = config.get_datawharehouse()
+        dwh = config.get_datawarehouse()
         dict = dwh.event(self.EVENT_NAME).sort_values(by='bookmarked_date', ascending=False).to_dict(orient='record')
         latest = dict[0]
         Paper(arxiv_url=latest['paper_url']).download_and_open()

@@ -2,7 +2,6 @@ from typing import List
 
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.papers_data import Papers
-from state_of_the_art.preferences.topics import topics
 from rank_bm25 import BM25Okapi as BM25
 import nltk
 

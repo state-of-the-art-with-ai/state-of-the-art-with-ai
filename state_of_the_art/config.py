@@ -17,13 +17,13 @@ class Config():
     OPEN_API_KEY = os.environ['SOTA_OPENAI_KEY']
 
     def get_current_audience(self) -> Audience:
-        from state_of_the_art.preferences.audience import get_current_audience
-        return get_current_audience()
+        from state_of_the_art.preferences.preferences import SotaPreferences
+        return SotaPreferences.load_preferences().get_current_audience()
     @staticmethod
     def load_config():
         return Config()
 
-    def get_datawharehouse(self):
+    def get_datawarehouse(self):
         from tiny_data_warehouse.data_warehouse import DataWarehouse
         return DataWarehouse()
 

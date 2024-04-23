@@ -34,10 +34,8 @@ class PaperInsightExtractor:
         print("Abstract: ", abstract_url)
         print(result)
 
-        from tiny_data_wharehouse.data_wharehouse import DataWharehouse
-        tdw = DataWharehouse()
         question_topic = question_topic if question_topic else "all"
-        tdw.write_event('sota_paper_insight', {'abstract_url': abstract_url, 'insights': result, 'topic': question_topic})
+        config.get_datawarehouse().write_event('sota_paper_insight', {'abstract_url': abstract_url, 'insights': result, 'topic': question_topic})
 
     def _get_prompt(self, question_topic=None) -> str:
         QUESTIONS = ""

@@ -11,9 +11,8 @@ import sys
 class Report():
     """
     Class responsible to the entire generation pipeline
-
     """
-    def generate_latest(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1, max_papers_per_query=None):
+    def generate(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1, max_papers_per_query=None):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
