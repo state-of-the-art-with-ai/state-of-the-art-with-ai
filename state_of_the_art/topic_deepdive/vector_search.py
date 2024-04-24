@@ -3,7 +3,7 @@ import os
 import sys
 
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.papers_data import Papers
+from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 
 
 class VectorSearch:
@@ -25,7 +25,7 @@ class VectorSearch:
         return self.client
     def setup_papers(self):
         print('Setting up documents')
-        papers = Papers().get_all_papers()
+        papers = PapersInDataWharehouse().get_all_papers()
         documents = []
         ids = []
         for paper in papers:
@@ -53,7 +53,7 @@ class VectorSearch:
         ids = self.collection.query(query_texts=[query], n_results=n)['ids'][0]
         print(ids)
 
-        papers_data = Papers()
+        papers_data = PapersInDataWharehouse()
         papers = papers_data.to_papers(papers_data.load_from_urls(ids))
 
         print(PapersFormatter(disable_abstract=True).from_papers(papers))

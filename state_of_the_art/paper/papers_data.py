@@ -5,7 +5,7 @@ import pandas as pd
 import datetime
 from state_of_the_art.config import config
 
-class Papers():
+class PapersInDataWharehouse():
     TITLE_MAX_LENGH = 80
     def print(self, from_date=None, n=None):
         """
@@ -25,11 +25,11 @@ class Papers():
 
         self.print_papers(papers)
 
-    def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1):
+    def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1, batch_size=None):
         if not from_date and not lookback_days:
             lookback_days = config.DEFAULT_LOOK_BACK_DAYS
 
-        max_papers = config.RANK_MAX_PAPERS_TO_COMPUTE
+        max_papers = batch_size
         if not article_slices:
             article_slices = (max_papers * (batch - 1), max_papers * batch)
 
@@ -51,8 +51,10 @@ class Papers():
 
         return articles
     def load_papers(self):
-        
         df = config.get_datawarehouse().event('arxiv_papers')
+        # @todo Fix duplicates
+        df.drop_duplicates(subset=['url'], keep='first', inplace=True)
+
         return df
 
     def get_all_papers(self) -> List[Paper]:

@@ -1,11 +1,15 @@
 
 from pydantic import BaseModel
 from typing import Optional
+from state_of_the_art.config import config
 
-class ReportParemeters(BaseModel):
+class RecommenderParameters(BaseModel):
     lookback_days:Optional[int]=None
     from_date:Optional[str]=None
     to_date:Optional[str]=None
     skip_register:bool=False
     dry_run:bool=False
     batch: int =1
+    # if we are receiving in the inpyut  atext with a  list of papers to rank
+    papers_to_rank: Optional[str]= None
+    batch_size = config.RANK_MAX_PAPERS_TO_COMPUTE

@@ -1,6 +1,6 @@
 from typing import List
 
-from state_of_the_art.paper.papers_data import Papers
+from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 
 class PapersFormatter:
@@ -9,10 +9,10 @@ class PapersFormatter:
         self.disable_abstract = disable_abstract
     def from_str(self, papers_str: str) -> str:
         urls = PapersUrlsExtractor().extract_urls(papers_str)
-        papers = Papers().load_papers_from_urls(urls)
+        papers = PapersInDataWharehouse().load_papers_from_urls(urls)
         return self.from_papers(papers)
 
-    def from_papers(self, papers: List[Papers]) -> str:
+    def from_papers(self, papers: List[PapersInDataWharehouse]) -> str:
         formatted_result = ""
         counter = 1
         for paper in papers:

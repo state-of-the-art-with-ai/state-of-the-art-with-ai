@@ -34,7 +34,7 @@ First explain it normally and then explain it in analogies.
 }
 class Audience():
     DEFAULT_KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
-                       'construction engineering', 'material science', 'robotics', 'mobility', 'geology']
+                       'construction engineering', 'material science', 'robotics', 'mobility', 'geology', 'electrical engineering']
 
     DEFAULT_KEYWORDS_OF_INTEREST = None
 

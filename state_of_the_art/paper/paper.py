@@ -24,8 +24,8 @@ class Paper():
         return Paper(arxiv_url=data['url'], published=data['published'], title=data['title'], abstract=data['abstract'])
     @staticmethod
     def load_paper_from_url(url) -> 'Paper':
-        from state_of_the_art.paper.papers_data import Papers
-        result = Papers().load_from_url(url)
+        from state_of_the_art.paper.papers_data import PapersInDataWharehouse
+        result = PapersInDataWharehouse().load_from_url(url)
         if result is None:
             raise Exception(f"Paper with url {url} not found")
         result = result.iloc[0].to_dict()
