@@ -7,16 +7,19 @@ from state_of_the_art.report.report_parameters import RecommenderParameters
 from state_of_the_art.report.reports_data import ReportsData
 import sys
 
+from state_of_the_art.topic_deepdive.bm25_search import TopicSearch
+
+
 class RecommenderReport():
     """
     Class responsible to the entire generation pipeline
     """
-    def generate(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1, batch_size=None, max_papers_per_query=None, papers_to_rank=None):
+    def generate(self, *, lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False, batch=1, batch_size=None, max_papers_per_query=None, papers_to_rank=None, query=None):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
 
-        parameters = RecommenderParameters(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch, batch_size=batch_size, papers_to_rank=papers_to_rank)
+        parameters = RecommenderParameters(lookback_days=lookback_days, from_date=from_date, to_date=to_date, skip_register=skip_register, dry_run=dry_run, batch=batch, batch_size=batch_size, papers_to_rank=papers_to_rank, query=query)
 
         if not skip_register:
             PaperMiner().register_new(dry_run=dry_run, max_papers_per_query=max_papers_per_query)
@@ -28,6 +31,10 @@ class RecommenderReport():
         return result
 
     def _rank(self, parameters) -> str:
+
+        if parameters.query:
+            return TopicSearch().search_with_query(parameters.query)
+
         if parameters.papers_to_rank:
             articles = self._load_papers_from_str(parameters.papers_to_rank)
         elif not sys.stdin.isatty():
