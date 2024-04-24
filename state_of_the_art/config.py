@@ -17,8 +17,9 @@ class Config():
     OPEN_API_KEY = os.environ['SOTA_OPENAI_KEY']
 
     def get_current_audience(self) -> Audience:
-        from state_of_the_art.preferences.preferences import SotaPreferences
-        return SotaPreferences.load_preferences().get_current_audience()
+        # @todo implement this dynamically
+        from examples.gyg import sota_preferences
+        return sota_preferences.get_current_audience()
     @staticmethod
     def load_config():
         return Config()

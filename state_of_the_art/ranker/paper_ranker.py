@@ -62,9 +62,10 @@ Ranked output of articles: ##start """
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
         formatted_result = PapersFormatter().from_str(result)
+        profile_name = config.get_current_audience().name.upper()
 
         now = datetime.datetime.now().isoformat()
-        header = f"Results generated at {now} for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
+        header = f"Results generated at {now} for profile: \"{profile_name}\" for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
         result = header + result
         formatted_result = header + formatted_result
         papers_str = Papers().papers_to_urls_str(Papers().df_to_papers(articles))
@@ -74,7 +75,7 @@ Ranked output of articles: ##start """
         config.get_datawarehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
 
         print("Sending email")
-        Mail().send(formatted_result, f'Sota summary batch {parameters.batch} at {now}')
+        Mail().send(formatted_result, f'Sota summary batch {parameters.batch} at {now} for profile {profile_name}')
 
         return formatted_result
 

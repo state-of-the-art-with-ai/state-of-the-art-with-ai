@@ -1,23 +1,6 @@
 
-COMMON_KEYWORDS = [
-    'cs.AI', 'cs.LG', 'cs.SI', 'stat.ML',
-    'ai', 'machine learning',
-    'ads','data science', 'mlops',
-    'large language models', 'ai for social good', 'ai ethics'
-                                                   'data science management and data science teams  performance', 'ai regulation', 'deep learning & neural nets',
-    'computer science','knowledge graphs', 'graph neural networks', 'ai productivity', 'explainable ai', 'xai']
 
-"""
-keywords that did not work well
-'cs',
-'attribution', 
-'marketing measurement', 
-'experimentation', 
-'analytics',
-"""
 
-KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
-                   'construction engineering', 'material science', 'robotics', 'mobility', 'geology']
 
 
 DEAFULT_DESCRIPTION = """
@@ -50,18 +33,31 @@ First explain it normally and then explain it in analogies.
     'do_i_want_to_read_this': 'As a human being with limited time should i read this paper or should I look into others instead? Give a confidence score from 0 to 100 if i should read it and explain why',
 }
 class Audience():
-    def __init__(self, audience_description = None, keywords = None, keywords_to_exclude = None, paper_questions=None):
+    DEFAULT_KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
+                       'construction engineering', 'material science', 'robotics', 'mobility', 'geology']
+
+    DEFAULT_KEYWORDS_OF_INTEREST = None
+
+    def __init__(self, audience_description = None, keywords = None, keywords_to_exclude = None, paper_questions=None, topics=None, name=None):
         self.audience_description = audience_description if audience_description else DEAFULT_DESCRIPTION
-        self.keywords = keywords if keywords else COMMON_KEYWORDS
-        self.keywords_to_exclude = keywords_to_exclude if keywords_to_exclude else KEYWORS_EXCLUDE
+        self.keywords = keywords if keywords else Audience.DEFAULT_KEYWORDS_OF_INTEREST
+        self.keywords_to_exclude = keywords_to_exclude if keywords_to_exclude else Audience.DEFAULT_KEYWORS_EXCLUDE
         self.paper_questions = paper_questions if paper_questions else DEFAULT_PAPER_QUESTIONS
+        self.topics = topics
+        self.name = name
 
     def get_preferences(self) -> str:
         """
         Returns all the preferences of the profile encoded in a string
         """
-        return f"""General Preferences: {self.audience_description}
-Important relevant topics: \n - {'\n - '.join(self.keywords)}
 
+        if self.keywords:
+           keywords_str = f"""Important relevant topics: \n - {'\n - '.join(self.keywords)}
+           """
+        else:
+            keywords_str = ""
+
+        return f"""{self.audience_description}
+{keywords_str}
 Non relevant topics (make sure they are not mentioned in the results): \n - {'\n - '.join(self.keywords_to_exclude)}
         """

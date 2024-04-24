@@ -60,6 +60,9 @@ INPUT: {prompt_input}
 PROMPT: {prompt[0:200]}...
             """
 
+        if 'PRINT_PROMPT' in os.environ:
+            print(prompt)
+
         self._cost_check(prompt, prompt_input, expected_ouput_len, ask_cost_confirmation)
 
 

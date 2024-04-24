@@ -77,6 +77,25 @@ to see what is going on on important institutions and companies in the field of 
     """,
     paper_questions=paper_questions,
     topics=topics,
+    keywords=['cs.AI', 'cs.LG', 'cs.SI', 'stat.ML',
+        'ai', 'machine learning',
+         'data science',
+        'large language models',
+        'ai for social good',
+        'ai ethics'
+        'data science management and data science teams  performance',
+        'ai regulation',
+        'deep learning & neural nets',
+        'mlops',
+        'ads',
+        'computer science',
+        'knowledge graphs',
+        'graph neural networks',
+        'ai productivity',
+        'explainable ai',
+        'xai'
+    ]
+
 )
 
 gdp = Audience(
@@ -91,4 +110,73 @@ to see what is going on on important institutions and companies in the field of 
 )
 
 
-sota_preferences = SotaPreferences(audiences={'jean': jean, 'gdp': gdp})
+art = Audience(
+    audience_description="""
+    The activity ranking team team has the following mission:
+    We provide customers with a highly relevant and personalized ranking of activities to make easier purchase decisions. We also enable our suppliers to grow through a fair assessment of their activities.
+    Responsibilities
+    Search ranking logic:
+    Global baseline ranking used on GYG web (POIs and search results), native apps and partner widget
+    Ranking service used to fine tune the global ranking for each request based on request context
+""",
+    topics=topics,
+)
+
+sdp = Audience(
+    audience_description="""
+    the supply data products team has the following mission:
+    Our mission is to build impactful data products to automate, advance, and empower our supply domain.
+    
+revelant topics examples are:
+demand forecast
+inventory management
+coverage of locations
+catalog
+
+""",
+    topics=topics,
+)
+tdp = Audience(
+    audience_description="""
+    The traveler data products team has the following mission:
+Develop data driven capabilities to support scaling and optimization of products in the traveler group domain of GYG.
+
+Entity Ranking:
+Logic to rank collection filters, POIs, … on Destination Pages
+Entity Ranking Service
+(Similar) Recommendations
+Recommendations model logic
+Reco service incl. ADP user history
+Query Understanding
+""",
+    topics=topics,
+)
+
+tdp = Audience(
+    audience_description="""
+    The traveler data products team has the following mission:
+Develop data driven capabilities to support scaling and optimization of products in the traveler group domain of GYG.
+
+Entity Ranking:
+Logic to rank collection filters, POIs, … on Destination Pages
+Entity Ranking Service
+(Similar) Recommendations
+Recommendations model logic
+Reco service incl. ADP user history
+Query Understanding
+""",
+    topics=topics,
+)
+
+mlp = Audience(
+    audience_description="""
+    Machine learning platform team
+    
+    Has the following mission
+    Enable data scientists and engineers to deliver production-ready data products faster and reliably by leveraging MLOps best practices providing self-service tools and automation. 
+
+""",
+    topics=topics,
+)
+
+sota_preferences = SotaPreferences(audiences={'jean': jean, 'gdp': gdp, 'art': art, 'sdp': sdp, 'tdp': tdp, 'mlp': mlp})
