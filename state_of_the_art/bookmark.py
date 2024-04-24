@@ -12,11 +12,14 @@ class Bookmark():
     EVENT_NAME = 'paper_bookmarks'
     def add(self, paper_url, comment: Optional[str]):
         print(f"Registering paper {paper_url} in bookmarks")
-        paper = Paper(arxiv_url=Paper.convert_pdf_to_abstract(paper_url))
+        try: 
+            paper = Paper(arxiv_url=Paper.convert_pdf_to_abstract(paper_url))
+        except Exception as e:
+            print("Given url is not from Arxiv")
 
         dwh = config.get_datawarehouse()
-        dwh.write_event(self.EVENT_NAME, {'paper_url': paper.arxiv_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
-
+        dwh.write_event(self.EVENT_NAME, {'paper_url': paper_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
+        self.send_to_email()
 
     def add_from_clipboard(self):
         import subprocess

@@ -11,6 +11,9 @@ topics = {
         synonyms=['bidding', 'auction', 'google ads', 'paid search', 'bid optimization', 'bidding', 'bid management', 'bid optimization', 'search engine marketing', 'paid advertising', 'bid', 'portifolio optimization'],
         subtopics=[]
     ),
+    'clv':  Topic(
+        synonyms=['customer lifetime value', 'clv'],
+    ),
     'xsell':  Topic(
         synonyms=['cross sell', 'cross sell recommendations', 'collaborative filtering', 'cross sell optimization'],
         subtopics=['recommnder systems', 'cross sell', 'cross sell recommendation', 'cross sell strategy', 'cross sell optimization']
@@ -20,7 +23,9 @@ topics = {
             'experimentation',
             'ab-test',
             'experiment design', 'experiment analysis', 'experimentation and reporting'],
-        subtopics=['markov chain attribution', 'marketing measurement',
+        subtopics=[
+                    'statistical signficance', 'ab-test', 'experiment design', 'experiment analysis', 'experimentation and reporting'
+                    'markov chain attribution', 'marketing measurement',
                    'marketing metrics',
                    'marketing analytics',
                    'marketing attribution',
@@ -30,7 +35,7 @@ topics = {
         synonyms=['data products management', 'data science leadership', 'success metrics'],
         subtopics=[]
     ),
-    'collaboration': Topic(
+    'coVllaboration': Topic(
         synonyms=['tech teams collaboration beyond immediate team', 'tech organizations cohesion', 'achieving impact beydon the team', 'top performing organization', 'data prodcuts'],
         subtopics=[]
     )

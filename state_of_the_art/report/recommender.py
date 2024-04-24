@@ -8,7 +8,7 @@ from state_of_the_art.report.report_parameters import ReportParemeters
 from state_of_the_art.report.reports_data import ReportsData
 import sys
 
-class Report():
+class RecommenderReport():
     """
     Class responsible to the entire generation pipeline
     """
