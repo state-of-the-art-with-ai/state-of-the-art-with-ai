@@ -1,5 +1,5 @@
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
-from state_of_the_art.report.reports_data import ReportsData
+from state_of_the_art.recommender.reports_data import ReportsData
 
 
 class SummaryFormatter:

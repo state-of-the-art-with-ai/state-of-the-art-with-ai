@@ -2,6 +2,7 @@
 from state_of_the_art.config import config
 from state_of_the_art.llm import LLM
 from state_of_the_art.paper.paper import Paper
+from state_of_the_art.utils.mail import Mail
 
 
 class PaperInsightExtractor:
@@ -15,6 +16,15 @@ class PaperInsightExtractor:
 
         abstract_url = Paper.convert_pdf_to_abstract(abstract_url)
         local_location = Paper(arxiv_url=abstract_url).download()
+
+        paper_title = abstract_url
+        try :
+            paper = Paper.load_paper_from_url(abstract_url)
+            paper_title = paper.title
+        except Exception as e:
+            print(f"Error loading paper from url {abstract_url} {e}")
+
+
         from pypdf import PdfReader
 
         reader = PdfReader(local_location)
@@ -31,11 +41,13 @@ class PaperInsightExtractor:
         prompt = self._get_prompt(question_topic=question_topic)
 
         result = LLM().call(prompt, PAPER_CONTENT)
-        print("Abstract: ", abstract_url)
+        result = f"Abstract: {abstract_url} + \n\n" + result
         print(result)
-
         question_topic = question_topic if question_topic else "all"
         config.get_datawarehouse().write_event('sota_paper_insight', {'abstract_url': abstract_url, 'insights': result, 'topic': question_topic})
+
+        Mail().send(result, f'Insight extracted form paper {paper_title}')
+
 
     def _get_prompt(self, question_topic=None) -> str:
         QUESTIONS = ""
@@ -70,4 +82,8 @@ tasks start###
 start of answers ###start
 Question 1 (institution):
 """
+
+
         return prompt
+
+

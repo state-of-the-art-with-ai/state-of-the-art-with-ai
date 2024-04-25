@@ -89,6 +89,10 @@ Url: {self.url}\n"""
         return result
 
     @staticmethod
+    def is_arxiv_url(url):
+        return url.startswith('http://arxiv.org') or url.startswith('https://arxiv.org')
+
+    @staticmethod
     def convert_pdf_to_abstract(url):
         url = url.replace('.pdf', '')
         url = url.replace('pdf', 'abs')

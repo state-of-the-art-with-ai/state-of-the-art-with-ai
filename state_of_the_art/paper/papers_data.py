@@ -32,9 +32,7 @@ class PapersInDataWharehouse():
         max_papers = batch_size
         if not article_slices:
             article_slices = (max_papers * (batch - 1), max_papers * batch)
-
         print("Look back days ", lookback_days)
-        print("Article slices ", article_slices)
 
         from_date = from_date if from_date else (datetime.date.today() - datetime.timedelta(days=lookback_days)).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()

@@ -1,5 +1,4 @@
 
-import os
 from typing import Optional
 from state_of_the_art.config import config
 import datetime
@@ -25,15 +24,9 @@ class Bookmark():
         import subprocess
         url = subprocess.check_output("clipboard get_content", shell=True, text=True)
         url = url.strip()
-
-        if not Paper.is_valid_abstract_url(url):
-            return f"Invalid url {url}"
-
         self.add(url, 'regisered interest')
 
-
-
-    def list(self, return_result=True):
+    def list(self, return_result=True, top_n=None):
         dwh = config.get_datawarehouse()
         dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
 
@@ -41,7 +34,11 @@ class Bookmark():
         counter = 1
         for i in dict:
             paper_title = "Title not found"
-            paper_url = Paper.convert_pdf_to_abstract(dict[i]['paper_url'])
+            paper_url = dict[i]['paper_url']
+
+            if Paper.is_arxiv_url(paper_url):
+                paper_url = Paper.convert_pdf_to_abstract(paper_url)
+
             try:
                 paper = Paper.load_paper_from_url(paper_url)
                 paper_title = paper.title
@@ -54,6 +51,8 @@ Comment: {dict[i]['comment']}
 
 """
             counter += 1
+            if top_n and counter > top_n:
+                break
 
         if return_result:
             return result

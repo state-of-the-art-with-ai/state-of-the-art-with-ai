@@ -9,7 +9,7 @@ from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
 from state_of_the_art.llm import LLM
 from state_of_the_art.ranker.rank_generated_data import RankGeneratedData
-from state_of_the_art.report.report_parameters import RecommenderParameters
+from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.utils.mail import Mail
 
 class PaperRanker:
@@ -26,7 +26,7 @@ class PaperRanker:
         if dry_run:
             print(prompt)
 
-        articles_str = self.get_articles_str(articles)
+        articles_str = self._format_input_articles(articles)
 
         if 'PRINT_PAPERS_INPUT' in os.environ:
             print(articles_str)
@@ -54,7 +54,7 @@ class PaperRanker:
 
         return formatted_result
 
-    def get_articles_str(self, papers)->str:
+    def _format_input_articles(self, papers)->str:
         papers_str = " "
         counter = 1
         for i in papers.iterrows():
