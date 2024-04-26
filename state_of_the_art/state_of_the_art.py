@@ -1,6 +1,5 @@
 
-from state_of_the_art.paper_miner.arxiv_miner import PaperMiner
-from state_of_the_art.ranker.ranker import PaperRanker
+from state_of_the_art.register_papers.arxiv_miner import PaperMiner
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.paper.browser import BrowserPapers as browser_papers
 from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
@@ -16,7 +15,6 @@ class Sota:
         self.browser_papers = browser_papers
         self.papers_ui = browser_papers().fzf
         self.papers = PapersInDataWharehouse()
-        self.rank = PaperRanker().rank
         self.PaperMiner = PaperMiner()
         self.PaperInsightExtractor = PaperInsightExtractor
         self.bookmark = bookmark()

@@ -38,7 +38,6 @@ class PaperMiner():
             papers = papers + self._find_papers(query=topic, sort_by='relevance')
             papers = papers + self._find_papers(query=topic, sort_by='submitted')
 
-        print("Found ", len(papers), " papers")
         papers = [p for p in papers if p.url not in self.existing_papers_urls]
         print("Found ", len(papers), " new papers")
 

@@ -1,5 +1,7 @@
 import os
 from state_of_the_art.preferences.audience import Audience
+from tiny_data_warehouse import DataWarehouse
+
 
 class Config():
     HOME = os.path.expanduser("~")
@@ -15,6 +17,7 @@ class Config():
     # the maximum allowed context lenght for the open-ai model
     MAX_CHARS_CONTEXT_LENGHT = 128000 * 4 
     OPEN_API_KEY = os.environ['SOTA_OPENAI_KEY']
+    dwh = None
 
     def get_current_audience(self) -> Audience:
         # @todo implement this dynamically
@@ -25,8 +28,12 @@ class Config():
         return Config()
 
     def get_datawarehouse(self):
-        from tiny_data_warehouse.data_warehouse import DataWarehouse
-        return DataWarehouse()
+        if self.dwh:
+            return self.dwh
+
+        self.dwh = DataWarehouse(events_config={'arxiv_papers': {'prevent_duplicates_col': 'url'}})
+
+        return self.dwh
 
 
 

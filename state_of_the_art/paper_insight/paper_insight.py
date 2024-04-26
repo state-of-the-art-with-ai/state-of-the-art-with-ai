@@ -1,6 +1,6 @@
 
 from state_of_the_art.config import config
-from state_of_the_art.llm import LLM
+from state_of_the_art.utils.llm import LLM
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.utils.mail import Mail
 
@@ -13,6 +13,7 @@ class PaperInsightExtractor:
         self.profile = config.get_current_audience()
 
     def answer_questions(self, abstract_url: str, question_topic=None):
+        abstract_url = abstract_url.strip()
 
         abstract_url = Paper.convert_pdf_to_abstract(abstract_url)
         local_location = Paper(arxiv_url=abstract_url).download()
