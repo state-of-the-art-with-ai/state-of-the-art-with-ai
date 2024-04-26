@@ -8,10 +8,7 @@ from state_of_the_art.paper.paper import Paper
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.recommender.report import RecommenderReport
-from state_of_the_art.recommender.formatter import SummaryFormatter
-from state_of_the_art.recommender.reports_data import ReportsData
 from state_of_the_art.topic_deepdive.topic_search import TopicSearch
-from state_of_the_art.utils.mail import Mail
 
 class Sota:
     def __init__(self):

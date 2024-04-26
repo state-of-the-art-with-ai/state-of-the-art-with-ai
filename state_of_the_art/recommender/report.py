@@ -10,7 +10,6 @@ import sys
 
 from state_of_the_art.topic_deepdive.topic_search import TopicSearch
 
-
 class RecommenderReport():
     """
     Class responsible to the entire generation pipeline
