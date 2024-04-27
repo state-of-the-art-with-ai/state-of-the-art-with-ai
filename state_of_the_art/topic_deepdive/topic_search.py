@@ -21,7 +21,11 @@ class TopicSearch:
         """
         from state_of_the_art.config import config
         audience: Audience = config.get_current_audience()
-        topic : Topic = audience.get_topics()[topic_name]
+
+        topics = audience.get_topics()
+        if topic_name not in topics:
+            raise Exception(f"Topic {topic_name} not found in audience topics {topics.keys()}")
+        topic : Topic = topics[topic_name]
         print(f"Searching for topic {topic_name} with query {topic.semantic_query}")
 
         self.search_with_query(topic.semantic_query)

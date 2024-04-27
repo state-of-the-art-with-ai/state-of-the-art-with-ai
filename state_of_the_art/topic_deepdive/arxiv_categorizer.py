@@ -1,4 +1,4 @@
-from state_of_the_art.config import config
+from state_of_0the_art.config import config
 class TopicInsights:
     def get_categories_for_topic(self):
 

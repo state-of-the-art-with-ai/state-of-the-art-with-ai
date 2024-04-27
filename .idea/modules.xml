@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/state-of-the-art-via-ai.iml" filepath="$PROJECT_DIR$/.idea/state-of-the-art-via-ai.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tiny-data-warehouse/.idea/tiny-data-wharehouse.iml" filepath="$PROJECT_DIR$/../tiny-data-warehouse/.idea/tiny-data-wharehouse.iml" />
     </modules>
   </component>
 </project>
