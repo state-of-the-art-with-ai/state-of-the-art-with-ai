@@ -7,7 +7,8 @@ from state_of_the_art.paper.paper import Paper
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.recommender.report import RecommenderReport
-from state_of_the_art.topic_deepdive.topic_search import TopicSearch
+from state_of_the_art.recommender.topic_based.searches import SemanticSearch
+from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 
 class Sota:
     def __init__(self):
@@ -20,6 +21,7 @@ class Sota:
         self.bookmark = bookmark()
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
         self.topic_search = TopicSearch
+        self.SemanticSearch = SemanticSearch
 
 
 def main():

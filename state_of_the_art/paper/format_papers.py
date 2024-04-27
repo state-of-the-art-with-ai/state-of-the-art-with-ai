@@ -1,7 +1,7 @@
 from typing import List
 
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
-from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
+from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 
 class PapersFormatter:
     """ Class optimized to format a list of papers for reading """

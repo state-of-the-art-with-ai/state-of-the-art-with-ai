@@ -21,7 +21,7 @@ class Config():
 
     def get_current_audience(self) -> Audience:
         # @todo implement this dynamically
-        from examples.gyg import sota_preferences
+        from examples.gyg_teams import sota_preferences
         return sota_preferences.get_current_audience()
     @staticmethod
     def load_config():

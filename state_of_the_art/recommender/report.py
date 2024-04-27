@@ -1,14 +1,14 @@
 from typing import Optional
 
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
-from state_of_the_art.paper.text_extractor import PapersUrlsExtractor
+from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.register_papers.arxiv_miner import PaperMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
 from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.recommender.reports_data import ReportsData
 import sys
 
-from state_of_the_art.topic_deepdive.topic_search import TopicSearch
+from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 
 class RecommenderReport():
     """

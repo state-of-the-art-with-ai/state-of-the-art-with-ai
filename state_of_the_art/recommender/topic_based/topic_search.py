@@ -1,17 +1,21 @@
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.preferences.audience import Audience
 
-from state_of_the_art.topic_deepdive.searches import Bm25Search
-from state_of_the_art.topic_deepdive.topic import Topic
+from state_of_the_art.recommender.topic_based.searches import Bm25Search, SemanticSearch
+from state_of_the_art.recommender.topic_based.topic import Topic
 
-MAX_PAPERS = 30
+from state_of_the_art.recommender.topic_based.topic_extraction import TopicExtractor
+
 
 class TopicSearch:
+    MAX_PAPERS = 20
+
     def __init__(self):
         papers_data = PapersInDataWharehouse()
         papers = papers_data.load_papers()
         papers_list = papers_data.df_to_papers(papers)
-        self.search = Bm25Search(papers_list)
+        self.bm25_search = Bm25Search(papers_list)
+        self.semantic_search = SemanticSearch()
 
     def search_by_topic(self, topic_name: str):
         """
@@ -26,13 +30,22 @@ class TopicSearch:
         if topic_name not in topics:
             raise Exception(f"Topic {topic_name} not found in audience topics {topics.keys()}")
         topic : Topic = topics[topic_name]
+
+        if not topic.semantic_query:
+            topic.semantic_query = TopicExtractor().extract_semantic_query(topic)
+            print(f'Extracted semantic query: ', topic.semantic_query)
+
         print(f"Searching for topic {topic_name} with query {topic.semantic_query}")
 
-        self.search_with_query(topic.semantic_query)
 
-    def search_with_query(self, query: str):
-        papers = self.search.search(query)
+        print("BM25")
+        papers = self.bm25_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
         self.print_papers(papers)
+
+        print("Semantic results")
+        self.semantic_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
+
+
 
     def print_papers(self, papers):
         result = [p.published_date_str() + ' ' + p.title[0:100] + ' ' + p.url for p in papers]

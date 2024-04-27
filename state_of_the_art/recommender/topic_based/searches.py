@@ -10,8 +10,7 @@ from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 
-
-class VectorSearch:
+class SemanticSearch:
 
     def __init__(self):
         self.client = self.setup()
@@ -23,6 +22,7 @@ class VectorSearch:
         try:
             self.collection = self.client.get_collection('papers')
         except:
+            print('Collection not found')
             self.collection = self.setup_papers()
 
 
@@ -78,10 +78,6 @@ class VectorSearch:
 
 
 
-if __name__ == "__main__":
-    import fire
-    fire.Fire()
-
 
 class Bm25Search:
     def __init__(self, papers_data: List[Paper]):
@@ -100,11 +96,11 @@ class Bm25Search:
 
         return bm25
 
-    def search(self, query, MAX_PAPERS=25):
+    def search(self, query, n=25):
         tokenized_query = self.tokenize(query)
 
         matches = self.bm25.get_top_n(
-            tokenized_query, self.papers_data, n=MAX_PAPERS
+            tokenized_query, self.papers_data, n=n
         )
 
         return matches
@@ -113,3 +109,7 @@ class Bm25Search:
         tokens = self.tokenizer.tokenize(string)
         lemmas = [self.lemmatizer.lemmatize(t) for t in tokens]
         return lemmas
+if __name__ == "__main__":
+    import fire
+    fire.Fire()
+
