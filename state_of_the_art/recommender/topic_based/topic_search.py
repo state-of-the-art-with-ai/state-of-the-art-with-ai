@@ -42,13 +42,14 @@ class TopicSearch:
         print("Semantic Search")
         ids = self.semantic_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
         papers_str = str(ids)
+        formatter = PapersFormatter(max_abstract_size=200)
 
 
-        print(PapersFormatter().from_str(papers_str))
+        print(formatter.from_str(papers_str))
 
         print("BM25")
-        papers = self.bm25_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
-        print(PapersFormatter().from_papers(papers))
+        papers = self.bm25_search.search(topic.semantic_query, n=10)
+        print(formatter.from_papers(papers))
 
 
 

@@ -15,7 +15,7 @@ class Audience():
 
     DEFAULT_PAPER_QUESTIONS = {
         'institution': 'Which institution published this paper?',
-        'problem_definition': """Which is the key problem the paper is trying to address? Make it simple and focus on the core of the prblem while explaining it.""",
+        'explain_me': 'Guide me through understanding the main point of the paper even if you are not 100% in the topic',
         'top_insights': """What are the key insights of the paper?
     Highlight only key insights, ideally actionable ones.
     The insights can come form the results of the paper or form literature review
@@ -26,15 +26,14 @@ class Audience():
     Make sure to mention a literal quote from the paper that supports your insight
         """,
         'literature_review': 'What is the most interesting learning from this paper literature review? Quote the interesting part literally and explain why its interesting',
-        'state_of_art_before': 'What was the state of the art before this paper? Analyse and summarize what does the paper mention in the literature review about it?',
         'hardest_part': """What is the more complex part of the paper?
-    First identify what it is and define it well. Explain terms that are not necessarily explained in the paper but are crucial to understand the hardest part.
-    Then break down the topic on its parts as they are explained in the paper. Quote literally a phrase form the paper where it talks about it.
-    First explain it normally and then explain it in analogies.
-    """,
+        First identify what it is and define it well. Explain terms that are not necessarily explained in the paper but are crucial to understand the hardest part.
+        Then break down the topic on its parts as they are explained in the paper. Quote literally a phrase form the paper where it talks about it.
+        First explain it normally and then explain it in analogies.
+        """,
         'methodology': """Is the methodoloy and claims of the  paper sound? What are the weaknessess? Be skeptical, act like a scientific reviewer and provide a critique of the methodology of the paper""",
-        'main_finding': """What is the main finding of this paper? """,
-        'outcome_actions': """What are top actions recommended as learnings from this paper? """,
+        'value_realised': """Which palpable value did the authors get out of the paper and related projects? What does it allows now that it was not possible before?""",
+        'recommended_actions': """What are top actions recommended as learnings from this paper? """,
     }
 
     def __init__(self, audience_description = None, keywords = None, keywords_to_exclude = None, paper_questions=None, topics=None, name=None):

@@ -19,4 +19,4 @@ if you detect some domain specific words that are not common in scientific paper
 limit it to 10 words max
 Topic: {text}
         Your query:"""
-        return self.llm.call(prompt, topic.problem_document)
+        return self.llm.call(prompt, topic.problem_description)

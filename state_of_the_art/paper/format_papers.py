@@ -8,8 +8,9 @@ class PapersFormatter:
     from a list of strings or a list of papers return a reading formattted optimzed ouput
 
     """
-    def __init__(self, show_abstract=True):
-        self.disable_abstract = show_abstract
+    def __init__(self, show_abstract=True, max_abstract_size=500):
+        self.show_abstract = show_abstract
+        self.max_abstract_size = max_abstract_size
     def from_str(self, papers_str: str) -> str:
         urls = PapersUrlsExtractor().extract_urls(papers_str)
         papers = PapersInDataWharehouse().load_papers_from_urls(urls)
@@ -19,13 +20,14 @@ class PapersFormatter:
         formatted_result = ""
         counter = 1
         for paper in papers:
-            if self.disable_abstract:
+            if not self.show_abstract:
                 abstract = ""
             else:
-                abstract = f"\n{paper.abstract[0:500]}"
+                abstract = f"Abstract: {paper.abstract[0:self.max_abstract_size]}"
             formatted_result += f"""
 {counter}. {paper.title}  
 {paper.url} {paper.published_date_str()}
-{abstract}"""
+{abstract}\n\n"""
+
             counter = counter + 1
         return formatted_result
