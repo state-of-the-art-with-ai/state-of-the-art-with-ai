@@ -46,9 +46,10 @@ class Bookmark():
                 pass
             result += f"""{counter}. Title: {paper_title} 
 {paper_url}
-Date bookmark: {str(dict[i]['bookmarked_date']).split(' ')[0]}
 Comment: {dict[i]['comment']} 
-
+Published: {paper.published_date_str()}
+Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
+\n
 """
             counter += 1
             if top_n and counter > top_n:
@@ -68,8 +69,6 @@ Comment: {dict[i]['comment']}
 
     def send_to_email(self):
         Mail().send(self.list(return_result=True), "SOTA Bookmarks as of " + datetime.date.today().isoformat())
-
-
 
     def fzf(self):
         import os
