@@ -1,3 +1,4 @@
+from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.preferences.audience import Audience
 
@@ -38,19 +39,18 @@ class TopicSearch:
         print(f"Searching for topic {topic_name} with query {topic.semantic_query}")
 
 
+        print("Semantic Search")
+        ids = self.semantic_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
+        papers_str = str(ids)
+
+
+        print(PapersFormatter().from_str(papers_str))
+
         print("BM25")
         papers = self.bm25_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
-        self.print_papers(papers)
-
-        print("Semantic results")
-        self.semantic_search.search(topic.semantic_query, n=TopicSearch.MAX_PAPERS)
+        print(PapersFormatter().from_papers(papers))
 
 
-
-    def print_papers(self, papers):
-        result = [p.published_date_str() + ' ' + p.title[0:100] + ' ' + p.url for p in papers]
-        for r in result:
-            print(r)
 
 
 if __name__ == "__main__":

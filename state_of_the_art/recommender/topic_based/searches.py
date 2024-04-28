@@ -56,12 +56,7 @@ class SemanticSearch:
                 query = "".join(data)
 
         ids = self.collection.query(query_texts=[query], n_results=n)['ids'][0]
-        print(ids)
-
-        papers_data = PapersInDataWharehouse()
-        papers = papers_data.to_papers(papers_data.load_from_urls(ids))
-
-        print(PapersFormatter(disable_abstract=True).from_papers(papers))
+        return ids
 
 
 

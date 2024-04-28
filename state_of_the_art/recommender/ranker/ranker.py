@@ -7,7 +7,7 @@ from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.utils.llm import LLM
-from state_of_the_art.recommender.ranker.rank_generated_data import RankGeneratedData
+from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
 from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.utils.mail import Mail
 
