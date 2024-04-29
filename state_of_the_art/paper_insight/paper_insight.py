@@ -12,7 +12,13 @@ class PaperInsightExtractor:
     def __init__(self):
         self.profile = config.get_current_audience()
 
+    def answer_questions_from_clipboard(self):
+        import subprocess
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        self.answer_questions(url, 'regisered interest')
+
     def answer_questions(self, abstract_url: str, question_topic=None):
+        print("Generating insights for paper: ", abstract_url)
         abstract_url = abstract_url.strip()
 
         abstract_url = Paper.convert_pdf_to_abstract(abstract_url)

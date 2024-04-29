@@ -10,6 +10,7 @@ class Bookmark():
 
     EVENT_NAME = 'paper_bookmarks'
     def add(self, paper_url, comment: Optional[str]):
+        paper_url = paper_url.strip()
         print(f"Registering paper {paper_url} in bookmarks")
         try: 
             paper = Paper(arxiv_url=Paper.convert_pdf_to_abstract(paper_url))
@@ -20,7 +21,15 @@ class Bookmark():
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
         self.send_to_email()
 
-    def add_from_clipboard(self):
+    def add_interactive(self):
+        print("Interactive collecting paper input")
+        import subprocess
+        url = subprocess.check_output("collect_input -n Url -p", shell=True, text=True)
+        comment = subprocess.check_output("collect_input -n Comment -p", shell=True, text=True)
+        self.add(url, comment)
+
+
+    def register_interest(self):
         import subprocess
         url = subprocess.check_output("clipboard get_content", shell=True, text=True)
         url = url.strip()
