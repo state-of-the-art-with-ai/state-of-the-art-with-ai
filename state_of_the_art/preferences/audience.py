@@ -1,13 +1,8 @@
-
-
-
-
-
-
-
 class Audience():
-    DEFAULT_KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy', 'chemistry',
-                       'construction engineering', 'material science', 'robotics', 'mobility', 'geology', 'electrical engineering']
+    DEFAULT_KEYWORS_EXCLUDE = ['physics', 'biology', 'bioinformatics and biomedicine', 'medicine', 'astronomy',
+                               'chemistry',
+                               'construction engineering', 'material science', 'robotics', 'mobility', 'geology',
+                               'electrical engineering']
 
     DEFAULT_KEYWORDS_OF_INTEREST = None
 
@@ -19,7 +14,7 @@ class Audience():
         'top_insights': """What are the key insights of the paper?
     Highlight only key insights, ideally actionable ones.
     The insights can come form the results of the paper or form literature review
-    Highlight 3-4 insights.
+    Highlight 3-5 insights.
     Avoid trivial insights that are common knowledge for your audience.
     Avoid salesly insights that are not backed up by data.
     Highlight also insights from the literature review in the paper.
@@ -32,19 +27,22 @@ class Audience():
         First explain it normally and then explain it in analogies.
         """,
         'methodology': """Is the methodoloy and claims of the  paper sound? What are the weaknessess? Be skeptical, act like a scientific reviewer and provide a critique of the methodology of the paper""",
-        'value_realised': """Which palpable value did the authors get out of the paper and related projects? What does it allows now that it was not possible before?""",
         'recommended_actions': """What are top actions recommended as learnings from this paper? """,
     }
 
-    def __init__(self, audience_description = None, keywords = None, keywords_to_exclude = None, paper_questions=None, topics=None, name=None):
+    def __init__(self, audience_description=None, keywords=None, keywords_to_exclude=None, paper_questions=None,
+                 topics=None, name=None):
         self.audience_description = audience_description if audience_description else Audience.DEAFULT_DESCRIPTION
         self.keywords = keywords if keywords else Audience.DEFAULT_KEYWORDS_OF_INTEREST
         self.keywords_to_exclude = keywords_to_exclude if keywords_to_exclude else Audience.DEFAULT_KEYWORS_EXCLUDE
         self.paper_questions = paper_questions if paper_questions else Audience.DEFAULT_PAPER_QUESTIONS
+        if topics and type(topics) != dict:
+            raise ValueError("topics should be a dict, found ", type(topics))
+
         self.topics = topics
         self.name = name
 
-    def get_topics(self):
+    def get_topics(self) -> dict:
         return self.topics
 
     def get_preferences(self) -> str:
@@ -53,7 +51,7 @@ class Audience():
         """
 
         if self.keywords:
-           keywords_str = f"""Important relevant topics: \n - {'\n - '.join(self.keywords)}
+            keywords_str = f"""Important relevant topics: \n - {'\n - '.join(self.keywords)}
            """
         else:
             keywords_str = ""

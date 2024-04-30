@@ -2,11 +2,11 @@ import os
 
 import sys
 from typing import List
+import tqdm
 
 import nltk
 from rank_bm25 import BM25Okapi as BM25
 
-from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 
@@ -33,16 +33,16 @@ class SemanticSearch:
         papers = PapersInDataWharehouse().get_all_papers()
         documents = []
         ids = []
-        for paper in papers:
-            documents.append(paper.title + ' ' + paper.abstract)
-            ids.append(paper.url)
 
         collection = self.client.get_or_create_collection('papers')
+
+        for paper in tqdm.tqdm(papers):
+            collection.add(
+                documents=[paper.title + ' ' + paper.abstract],
+                ids=[paper.url],
+            )
+
         print('Adding documents', len(documents))
-        collection.add(
-            documents=documents,
-            ids=ids,
-        )
         self.collection = collection
         print('Done setting up documents')
 
@@ -62,7 +62,7 @@ class SemanticSearch:
 
     def info(self):
         return {
-            'docs': self.collection.get()
+            'docs_count': self.collection.count()
 
         }
 

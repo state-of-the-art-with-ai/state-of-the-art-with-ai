@@ -19,7 +19,7 @@ class PaperMiner():
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
-    def register_new(self, dry_run=False, max_papers_per_query=None):
+    def register_new(self, dry_run=False, max_papers_per_query=None, topic=None):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
@@ -30,11 +30,17 @@ class PaperMiner():
         if dry_run:
             print("Dry run, just printing, not registering them")
 
-        topics = config.get_current_audience().keywords
-        print("Registering papers for the following keywords: ", topics)
+
+
+        if topic:
+            topics_to_mine = [topic]
+        else:
+            topics_to_mine = self._get_default_topics()
+
+        print(f"Registering papers for the following ({len(topics_to_mine)}) keywords: ", topics_to_mine)
 
         papers = []
-        for topic in topics:
+        for topic in topics_to_mine:
             papers = papers + self._find_papers(query=topic, sort_by='relevance')
             papers = papers + self._find_papers(query=topic, sort_by='submitted')
 
@@ -47,6 +53,15 @@ class PaperMiner():
         total_registered, total_skipped = self._register_given_papers(papers)
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
+
+    def _get_default_topics(self) -> List[str]:
+        audience_keywords = config.get_current_audience().keywords
+        topics_to_mine = audience_keywords
+        audience_topics = config.get_current_audience().get_topics().values()
+        for topic in audience_topics:
+            topics_to_mine = topics_to_mine + topic.get_arxiv_search_keywords()
+
+        return topics_to_mine
 
     def inspect_latest(self, *, query=None, n=10):
         """"
@@ -66,7 +81,7 @@ class PaperMiner():
             query = self.DEFAULT_QUERY
 
         if not number_of_papers:
-            number_of_papers = self.max_papers_per_query if self.max_papers_per_query else self.config.MAX_PAPERS_TO_MINE_PER_QUERY
+            number_of_papers = self.max_papers_per_query if self.max_papers_per_query else self.config.papers_to_mine_per_query()
 
         sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
 
@@ -110,14 +125,16 @@ class PaperMiner():
         self.existing_papers_urls = self.load_existing_papers_urls()
 
 
+        registered_now = []
         for paper in tqdm(papers):
             counter = counter+1
-            if paper.url in self.existing_papers_urls:
+            if paper.url in self.existing_papers_urls or paper.url in registered_now:
                 skipped += 1
                 continue
 
             registered+=1
             self.tdw.write_event('arxiv_papers', paper.to_dict())
+            registered_now.append(paper.url)
 
         print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
         return registered, skipped

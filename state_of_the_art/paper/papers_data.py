@@ -25,7 +25,7 @@ class PapersInDataWharehouse():
 
         self.print_papers(papers)
 
-    def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1, batch_size=None):
+    def get_latest_articles(self, from_date: Optional[str]=None, to_date: Optional[str]=None, lookback_days=None, article_slices=None, batch=1, batch_size=100):
         if not from_date and not lookback_days:
             lookback_days = config.DEFAULT_LOOK_BACK_DAYS
 

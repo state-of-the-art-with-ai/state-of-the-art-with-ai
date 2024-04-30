@@ -7,9 +7,12 @@ from state_of_the_art.utils.mail import Mail
 from state_of_the_art.paper.paper import Paper
 
 class Bookmark():
-
     EVENT_NAME = 'paper_bookmarks'
     def add(self, paper_url, comment: Optional[str]):
+
+        if not comment:
+            comment = 'registered interest'
+
         paper_url = paper_url.strip()
         print(f"Registering paper {paper_url} in bookmarks")
         try: 
@@ -26,6 +29,7 @@ class Bookmark():
         import subprocess
         url = subprocess.check_output("collect_input -n Url -p", shell=True, text=True)
         comment = subprocess.check_output("collect_input -n Comment -p", shell=True, text=True)
+
         self.add(url, comment)
 
 

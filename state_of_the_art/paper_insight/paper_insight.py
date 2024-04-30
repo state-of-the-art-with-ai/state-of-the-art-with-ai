@@ -15,7 +15,7 @@ class PaperInsightExtractor:
     def answer_questions_from_clipboard(self):
         import subprocess
         url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        self.answer_questions(url, 'regisered interest')
+        self.answer_questions(url)
 
     def answer_questions(self, abstract_url: str, question_topic=None):
         print("Generating insights for paper: ", abstract_url)
@@ -74,6 +74,7 @@ Question {counter} (Topic: {key})
         prompt = f"""You are an world class expert in Data Science and computer science.
 Your job is answering questions about the paper given to you as they are asked.
 Mention the topic and question number in your answers. Make sure to answer all questions you are asked.
+make sure to mention all the questions do not stop after answering the first one
 Space the questions with 3 new lines
 Optimize your suggestions to the following audience: {self.profile.get_preferences()}
 
