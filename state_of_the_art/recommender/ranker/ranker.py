@@ -12,7 +12,6 @@ from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.utils.mail import Mail
 
 class PaperRanker:
-    MAX_ARTICLES_TO_RETURN = 25
 
     def __init__(self):
         self._enable_abstract_in_ranking = False
@@ -45,7 +44,6 @@ class PaperRanker:
         papers_str = PapersInDataWharehouse().papers_to_urls_str(PapersInDataWharehouse().df_to_papers(articles))
 
         ranking_data = RankGeneratedData(from_date=parameters.from_date, to_date=parameters.to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
-        print("Writing event")
         config.get_datawarehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
 
         print("Sending email")
@@ -68,36 +66,37 @@ Published: {i[1]['published']}
         return papers_str
     def get_prompt(self):
         return f"""You are an world class expert in Data Science and computer science.
-        Your task is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
-        Highlight only topics that are exciting or import for your target audience
+Your task is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
+Highlight only topics that are exciting or import for your target audience
 
-        ##start of target audience 
-                {config.get_current_audience().get_preferences()}
-        ##end of target audience
+##start of target audience 
+{config.get_current_audience().get_preferences()}
+##end of target audience
 
-        The articles for you to work with will be provided below in the following format (Title, Abstract, URL)
-        the order they are provided is not optimized, figure out the best order to present them to your audience.
-        Do not be biased by the given order of the papers, it does not mean more recent is more relevant.
-        Sort the papers from most relevant to less, return not more than a single page of results
-        Try also to include meta-analysis and reviews of the field.
+Try also to include meta-analysis and reviews of the field.
 
-        Example of expected output format: ##start
+Articles to rank
+The articles for you to work with will be provided below in the following format (Title, Abstract, URL)
+##start
+{{text}}
+##end of articles
 
-        (0.9) Title: "A new approach to ml pipeline testing" 
-        Arxiv URL: the article url
-        Relevance: Relevant because it presents a new approach to testing pipelines and could change how production systems are built.
+Example of expected output format: ##start
 
-        (0.7) Title: "a new mixed of experts llm breaking bechmarks"
-        Relevance: "Relevant because it presents a new large language model that could be used to improve quality and speed of delivery of recommendation system"
-        Arxiv URL: the article url
-        ## end of example
+(0.9) Title: "the title" 
+Arxiv URL: the article url
+Relevance: Relevant because it presents a new approach to .. 
 
-        Articles to rank
-        ##start
-        {{text}}
-        ##end of articles
+(0.7) Title: "the title 2"
+Relevance: "Relevant because it presents a new ... "
+Arxiv URL: the article url
+## end of example
 
-        Ranked output of articles: ##start """
+the order they are provided is not optimized, figure out the best order to present them to your audience.
+Do not be biased by the given order of the papers, it does not mean more recent is more relevant.
+Sort the papers from most relevant to less, return  {config.get_max_articles_to_return_rank()} ranked papers
+
+Ranked output of articles: ##start """
 
 
 if __name__ == "__main__":

@@ -7,6 +7,9 @@ from state_of_the_art.utils.mail import Mail
 from state_of_the_art.paper.paper import Paper
 
 class Bookmark():
+    """
+    Bookmarking papers for future reference
+    """
     EVENT_NAME = 'paper_bookmarks'
     def add(self, paper_url, comment: Optional[str]):
 
