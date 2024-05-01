@@ -5,6 +5,7 @@ import datetime
 
 from state_of_the_art.utils.mail import Mail
 from state_of_the_art.paper.paper import Paper
+import pandas as pd
 
 class Bookmark():
     """
@@ -12,6 +13,7 @@ class Bookmark():
     """
     EVENT_NAME = 'paper_bookmarks'
     def add(self, paper_url, comment: Optional[str]):
+        comment = comment.strip()
 
         if not comment:
             comment = 'registered interest'
@@ -37,23 +39,34 @@ class Bookmark():
 
         self.add(url, comment)
 
-
-    def register_interest(self):
-        import subprocess
-        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        url = url.strip()
-        self.add(url, 'regisered interest')
-
-    def list(self, return_result=True, top_n=None, n=None):
+    def load_df(self, n=None) -> pd.DataFrame:
         dwh = config.get_datawarehouse()
-        dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
+        df = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False)
 
-        result  = "Bookmarks: \n\n"
+        # join duplicates
+        df = df.groupby('paper_url').agg({'comment': ' '.join, 'bookmarked_date': 'last'}).reset_index().sort_values(
+            by='bookmarked_date', ascending=False)
+
+        if n:
+            return df.head(n)
+
+        return df
+
+
+    def list(self, n=None):
+        print(self.prepare_list(n=n))
+
+    def prepare_list(self, n=None):
+        dict = self.load_df(n=n).to_dict(orient='index')
+        result = "Bookmarks: \n\n"
         counter = 1
         for i in dict:
             paper_title = "Title not found"
             published_str = ""
             paper_url = dict[i]['paper_url']
+            comment = dict[i]['comment']
+            comment = comment.strip()
+            comment_str = f"Comment: {comment}" if comment else ""
 
             if Paper.is_arxiv_url(paper_url):
                 paper_url = Paper.convert_pdf_to_abstract(paper_url)
@@ -66,33 +79,15 @@ class Bookmark():
                 pass
             result += f"""{counter}. Title: {paper_title} 
 {paper_url}
-Comment: {dict[i]['comment']} 
+{comment_str}
 Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
 {published_str}
 \n
 """
-            if n:
-                top_n = n
             counter += 1
-            if top_n and counter > top_n:
-                break
 
-        if return_result:
-            return result
-
-        print(result)
-
-    def open_latest_paper(self):
-        dwh = config.get_datawarehouse()
-        dict = dwh.event(self.EVENT_NAME).sort_values(by='bookmarked_date', ascending=False).to_dict(orient='record')
-        latest = dict[0]
-        Paper(arxiv_url=latest['paper_url']).download_and_open()
-
+        return result
 
     def send_to_email(self):
-        Mail().send(self.list(return_result=True), "SOTA Bookmarks as of " + datetime.date.today().isoformat())
-
-    def fzf(self):
-        import os
-        os.system("sota bookmark list | fzf ")
+        Mail().send(self.prepare_list(), "SOTA Bookmarks as of " + datetime.date.today().isoformat())
 
