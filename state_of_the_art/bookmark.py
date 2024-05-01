@@ -27,11 +27,13 @@ class Bookmark():
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
         self.send_to_email()
 
+        self.list(return_result=False, n=10)
+
     def add_interactive(self):
         print("Interactive collecting paper input")
         import subprocess
         url = subprocess.check_output("collect_input -n Url -p", shell=True, text=True)
-        comment = subprocess.check_output("collect_input -n Comment -p", shell=True, text=True)
+        comment = subprocess.check_output("collect_input -n Comment", shell=True, text=True)
 
         self.add(url, comment)
 
@@ -42,7 +44,7 @@ class Bookmark():
         url = url.strip()
         self.add(url, 'regisered interest')
 
-    def list(self, return_result=True, top_n=None):
+    def list(self, return_result=True, top_n=None, n=None):
         dwh = config.get_datawarehouse()
         dict = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False).to_dict(orient='index')
 
@@ -50,6 +52,7 @@ class Bookmark():
         counter = 1
         for i in dict:
             paper_title = "Title not found"
+            published_str = ""
             paper_url = dict[i]['paper_url']
 
             if Paper.is_arxiv_url(paper_url):
@@ -58,15 +61,18 @@ class Bookmark():
             try:
                 paper = Paper.load_paper_from_url(paper_url)
                 paper_title = paper.title
+                published_str = f"Published: {paper.published_date_str()}"
             except Exception as e:
                 pass
             result += f"""{counter}. Title: {paper_title} 
 {paper_url}
 Comment: {dict[i]['comment']} 
-Published: {paper.published_date_str()}
 Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
+{published_str}
 \n
 """
+            if n:
+                top_n = n
             counter += 1
             if top_n and counter > top_n:
                 break

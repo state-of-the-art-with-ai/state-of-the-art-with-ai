@@ -8,7 +8,7 @@ class TopicExtractor:
     def __init__(self):
         self.llm = LLM()
 
-    def extract_semantic_query(self, topic: Topic) -> str:
+    def extract_semantic_query(self, description) -> str:
         """
         Extracts a topic from a text
         """
@@ -19,4 +19,4 @@ if you detect some domain specific words that are not common in scientific paper
 limit it to 10 words max
 Topic: {text}
         Your query:"""
-        return self.llm.call(prompt, topic.problem_description)
+        return self.llm.call(prompt, description)

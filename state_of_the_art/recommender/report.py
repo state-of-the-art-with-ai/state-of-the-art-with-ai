@@ -16,14 +16,14 @@ class RecommenderReport():
     """
 
     def generate(self, *, number_lookback_days=None, from_date=None, to_date=None, skip_register=False, dry_run=False,
-                 batch=1, batch_size=None, max_papers_per_query=None, papers_to_rank=None, query: Optional[str] = None, topic_dive: Optional[str] = None):
+                 batch=1, batch_size=None, max_papers_per_query=None, papers_to_rank=None, query: Optional[str] = None, topic_dive: Optional[str] = None, description_from_clipboard=False):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
 
         parameters = RecommenderParameters(lookback_days=number_lookback_days, from_date=from_date, to_date=to_date,
                                            skip_register=skip_register, dry_run=dry_run, batch=batch,
-                                           batch_size=batch_size, papers_to_rank=papers_to_rank, query=query, topic_dive=topic_dive)
+                                           batch_size=batch_size, papers_to_rank=papers_to_rank, query=query, topic_dive=topic_dive, description_from_clipboard=description_from_clipboard)
 
         if not skip_register:
             PaperMiner().register_new(dry_run=dry_run, max_papers_per_query=max_papers_per_query)
@@ -42,19 +42,25 @@ class RecommenderReport():
         if parameters.query:
             return TopicSearch().search_with_query(parameters.query)
 
-        if parameters.papers_to_rank:
-            articles = self._load_papers_from_str(parameters.papers_to_rank)
-        elif not sys.stdin.isatty():
+        if parameters.description_from_clipboard:
+            import subprocess
+            output = subprocess.getoutput('clipboard get_content')
+            print("Clipboard content: ", output)
+            return TopicSearch().extract_query_and_search(output)
+
+
+        if not sys.stdin.isatty():
             print("Reading from stdin")
             stdindata = sys.stdin.readlines()
             stdindata = "\n".join(stdindata)
-            articles = self._load_papers_from_str(stdindata)
-        else:
-            articles = PapersInDataWharehouse().get_latest_articles(lookback_days=parameters.lookback_days,
-                                                                    from_date=parameters.from_date,
-                                                                    batch=parameters.batch,
-                                                                    batch_size=parameters.batch_size)
-            print(f"Found {len(articles)} articles")
+            TopicSearch().extract_query_and_search(stdindata)
+            return
+
+        articles = PapersInDataWharehouse().get_latest_articles(lookback_days=parameters.lookback_days,
+        from_date=parameters.from_date,
+        batch=parameters.batch,
+        batch_size=parameters.batch_size)
+        print(f"Found {len(articles)} articles")
 
         if len(articles) == 0:
             return "No articles found"
