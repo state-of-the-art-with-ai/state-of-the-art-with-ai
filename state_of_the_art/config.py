@@ -2,12 +2,11 @@ import os
 from state_of_the_art.preferences.audience import Audience
 from tiny_data_warehouse import DataWarehouse
 
-
 class Config():
     HOME = os.path.expanduser("~")
     NEW_PAPERS_FOLDER = os.path.expanduser("~")+"/.arxiv_papers_new"
     MAX_ABSTRACT_SIZE_RANK=500
-    _MAX_PAPERS_TO_MINE_PER_QUERY = 50
+    DEFAUL_MAX_PAPERS_TO_MINE_PER_QUERY = 50
     DEFAULT_LOOK_BACK_DAYS = 1
     MINIMAL_CONFIRMATION_COST = 0.35
 
@@ -28,7 +27,7 @@ class Config():
     def papers_to_mine_per_query(self) -> int:
         if os.environ.get('PAPERS_TO_MINE_PER_QUERY'):
             return int(os.environ.get('PAPERS_TO_MINE_PER_QUERY'))
-        return self._MAX_PAPERS_TO_MINE_PER_QUERY
+        return self.DEFAUL_MAX_PAPERS_TO_MINE_PER_QUERY
 
     def get_current_audience(self) -> Audience:
         # @todo implement this dynamically

@@ -30,8 +30,6 @@ class PaperMiner():
         if dry_run:
             print("Dry run, just printing, not registering them")
 
-
-
         if topic:
             topics_to_mine = [topic]
         else:

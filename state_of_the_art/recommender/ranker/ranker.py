@@ -34,22 +34,7 @@ class PaperRanker:
             return "Dry run result"
 
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
-        formatted_result = PapersFormatter().from_str(result)
-        profile_name = config.get_current_audience().name.upper()
-
-        now = datetime.datetime.now().isoformat()
-        header = f"Results generated at {now} for profile: \"{profile_name}\" for period ({parameters.from_date}, {parameters.to_date}) analysed {len(articles)} papers: \n\n"
-        result = header + result
-        formatted_result = header + formatted_result
-        papers_str = PapersInDataWharehouse().papers_to_urls_str(PapersInDataWharehouse().df_to_papers(articles))
-
-        ranking_data = RankGeneratedData(from_date=parameters.from_date, to_date=parameters.to_date, prompt=prompt, summary=formatted_result, llm_result=result, papers_analysed=papers_str)
-        config.get_datawarehouse().write_event('state_of_the_art_summary', ranking_data.to_dict())
-
-        print("Sending email")
-        Mail().send(formatted_result, f'Sota summary batch {parameters.batch} at {now} for profile {profile_name}')
-
-        return formatted_result
+        return result
 
     def _format_input_articles(self, papers)->str:
         papers_str = " "

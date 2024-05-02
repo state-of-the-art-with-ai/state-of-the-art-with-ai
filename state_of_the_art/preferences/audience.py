@@ -20,6 +20,7 @@ class Audience():
     Highlight also insights from the literature review in the paper.
     Make sure to mention a literal quote from the paper that supports your insight
         """,
+        'recommended_actions': """What are top actions recommended as learnings from this paper? """,
         'literature_review': 'What is the most interesting learning from this paper literature review? Quote the interesting part literally and explain why its interesting',
         'hardest_part': """What is the more complex part of the paper?
         First identify what it is and define it well. Explain terms that are not necessarily explained in the paper but are crucial to understand the hardest part.
@@ -27,7 +28,6 @@ class Audience():
         First explain it normally and then explain it in analogies.
         """,
         'methodology': """Is the methodoloy and claims of the  paper sound? What are the weaknessess? Be skeptical, act like a scientific reviewer and provide a critique of the methodology of the paper""",
-        'recommended_actions': """What are top actions recommended as learnings from this paper? """,
     }
 
     def __init__(self, audience_description=None, keywords=None, keywords_to_exclude=None, paper_questions=None,

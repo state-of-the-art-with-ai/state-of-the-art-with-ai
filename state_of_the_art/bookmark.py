@@ -29,7 +29,7 @@ class Bookmark():
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
         self.send_to_email()
 
-        self.list(return_result=False, n=10)
+        self.list(n=10)
 
     def add_interactive(self):
         print("Interactive collecting paper input")
@@ -39,13 +39,17 @@ class Bookmark():
 
         self.add(url, comment)
 
-    def load_df(self, n=None) -> pd.DataFrame:
+
+    def _base_df(self):
         dwh = config.get_datawarehouse()
-        df = dwh.event(self.EVENT_NAME).set_index("tdw_timestamp").sort_values(by='bookmarked_date', ascending=False)
+        return dwh.event(self.EVENT_NAME)
+
+    def load_df(self, n=None) -> pd.DataFrame:
+        df = self._base_df()
 
         # join duplicates
-        df = df.groupby('paper_url').agg({'comment': ' '.join, 'bookmarked_date': 'last'}).reset_index().sort_values(
-            by='bookmarked_date', ascending=False)
+        df = df.groupby('paper_url').agg({'comment': ' '.join, 'tdw_timestamp': 'last', 'bookmarked_date': 'last'}).reset_index().sort_values(
+            by='tdw_timestamp', ascending=False)
 
         if n:
             return df.head(n)
@@ -66,22 +70,24 @@ class Bookmark():
             paper_url = dict[i]['paper_url']
             comment = dict[i]['comment']
             comment = comment.strip()
-            comment_str = f"Comment: {comment}" if comment else ""
+            comment_str = f"\n Comment: {comment}" if comment else ""
+
 
             if Paper.is_arxiv_url(paper_url):
                 paper_url = Paper.convert_pdf_to_abstract(paper_url)
 
+            abstract_str = ""
             try:
                 paper = Paper.load_paper_from_url(paper_url)
                 paper_title = paper.title
                 published_str = f"Published: {paper.published_date_str()}"
+                abstract_str = f"\nAbstract: {paper.abstract}"
             except Exception as e:
                 pass
             result += f"""{counter}. Title: {paper_title} 
-{paper_url}
-{comment_str}
+{paper_url} {comment_str}
 Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
-{published_str}
+{published_str} {abstract_str[0:500]}
 \n
 """
             counter += 1
@@ -89,5 +95,5 @@ Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
         return result
 
     def send_to_email(self):
-        Mail().send(self.prepare_list(), "SOTA Bookmarks as of " + datetime.date.today().isoformat())
+        Mail().send(self.prepare_list(), "Bookmarks as of " + datetime.datetime.now().isoformat().split('.')[0])
 

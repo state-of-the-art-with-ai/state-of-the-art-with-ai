@@ -6,7 +6,7 @@ from state_of_the_art.config import config
 
 class Paper():
     """
-    Main dto to acceess papers functionality
+    Main dto to access papers functionality
 
     """
     def __init__(self,*, arxiv_url, published=None, title=None, abstract=None):
@@ -14,6 +14,7 @@ class Paper():
         self.arxiv_url = arxiv_url
 
         self.url = arxiv_url
+        self.pdf_url = None
         self.published = published
         self.title = title
         self.abstract = abstract
@@ -105,31 +106,37 @@ Url: {self.url}\n"""
         :param url:
         :return:
         """
-        pdf_url = self.url
+        self.pdf_url = self.url
         if not self.url.endswith('.pdf'):
-            pdf_url = Paper.convert_abstract_to_pdf(self.url)
+           self.pdf_url = Paper.convert_abstract_to_pdf(self.url)
 
-        if not pdf_url.endswith('.pdf'):
+        if not self.pdf_url.endswith('.pdf'):
             raise Exception("Invalid file format. Only PDF files are supported")
 
-        destination = self.get_destination(pdf_url)
+        destination = self.get_destination()
 
         if os.path.exists(destination):
             print(f"File {destination} already exists so wont download it again")
             return destination
 
-        print(f"Downloading file {pdf_url} to {destination}")
+        print(f"Downloading file {self.pdf_url} to {destination}")
 
         import urllib
-        urllib.request.urlretrieve(pdf_url, destination)
+        urllib.request.urlretrieve(self.pdf_url, destination)
         return destination
 
-    def get_destination(self, url):
-        if not url.endswith('.pdf'):
-            url = Paper.convert_abstract_to_pdf(url)
-
-        file_name = url.split('/')[-1]
+    def get_destination(self):
+        file_name = self.get_abstract_id_filename()
         return f'{config.NEW_PAPERS_FOLDER}/{file_name}'
+
+    def get_abstract_id_filename(self):
+        return self.pdf_url.split('/')[-1]
+
+    def get_title_filename(self):
+        # remove non alphanumeric characters
+        file_name = ''.join(e for e in self.title if e.isalnum() or e in [' ', '_'])
+        file_name = file_name.replace(' ', '_')
+        return file_name + '.pdf'
 
     def download_and_open(self):
         self.download()

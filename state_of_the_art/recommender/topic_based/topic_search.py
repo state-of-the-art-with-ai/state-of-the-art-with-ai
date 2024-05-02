@@ -3,12 +3,9 @@ from typing import Optional
 from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.preferences.audience import Audience
-
 from state_of_the_art.recommender.topic_based.searches import Bm25Search, SemanticSearch
 from state_of_the_art.recommender.topic_based.topic import Topic
-
 from state_of_the_art.recommender.topic_based.topic_extraction import TopicExtractor
-
 
 class TopicSearch:
 
@@ -39,24 +36,26 @@ class TopicSearch:
 
         print(f"Searching for topic {topic_name} with query {topic.semantic_query}")
 
-        self.search_with_query(query)
+        return self.search_with_query(query)
 
-    def extract_query_and_search(self, text):
+    def extract_query_and_search(self, text: str):
         query = TopicExtractor().extract_semantic_query(text)
         print(f'Extracted semantic query: ', query)
-        self.search_with_query(query)
+        return self.search_with_query(query)
 
     def search_with_query(self, query: str):
         formatter = PapersFormatter()
 
         print("BM25")
         papers = self.bm25_search.search(query, n=5)
-        print(formatter.from_papers(papers))
+        result = formatter.from_papers(papers)
 
         print("Semantic Search")
         ids = self.semantic_search.search(query, n=15)
         papers_str = str(ids)
-        print(formatter.from_str(papers_str))
+        result += formatter.from_str(papers_str)
+
+        return result
 
 
 

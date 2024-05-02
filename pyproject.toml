@@ -24,6 +24,7 @@ matplotlib = "^3.8.4"
 urlextract = "^1.9.0"
 tiny-data-warehouse = "0.1.3"
 tqdm = "^4.66.2"
+fpdf = "^1.7.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"

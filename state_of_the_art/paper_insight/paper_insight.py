@@ -3,6 +3,9 @@ from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.utils.mail import Mail
+from state_of_the_art.utils.pdf import create_pdf
+from state_of_the_art.utils import pdf
+import datetime
 
 
 class PaperInsightExtractor:
@@ -25,35 +28,35 @@ class PaperInsightExtractor:
         local_location = Paper(arxiv_url=abstract_url).download()
 
         paper_title = abstract_url
+
+
+        pdf_file_name = f'paper_{datetime.date.today().isoformat()}.pdf'
         try :
             paper = Paper.load_paper_from_url(abstract_url)
             paper_title = paper.title
+            pdf_file_name = paper.get_title_filename()
         except Exception as e:
             print(f"Error loading paper from url {abstract_url} {e}")
 
 
-        from pypdf import PdfReader
 
-        reader = PdfReader(local_location)
-        number_of_pages = len(reader.pages)
-        PAPER_CONTENT = ""
-        for page in reader.pages:
-            PAPER_CONTENT += page.extract_text()
-
-        print(PAPER_CONTENT)
-
-        print("Number of pages: ", number_of_pages)
-        print("Number of characters: ", len(PAPER_CONTENT))
-        print("Number of tokens: ", len(PAPER_CONTENT)/4)
+        paper_content = pdf.read_content(local_location)
         prompt = self._get_prompt(question_topic=question_topic)
 
-        result = LLM().call(prompt, PAPER_CONTENT)
-        result = f"Abstract: {abstract_url} + \n\n" + result
+        result = LLM().call(prompt, paper_content)
+        result = f"""Title: {paper_title}
+Abstract: {abstract_url}
+{result}
+        """
         print(result)
+
         question_topic = question_topic if question_topic else "all"
         config.get_datawarehouse().write_event('sota_paper_insight', {'abstract_url': abstract_url, 'insights': result, 'topic': question_topic})
+        create_pdf(result, f"/tmp/current_paper.pdf", disable_open=True)
+        output_paper_name = f"/tmp/" + pdf_file_name
+        pdf.merge_pdfs(output_paper_name, ["/tmp/current_paper.pdf", local_location ])
 
-        Mail().send(result, f'Insight extracted form paper {paper_title}')
+        Mail().send(result, f'Insight extracted form paper {paper_title}', attachment=output_paper_name)
 
 
     def _get_prompt(self, question_topic=None) -> str:

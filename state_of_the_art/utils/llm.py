@@ -44,25 +44,16 @@ def call_chatgpt(prompt_str: str, input_str: str) -> str:
 class LLM:
     """Wrapper for llm call """
 
-    def __init__(self, mock=False):
-
-        self.mock = mock
-
-        if 'LLM_MOCK' in os.environ:
-            print("LLM mock enabled via enviroment variable")
-            self.mock = True
-
-
     def call(self, prompt: str, prompt_input: str, expected_ouput_len=4000, ask_cost_confirmation=True) -> str:
         if not prompt:
             raise Exception("Prompt is empty")
         if not prompt_input:
             raise Exception("Prompt input is empty")
 
-        if self.mock:
+        if 'LLM_MOCK' in os.environ:
             return f"""Mocked llm return
-INPUT: {prompt_input}
-PROMPT: {prompt[0:200]}...
+Prompt: {prompt[0:50]}
+Input: {prompt_input[0:50]}
             """
 
         if 'PRINT_PROMPT' in os.environ:
