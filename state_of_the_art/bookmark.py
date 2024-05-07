@@ -12,18 +12,19 @@ class Bookmark():
     Bookmarking papers for future reference
     """
     EVENT_NAME = 'paper_bookmarks'
-    def add(self, paper_url, comment: Optional[str]):
-        comment = comment.strip()
+    def add(self, paper_url, comment: Optional[str] = None):
+        paper_url = paper_url.strip()
+
+        if comment:
+            comment = comment.strip()
 
         if not comment:
             comment = 'registered interest'
 
-        paper_url = paper_url.strip()
         print(f"Registering paper {paper_url} in bookmarks")
-        try: 
-            paper = Paper(arxiv_url=Paper.convert_pdf_to_abstract(paper_url))
-        except Exception as e:
-            print("Given url is not from Arxiv")
+        if Paper.is_arxiv_url(paper_url):
+            Paper.register_from_url(paper_url)
+
 
         dwh = config.get_datawarehouse()
         dwh.write_event(self.EVENT_NAME, {'paper_url': paper_url, 'comment': comment, 'bookmarked_date': datetime.date.today().isoformat()})
@@ -57,7 +58,7 @@ class Bookmark():
         return df
 
 
-    def list(self, n=None):
+    def list(self, n=5):
         print(self.prepare_list(n=n))
 
     def prepare_list(self, n=None):

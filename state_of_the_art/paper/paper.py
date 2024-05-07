@@ -9,8 +9,12 @@ class Paper():
     Main dto to access papers functionality
 
     """
-    def __init__(self,*, arxiv_url, published=None, title=None, abstract=None):
+    def __init__(self,*, arxiv_url: str, published=None, title=None, abstract=None):
         self.validate_abstract_url(arxiv_url)
+
+        if not arxiv_url.endswith('v1'):
+            arxiv_url+='v1'
+
         self.arxiv_url = arxiv_url
 
         self.url = arxiv_url
@@ -23,6 +27,19 @@ class Paper():
     @staticmethod
     def load_from_dict(data):
         return Paper(arxiv_url=data['url'], published=data['published'], title=data['title'], abstract=data['abstract'])
+
+
+    @staticmethod
+    def register_from_url(url: str):
+        from state_of_the_art.register_papers.arxiv_miner import PaperMiner
+        url = Paper.convert_pdf_to_abstract(url)
+        PaperMiner().register_by_id(Paper.id_from_url(url))
+
+
+    @staticmethod
+    def id_from_url(url):
+        return url.split('/')[-1]
+
     @staticmethod
     def load_paper_from_url(url) -> 'Paper':
         from state_of_the_art.paper.papers_data import PapersInDataWharehouse

@@ -10,6 +10,7 @@ class PaperMiner():
     """
 
     DEFAULT_QUERY = 'cs.AI'
+    max_papers_per_query = None
 
     def __init__(self):
         self.config = config
@@ -67,8 +68,9 @@ class PaperMiner():
         """
         self._find_papers(query=query, number_of_papers=n, sort_by='submitted', only_print=True)
 
-    def register_by_id(self, id):
+    def register_by_id(self, id: str):
         papers = self._find_papers(id_list=[str(id)], only_print=False)
+        print("Found_paper: ", papers)
         return self._register_given_papers(papers)
 
     def query_papers(self, query):
