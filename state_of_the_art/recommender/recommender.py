@@ -116,7 +116,7 @@ class Recommender:
         profile_name = config.get_current_audience().name.upper()
 
         now = datetime.now().isoformat()
-        header = f'Results generated at {now} for profile: "{profile_name}" for period ({parameters.from_date}, {parameters.to_date}) ({len(self._input_articles)}) papers analysed: \n\n'
+        header = f'Results generated at {now} for profile: "{profile_name}" ({len(self._input_articles)}) papers analysed: \n\n'
         result = header + result
         formatted_result = header + formatted_result
 
@@ -135,14 +135,23 @@ class Recommender:
         )
 
         print("Sending email")
-        pdf.create_pdf(formatted_result, f"/tmp/sota_summary.pdf")
+        pdf.create_pdf(
+            formatted_result,
+            f"/tmp/sota_summary_{"".join(x for x in now if x.isalnum())}.pdf",
+        )
 
+        self._send_email(
+            formatted_result,
+            f"Sota summary batch {parameters.batch} at {now} for profile {profile_name}",
+        )
+
+    def _send_email(self, formatted_result, title):
         if os.environ.get("LLM_MOCK"):
             print("Mocking email")
         else:
             Mail().send(
                 formatted_result,
-                f"Sota summary batch {parameters.batch} at {now} for profile {profile_name}",
+                title,
             )
 
     def _load_papers_from_str(self, papers_str: str):

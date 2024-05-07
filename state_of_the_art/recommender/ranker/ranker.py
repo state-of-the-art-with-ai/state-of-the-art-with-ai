@@ -5,6 +5,7 @@ from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.utils.llm import LLM
 
+
 class PaperRanker:
 
     def __init__(self):
