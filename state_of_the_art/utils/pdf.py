@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 
@@ -11,7 +12,7 @@ def create_pdf(data, output_path, disable_open=False):
     data = data.encode("latin-1", "replace").decode("latin-1")
     pdf.write(5, data)
     pdf.output(output_path)
-    if not disable_open:
+    if not disable_open and not os.environ.get("SOTA_TEST"):
         open_pdf(output_path)
 
 
@@ -48,7 +49,8 @@ def merge_pdfs(output_path, pdfs: List[str]):
         merger.append(pdf)
     merger.write(output_path)
     merger.close()
-    open_pdf(output_path)
+    if not os.environ.get("SOTA_TEST"):
+        open_pdf(output_path)
 
 
 if __name__ == "__main__":

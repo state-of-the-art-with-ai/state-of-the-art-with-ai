@@ -1,3 +1,5 @@
+import os
+
 from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
 from state_of_the_art.paper.paper import Paper
@@ -19,9 +21,9 @@ class PaperInsightExtractor:
         import subprocess
 
         url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        self.answer_questions(url)
+        self.generate(url)
 
-    def answer_questions(self, abstract_url: str, question_topic=None):
+    def generate(self, abstract_url: str, question_topic=None):
         print("Generating insights for paper: ", abstract_url)
         abstract_url = abstract_url.strip()
 
@@ -57,11 +59,18 @@ Abstract: {abstract_url}
         output_paper_name = f"/tmp/" + pdf_file_name
         pdf.merge_pdfs(output_paper_name, ["/tmp/current_paper.pdf", local_location])
 
-        Mail().send(
-            result,
-            f"Insight extracted form paper {paper_title}",
-            attachment=output_paper_name,
-        )
+        if os.environ.get("SOTA_TEST"):
+            print("Skipping email")
+        else:
+
+            self._send_email(
+                result,
+                f"Insight extracted form paper {paper_title}",
+                attachment=output_paper_name,
+            )
+
+    def _send_email(self, content, subject, attachment):
+        Mail().send(content, subject, attachment)
 
     def _get_prompt(self, question_topic=None) -> str:
         QUESTIONS = ""

@@ -64,7 +64,7 @@ class LLM:
         if not prompt_input:
             raise Exception("Prompt input is empty")
 
-        if "LLM_MOCK" in os.environ:
+        if "LLM_MOCK" in os.environ or "SOTA_TEST" in os.environ:
             if mock_content:
                 return mock_content
             else:

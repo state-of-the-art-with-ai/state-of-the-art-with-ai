@@ -17,7 +17,6 @@ from state_of_the_art.config import config
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
 from state_of_the_art.utils.mail import Mail
-import state_of_the_art.utils.pdf
 
 
 class Recommender:
@@ -44,7 +43,7 @@ class Recommender:
         max_papers_per_query=None,
         papers_to_rank=None,
         query: Optional[str] = None,
-        topic_dive: Optional[str] = None,
+        by_topic: Optional[str] = None,
         description_from_clipboard=False,
     ):
         """
@@ -61,7 +60,7 @@ class Recommender:
             batch_size=batch_size,
             papers_to_rank=papers_to_rank,
             query=query,
-            topic_dive=topic_dive,
+            by_topic=by_topic,
             description_from_clipboard=description_from_clipboard,
         )
 
@@ -79,8 +78,8 @@ class Recommender:
 
     def _rank(self, parameters: RecommenderParameters) -> str:
 
-        if parameters.topic_dive:
-            return self._topic_search.search_by_topic(parameters.topic_dive)
+        if parameters.by_topic:
+            return self._topic_search.search_by_topic(parameters.by_topic)
 
         if parameters.query:
             return self._topic_search.extract_query_and_search(parameters.query)
@@ -146,7 +145,7 @@ class Recommender:
         )
 
     def _send_email(self, formatted_result, title):
-        if os.environ.get("LLM_MOCK"):
+        if os.environ.get("LLM_MOCK") or os.environ.get("SOTA_TEST"):
             print("Mocking email")
         else:
             Mail().send(

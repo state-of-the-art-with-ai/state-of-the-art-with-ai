@@ -3,7 +3,7 @@ import os
 from unittest import mock
 
 
-@mock.patch.dict(os.environ, {"LLM_MOCK": "1"})
+@mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_generate():
     recommender = Recommender()
     result = recommender.generate(skip_register=True)

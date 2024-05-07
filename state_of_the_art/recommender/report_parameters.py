@@ -4,7 +4,7 @@ from state_of_the_art.config import config
 
 
 class RecommenderParameters(BaseModel):
-    topic_dive: Optional[str] = None
+    by_topic: Optional[str] = None
     lookback_days: Optional[int] = None
     from_date: Optional[str] = None
     to_date: Optional[str] = None
