@@ -2,12 +2,11 @@ from typing import List
 from urlextract import URLExtract
 
 
-class PapersUrlsExtractor():
+class PapersUrlsExtractor:
     def extract_urls(self, data: str) -> List[str]:
 
-        if not type(data)==str:
+        if not type(data) == str:
             raise Exception("Data to extract papers must be a string")
-
 
         extractor = URLExtract()
         return extractor.find_urls(data)
@@ -20,4 +19,4 @@ class PapersUrlsExtractor():
 
         total = len(papers_a) + len(papers_b)
 
-        return (2* overlap_size) / total
+        return (2 * overlap_size) / total

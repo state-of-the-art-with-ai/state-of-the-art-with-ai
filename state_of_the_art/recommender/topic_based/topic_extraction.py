@@ -4,7 +4,6 @@ from state_of_the_art.utils.llm import LLM
 
 class TopicExtractor:
 
-
     def __init__(self):
         self.llm = LLM()
 

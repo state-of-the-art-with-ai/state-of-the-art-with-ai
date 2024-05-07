@@ -4,19 +4,20 @@ from state_of_the_art.config import config
 from state_of_the_art.paper.paper import Paper
 from tqdm import tqdm
 
-class PaperMiner():
+
+class PaperMiner:
     """
     Looks at arxiv api for papers
     """
 
-    DEFAULT_QUERY = 'cs.AI'
+    DEFAULT_QUERY = "cs.AI"
     max_papers_per_query = None
 
     def __init__(self):
         self.config = config
         tdw = config.get_datawarehouse()
-        arxiv_papers = tdw.event('arxiv_papers')
-        self.existing_papers_urls = arxiv_papers['url'].values
+        arxiv_papers = tdw.event("arxiv_papers")
+        self.existing_papers_urls = arxiv_papers["url"].values
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
@@ -36,12 +37,15 @@ class PaperMiner():
         else:
             topics_to_mine = self._get_default_topics()
 
-        print(f"Registering papers for the following ({len(topics_to_mine)}) keywords: ", topics_to_mine)
+        print(
+            f"Registering papers for the following ({len(topics_to_mine)}) keywords: ",
+            topics_to_mine,
+        )
 
         papers = []
         for topic in topics_to_mine:
-            papers = papers + self._find_papers(query=topic, sort_by='relevance')
-            papers = papers + self._find_papers(query=topic, sort_by='submitted')
+            papers = papers + self._find_papers(query=topic, sort_by="relevance")
+            papers = papers + self._find_papers(query=topic, sort_by="submitted")
 
         papers = [p for p in papers if p.url not in self.existing_papers_urls]
         print("Found ", len(papers), " new papers")
@@ -63,10 +67,12 @@ class PaperMiner():
         return topics_to_mine
 
     def inspect_latest(self, *, query=None, n=10):
-        """"
+        """ "
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
-        self._find_papers(query=query, number_of_papers=n, sort_by='submitted', only_print=True)
+        self._find_papers(
+            query=query, number_of_papers=n, sort_by="submitted", only_print=True
+        )
 
     def register_by_id(self, id: str):
         papers = self._find_papers(id_list=[str(id)], only_print=False)
@@ -74,37 +80,63 @@ class PaperMiner():
         return self._register_given_papers(papers)
 
     def query_papers(self, query):
-        self._find_papers(query, number_of_papers=15, sort_by='relevance', only_print=True)
-    def _find_papers(self, id_list=None, query=None, number_of_papers=None, sort_by: Literal['submitted', 'relevance'] = 'submitted', only_print=False)->List[Paper]:
+        self._find_papers(
+            query, number_of_papers=15, sort_by="relevance", only_print=True
+        )
+
+    def _find_papers(
+        self,
+        id_list=None,
+        query=None,
+        number_of_papers=None,
+        sort_by: Literal["submitted", "relevance"] = "submitted",
+        only_print=False,
+    ) -> List[Paper]:
         if not query and not id_list:
             print("No query provided, using default query")
             query = self.DEFAULT_QUERY
 
         if not number_of_papers:
-            number_of_papers = self.max_papers_per_query if self.max_papers_per_query else self.config.papers_to_mine_per_query()
+            number_of_papers = (
+                self.max_papers_per_query
+                if self.max_papers_per_query
+                else self.config.papers_to_mine_per_query()
+            )
 
-        sort = arxiv.SortCriterion.SubmittedDate if sort_by == 'submitted' else arxiv.SortCriterion.Relevance
+        sort = (
+            arxiv.SortCriterion.SubmittedDate
+            if sort_by == "submitted"
+            else arxiv.SortCriterion.Relevance
+        )
 
-        print({'query': query, 'sort_by': sort_by, 'id_list': id_list, 'number_of_papers': number_of_papers})
+        print(
+            {
+                "query": query,
+                "sort_by": sort_by,
+                "id_list": id_list,
+                "number_of_papers": number_of_papers,
+            }
+        )
 
         if id_list:
             print("Searching by id list: ", id_list)
             search = arxiv.Search(
-                id_list=id_list,
-                max_results = number_of_papers,
-                sort_by = sort
+                id_list=id_list, max_results=number_of_papers, sort_by=sort
             )
         else:
             search = arxiv.Search(
-                query=query,
-                max_results = number_of_papers,
-                sort_by = sort
+                query=query, max_results=number_of_papers, sort_by=sort
             )
 
         result = []
         order_counter = 1
         for r in search.results():
-            paper = Paper(title=r.title, abstract=r.summary, arxiv_url=r.entry_id, published=r.published)
+            paper = Paper(
+                title=r.title,
+                abstract=r.summary,
+                arxiv_url=r.entry_id,
+                published=r.published,
+            )
             result.append(paper)
             print(order_counter, paper.published, paper.title, paper.url)
             order_counter += 1
@@ -115,8 +147,8 @@ class PaperMiner():
         return result
 
     def load_existing_papers_urls(self):
-        arxiv_papers = self.tdw.event('arxiv_papers')
-        return arxiv_papers['url'].values
+        arxiv_papers = self.tdw.event("arxiv_papers")
+        return arxiv_papers["url"].values
 
     def _register_given_papers(self, papers: List[Paper]):
         counter = 0
@@ -124,16 +156,15 @@ class PaperMiner():
         registered = 0
         self.existing_papers_urls = self.load_existing_papers_urls()
 
-
         registered_now = []
         for paper in tqdm(papers):
-            counter = counter+1
+            counter = counter + 1
             if paper.url in self.existing_papers_urls or paper.url in registered_now:
                 skipped += 1
                 continue
 
-            registered+=1
-            self.tdw.write_event('arxiv_papers', paper.to_dict())
+            registered += 1
+            self.tdw.write_event("arxiv_papers", paper.to_dict())
             registered_now.append(paper.url)
 
         print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
@@ -142,5 +173,5 @@ class PaperMiner():
 
 if __name__ == "__main__":
     import fire
-    fire.Fire()
 
+    fire.Fire()

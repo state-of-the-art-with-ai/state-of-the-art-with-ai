@@ -3,14 +3,17 @@ from typing import List
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 
+
 class PapersFormatter:
     """
     from a list of strings or a list of papers return a reading formattted optimzed ouput
 
     """
+
     def __init__(self, show_abstract=True, max_abstract_size=500):
         self.show_abstract = show_abstract
         self.max_abstract_size = max_abstract_size
+
     def from_str(self, papers_str: str) -> str:
         urls = PapersUrlsExtractor().extract_urls(papers_str)
         papers = PapersInDataWharehouse().load_papers_from_urls(urls)

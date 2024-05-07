@@ -6,17 +6,20 @@ class SummaryFormatter:
 
     def format_latest_summary(self):
         return self.format(ReportsData().get_latest_summary())
+
     def format(self, base_summary):
         urls = PapersUrlsExtractor().extract_urls(base_summary)
         result = ""
 
         for url in urls:
-            result+= f"""
+            result += f"""
             Url: {url}
             """
-        
+
         return result
+
 
 if __name__ == "__main__":
     import fire
+
     fire.Fire()

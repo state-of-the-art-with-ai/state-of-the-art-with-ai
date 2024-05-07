@@ -10,41 +10,43 @@ from rank_bm25 import BM25Okapi as BM25
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 
+
 class SemanticSearch:
 
     def __init__(self):
         self.client = self.setup()
+
     def setup(self):
         import chromadb
-        self.chroma_path = os.environ['HOME'] + '/.chroma.db'
+
+        self.chroma_path = os.environ["HOME"] + "/.chroma.db"
         self.client = chromadb.PersistentClient(path=self.chroma_path)
 
         try:
-            self.collection = self.client.get_collection('papers')
+            self.collection = self.client.get_collection("papers")
         except:
-            print('Collection not found')
+            print("Collection not found")
             self.collection = self.setup_papers()
 
-
-
         return self.client
+
     def setup_papers(self):
-        print('Setting up documents')
+        print("Setting up documents")
         papers = PapersInDataWharehouse().get_all_papers()
         documents = []
         ids = []
 
-        collection = self.client.get_or_create_collection('papers')
+        collection = self.client.get_or_create_collection("papers")
 
         for paper in tqdm.tqdm(papers):
             collection.add(
-                documents=[paper.title + ' ' + paper.abstract],
+                documents=[paper.title + " " + paper.abstract],
                 ids=[paper.url],
             )
 
-        print('Adding documents', len(documents))
+        print("Adding documents", len(documents))
         self.collection = collection
-        print('Done setting up documents')
+        print("Done setting up documents")
 
         return collection
 
@@ -55,23 +57,14 @@ class SemanticSearch:
                 data = sys.stdin.readlines()
                 query = "".join(data)
 
-        ids = self.collection.query(query_texts=[query], n_results=n)['ids'][0]
+        ids = self.collection.query(query_texts=[query], n_results=n)["ids"][0]
         return ids
 
-
-
     def info(self):
-        return {
-            'docs_count': self.collection.count()
-
-        }
+        return {"docs_count": self.collection.count()}
 
     def reset(self):
         self.client.reset()
-
-
-
-
 
 
 class Bm25Search:
@@ -84,7 +77,8 @@ class Bm25Search:
 
     def setup_bm25(self):
         tokenized_corpus = [
-            self.tokenize(paper.title + ' ' + paper.abstract) for paper in self.papers_data
+            self.tokenize(paper.title + " " + paper.abstract)
+            for paper in self.papers_data
         ]
 
         bm25 = BM25(tokenized_corpus)
@@ -94,9 +88,7 @@ class Bm25Search:
     def search(self, query, n=25):
         tokenized_query = self.tokenize(query)
 
-        matches = self.bm25.get_top_n(
-            tokenized_query, self.papers_data, n=n
-        )
+        matches = self.bm25.get_top_n(tokenized_query, self.papers_data, n=n)
 
         return matches
 
@@ -104,7 +96,9 @@ class Bm25Search:
         tokens = self.tokenizer.tokenize(string)
         lemmas = [self.lemmatizer.lemmatize(t) for t in tokens]
         return lemmas
+
+
 if __name__ == "__main__":
     import fire
-    fire.Fire()
 
+    fire.Fire()

@@ -1,4 +1,4 @@
-from state_of_the_art.papers import PapersExtractor
+from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 
 
 def test_no_url():
@@ -6,12 +6,13 @@ def test_no_url():
     not an url
     """
 
-    print(' test')
-    assert [] == PapersExtractor().extract_urls(data)
+    print(" test")
+    assert [] == PapersUrlsExtractor().extract_urls(data)
+
 
 def test_a_url():
     data = """
     http://foo.bar
     """
 
-    assert ["http://foo.bar"] == PapersExtractor().extract_urls(data)
+    assert ["http://foo.bar"] == PapersUrlsExtractor().extract_urls(data)

@@ -11,11 +11,13 @@ from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
 from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.utils.mail import Mail
 
+
 class PaperRanker:
 
     def __init__(self):
         self._enable_abstract_in_ranking = False
-    def rank(self, *, articles: List[Paper], parameters: RecommenderParameters, dry_run=False):
+
+    def rank(self, *, articles: List[Paper], dry_run=False):
         """
         Ranks existing papers by relevance
         """
@@ -26,7 +28,7 @@ class PaperRanker:
 
         articles_str = self._format_input_articles(articles)
 
-        if 'PRINT_PAPERS_INPUT' in os.environ:
+        if "PRINT_PAPERS_INPUT" in os.environ:
             print(articles_str)
             return "Dry run result"
 
@@ -36,19 +38,24 @@ class PaperRanker:
         result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
         return result
 
-    def _format_input_articles(self, papers)->str:
+    def _format_input_articles(self, papers: List[Paper]) -> str:
         papers_str = " "
         counter = 1
-        for i in papers.iterrows():
-            abstract_row =   f'Abstract: {i[1]['abstract'][0:config.MAX_ABSTRACT_SIZE_RANK]}' if self._enable_abstract_in_ranking else ''
+        for i in papers:
+            abstract_row = (
+                f"Abstract: {i.abstract[0:config.MAX_ABSTRACT_SIZE_RANK]}"
+                if self._enable_abstract_in_ranking
+                else ""
+            )
             papers_str += f"""
-{counter}. Title: {i[1]['title']}
-Arxiv URL: {i[1]['url']}
-Published: {i[1]['published']}
+{counter}. Title: {i.title}
+Arxiv URL: {i.url}
+Published: {i.published_date_str()}
 {abstract_row}
 """
             counter += 1
         return papers_str
+
     def get_prompt(self):
         return f"""You are an world class expert in Data Science and computer science.
 Your task is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
@@ -86,4 +93,5 @@ Ranked output of articles: ##start """
 
 if __name__ == "__main__":
     import fire
+
     fire.Fire()
