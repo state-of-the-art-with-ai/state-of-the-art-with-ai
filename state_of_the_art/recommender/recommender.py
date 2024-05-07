@@ -1,3 +1,4 @@
+import os
 from typing import Optional, List
 
 from datetime import datetime
@@ -19,7 +20,7 @@ from state_of_the_art.utils.mail import Mail
 import state_of_the_art.utils.pdf
 
 
-class RecommenderReport:
+class Recommender:
     """
     Class responsible to the entire generation pipeline
     """
@@ -97,7 +98,7 @@ class RecommenderReport:
             stdindata = "\n".join(stdindata)
             return self._topic_search.extract_query_and_search(stdindata)
 
-        self._input_articles = PapersInDataWharehouse.to_papers(
+        self._input_articles = PapersInDataWharehouse().to_papers(
             PapersInDataWharehouse().get_latest_articles(
                 lookback_days=parameters.lookback_days,
                 from_date=parameters.from_date,
@@ -136,10 +137,13 @@ class RecommenderReport:
         print("Sending email")
         pdf.create_pdf(formatted_result, f"/tmp/sota_summary.pdf")
 
-        Mail().send(
-            formatted_result,
-            f"Sota summary batch {parameters.batch} at {now} for profile {profile_name}",
-        )
+        if os.environ.get("LLM_MOCK"):
+            print("Mocking email")
+        else:
+            Mail().send(
+                formatted_result,
+                f"Sota summary batch {parameters.batch} at {now} for profile {profile_name}",
+            )
 
     def _load_papers_from_str(self, papers_str: str):
         urls = PapersUrlsExtractor().extract_urls(papers_str)

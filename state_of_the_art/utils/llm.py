@@ -1,5 +1,7 @@
 import os
 import sys
+from typing import Optional
+
 from state_of_the_art.config import config
 
 open_ai_cost = {
@@ -55,6 +57,7 @@ class LLM:
         prompt_input: str,
         expected_ouput_len=4000,
         ask_cost_confirmation=True,
+        mock_content: Optional[str] = None,
     ) -> str:
         if not prompt:
             raise Exception("Prompt is empty")
@@ -62,10 +65,13 @@ class LLM:
             raise Exception("Prompt input is empty")
 
         if "LLM_MOCK" in os.environ:
-            return f"""Mocked llm return
-Prompt: {prompt[0:50]}
-Input: {prompt_input[0:50]}
-            """
+            if mock_content:
+                return mock_content
+            else:
+                return f"""Mocked llm return
+    Prompt: {prompt[0:50]}
+    Input: {prompt_input[0:50]}
+                """
 
         if "PRINT_PROMPT" in os.environ:
             print("Prompt: ")

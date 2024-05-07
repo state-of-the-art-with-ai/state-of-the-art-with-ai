@@ -1,16 +1,9 @@
-import datetime
 import os
 from typing import List
 
 from state_of_the_art.config import config
-from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import Paper
-from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.utils.llm import LLM
-from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
-from state_of_the_art.recommender.report_parameters import RecommenderParameters
-from state_of_the_art.utils.mail import Mail
-
 
 class PaperRanker:
 
@@ -35,7 +28,12 @@ class PaperRanker:
         if dry_run:
             return "Dry run result"
 
-        result = LLM().call(prompt, articles_str, expected_ouput_len=4000)
+        result = LLM().call(
+            prompt,
+            articles_str,
+            expected_ouput_len=4000,
+            mock_content="A paper: http://arxiv.org/abs/2206.12048v1",
+        )
         return result
 
     def _format_input_articles(self, papers: List[Paper]) -> str:
@@ -56,7 +54,7 @@ Published: {i.published_date_str()}
             counter += 1
         return papers_str
 
-    def get_prompt(self):
+    def get_prompt(self) -> str:
         return f"""You are an world class expert in Data Science and computer science.
 Your task is spotting key insights of what is going on in academia an in the industry via arxiv articles provided to you.
 Highlight only topics that are exciting or import for your target audience

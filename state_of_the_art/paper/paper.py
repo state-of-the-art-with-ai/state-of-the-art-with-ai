@@ -12,9 +12,6 @@ class Paper:
     def __init__(self, *, arxiv_url: str, published=None, title=None, abstract=None):
         self.validate_abstract_url(arxiv_url)
 
-        if not arxiv_url.endswith("v1"):
-            arxiv_url += "v1"
-
         self.arxiv_url = arxiv_url
 
         self.url = arxiv_url
