@@ -7,7 +7,6 @@ from state_of_the_art.recommender.topic_based.searches import Bm25Search, Semant
 from state_of_the_art.recommender.topic_based.topic import Topic
 from state_of_the_art.recommender.topic_based.topic_extraction import TopicExtractor
 
-
 class TopicSearch:
 
     def __init__(self):
@@ -54,7 +53,7 @@ class TopicSearch:
         result = "BM25\n"
         result += formatter.from_papers(papers)
 
-        ids = self.semantic_search.search(query, n=15)
+        ids = self.semantic_search.search(query, n=30)
         papers_str = str(ids)
         result += "Semantic search\n"
         result += formatter.from_str(papers_str)
