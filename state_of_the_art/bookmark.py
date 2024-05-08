@@ -37,8 +37,13 @@ class Bookmark:
             },
         )
         self.send_to_email()
-
         self.list(n=10)
+
+    def register_url_from_clipboard(self):
+        import subprocess
+
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        self.add(url, "resigered interest")
 
     def add_interactive(self):
         print("Interactive collecting paper input")

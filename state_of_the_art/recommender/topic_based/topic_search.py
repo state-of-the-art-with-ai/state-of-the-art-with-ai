@@ -7,6 +7,7 @@ from state_of_the_art.recommender.topic_based.searches import Bm25Search, Semant
 from state_of_the_art.recommender.topic_based.topic import Topic
 from state_of_the_art.recommender.topic_based.topic_extraction import TopicExtractor
 
+
 class TopicSearch:
 
     def __init__(self):
