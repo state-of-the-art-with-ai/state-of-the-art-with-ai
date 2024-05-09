@@ -30,15 +30,18 @@ def create_pdf(
 def create_pdf_path(description_path: str):
     import datetime
 
+    description_path = description_path.strip()
     now = datetime.datetime.now().isoformat().split(".")[0]
     description_path = now + " " + description_path
     description_path = description_path.replace(" ", "_")
     description_path = "".join(x for x in description_path if x.isalnum() or x == "_")
-    return (
-        "/Users/jean.machado/projects/state-of-the-art-via-ai/reports/"
-        + description_path
-        + ".pdf"
-    )
+    base_path = "/Users/jean.machado/projects/state-of-the-art-via-ai/reports/"
+
+    if os.environ.get("SOTA_TEST"):
+        base_path = "/tmp/"
+        print("Given that tests are enabled will use /tmp/ as base path for pdfs.")
+
+    return base_path + description_path + ".pdf"
 
 
 def open_pdf(output_path):

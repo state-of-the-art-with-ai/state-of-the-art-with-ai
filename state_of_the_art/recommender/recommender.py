@@ -135,7 +135,7 @@ class Recommender:
 
         print("Sending email")
         pdf.create_pdf(
-            data=formatted_result, output_path_description="sota recommender summary"
+            data=formatted_result, output_path_description=f"recommender summary {profile_name}"
         )
 
         self._send_email(
