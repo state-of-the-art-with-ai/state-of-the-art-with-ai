@@ -1,10 +1,19 @@
 import os
-from typing import List
+from typing import List, Optional
 
 
-def create_pdf(data, output_path, disable_open=False):
+def create_pdf(
+    *,
+    data: str,
+    output_path_description: Optional[str] = None,
+    output_path: Optional[str] = None,
+    disable_open=False,
+):
 
     from fpdf import FPDF
+
+    if not output_path:
+        output_path = create_pdf_path(output_path_description)
 
     pdf = FPDF()
     pdf.add_page()
@@ -14,6 +23,22 @@ def create_pdf(data, output_path, disable_open=False):
     pdf.output(output_path)
     if not disable_open and not os.environ.get("SOTA_TEST"):
         open_pdf(output_path)
+
+    return output_path
+
+
+def create_pdf_path(description_path: str):
+    import datetime
+
+    now = datetime.datetime.now().isoformat().split(".")[0]
+    description_path = now + " " + description_path
+    description_path = description_path.replace(" ", "_")
+    description_path = "".join(x for x in description_path if x.isalnum() or x == "_")
+    return (
+        "/Users/jean.machado/projects/state-of-the-art-via-ai/reports/"
+        + description_path
+        + ".pdf"
+    )
 
 
 def open_pdf(output_path):

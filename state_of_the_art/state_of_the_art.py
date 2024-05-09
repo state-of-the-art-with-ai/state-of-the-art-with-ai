@@ -8,7 +8,7 @@ from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.recommender.recommender import Recommender
 from state_of_the_art.recommender.topic_based.searches import SemanticSearch
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
-from state_of_the_art import continuous_integration
+from state_of_the_art import validation
 
 
 class Sota:
@@ -25,7 +25,7 @@ class Sota:
         self.open_paper = lambda paper: Paper(arxiv_url=paper).download_and_open()
         self.topic_search = TopicSearch
         self.SemanticSearch = SemanticSearch
-        self._ci = continuous_integration
+        self._ci = validation
 
 
 def main():

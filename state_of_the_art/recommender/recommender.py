@@ -135,8 +135,7 @@ class Recommender:
 
         print("Sending email")
         pdf.create_pdf(
-            formatted_result,
-            f"/tmp/sota_summary_{"".join(x for x in now if x.isalnum())}.pdf",
+            data=formatted_result, output_path_description="sota recommender summary"
         )
 
         self._send_email(
@@ -155,7 +154,6 @@ class Recommender:
 
     def _load_papers_from_str(self, papers_str: str):
         urls = PapersUrlsExtractor().extract_urls(papers_str)
-
         return PapersInDataWharehouse().load_from_urls(urls, fail_on_missing_ids=False)
 
     def latest(self):

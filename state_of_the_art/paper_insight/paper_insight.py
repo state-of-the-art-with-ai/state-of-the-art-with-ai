@@ -4,7 +4,6 @@ from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
 from state_of_the_art.paper.paper import Paper
 from state_of_the_art.utils.mail import Mail
-from state_of_the_art.utils.pdf import create_pdf
 from state_of_the_art.utils import pdf
 import datetime
 
@@ -31,7 +30,6 @@ class PaperInsightExtractor:
         local_location = Paper(arxiv_url=abstract_url).download()
 
         paper_title = abstract_url
-
         pdf_file_name = f"paper_{datetime.date.today().isoformat()}.pdf"
         try:
             paper = Paper.load_paper_from_url(abstract_url)
@@ -55,9 +53,11 @@ Abstract: {abstract_url}
             "sota_paper_insight",
             {"abstract_url": abstract_url, "insights": result, "topic": question_topic},
         )
-        create_pdf(result, f"/tmp/current_paper.pdf", disable_open=True)
-        output_paper_name = f"/tmp/" + pdf_file_name
-        pdf.merge_pdfs(output_paper_name, ["/tmp/current_paper.pdf", local_location])
+        pdf.create_pdf(
+            data=result, output_path="/tmp/current_paper.pdf", disable_open=True
+        )
+        paper_path = pdf.create_pdf_path("paper " + paper_title)
+        pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", local_location])
 
         if os.environ.get("SOTA_TEST"):
             print("Skipping email")
@@ -66,7 +66,7 @@ Abstract: {abstract_url}
             self._send_email(
                 result,
                 f"Insight extracted form paper {paper_title}",
-                attachment=output_paper_name,
+                attachment=paper_path,
             )
 
     def _send_email(self, content, subject, attachment):
