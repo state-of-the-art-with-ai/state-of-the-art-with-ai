@@ -3,9 +3,8 @@ import os
 from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
 from state_of_the_art.paper.paper import Paper
-from state_of_the_art.utils.mail import Mail
+from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
-import datetime
 
 
 class PaperInsightExtractor:
@@ -30,11 +29,9 @@ class PaperInsightExtractor:
         local_location = Paper(arxiv_url=abstract_url).download()
 
         paper_title = abstract_url
-        pdf_file_name = f"paper_{datetime.date.today().isoformat()}.pdf"
         try:
             paper = Paper.load_paper_from_url(abstract_url)
             paper_title = paper.title
-            pdf_file_name = paper.get_title_filename()
         except Exception as e:
             print(f"Error loading paper from url {abstract_url} {e}")
 
@@ -57,20 +54,13 @@ Abstract: {abstract_url}
             data=result, output_path="/tmp/current_paper.pdf", disable_open=True
         )
         paper_path = pdf.create_pdf_path("paper " + paper_title)
+        print("Saving paper insights to ", paper_path)
         pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", local_location])
 
         if os.environ.get("SOTA_TEST"):
             print("Skipping email")
         else:
-
-            self._send_email(
-                result,
-                f"Insight extracted form paper {paper_title}",
-                attachment=paper_path,
-            )
-
-    def _send_email(self, content, subject, attachment):
-        Mail().send(content, subject, attachment)
+            SotaMail().send("", f"Insights from {paper_title}", paper_path)
 
     def _get_prompt(self, question_topic=None) -> str:
         QUESTIONS = ""

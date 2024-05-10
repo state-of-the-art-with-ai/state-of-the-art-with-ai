@@ -16,7 +16,7 @@ from state_of_the_art.config import config
 
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
-from state_of_the_art.utils.mail import Mail
+from state_of_the_art.utils.mail import SotaMail
 
 
 class Recommender:
@@ -72,9 +72,35 @@ class Recommender:
             print("Skipping registering papers")
 
         result = self._rank(parameters)
-        self._format_results(result, parameters)
+        formatted_result = self._format_results(result, parameters)
+        self._write_event(parameters, formatted_result, result)
+        profile_name = config.get_current_audience().name.upper()
+
+        pdf.create_pdf(
+            data=formatted_result,
+            output_path_description=f"recommender summary {profile_name} {parameters.by_topic if parameters.by_topic else ""} ",
+        )
+
+        self._send_email(
+            formatted_result,
+            f"Sota summary batch {parameters.batch} for profile {profile_name}",
+        )
 
         return result
+
+    def _write_event(self, parameters, formatted_result, result):
+        papers_str = PapersInDataWharehouse().papers_to_urls_str(self._input_articles)
+        ranking_data = RankGeneratedData(
+            from_date=parameters.from_date,
+            to_date=parameters.to_date,
+            prompt="",
+            summary=formatted_result,
+            llm_result=result,
+            papers_analysed=papers_str,
+        )
+        config.get_datawarehouse().write_event(
+            "state_of_the_art_summary", ranking_data.to_dict()
+        )
 
     def _rank(self, parameters: RecommenderParameters) -> str:
 
@@ -84,7 +110,7 @@ class Recommender:
         if parameters.query:
             return self._topic_search.extract_query_and_search(parameters.query)
 
-        if parameters.description_from_clipboard:
+        if parameters.problem_description:
             import subprocess
 
             output = subprocess.getoutput("clipboard get_content")
@@ -110,44 +136,31 @@ class Recommender:
 
         return result
 
-    def _format_results(self, result, parameters):
+    def _format_results(self, result: str, parameters: RecommenderParameters):
         formatted_result = PapersFormatter().from_str(result)
-        profile_name = config.get_current_audience().name.upper()
+        profile_name = config.get_current_audience().name
+
+        query_str = f"Query: {parameters.query} \n" if parameters.query else ""
+        topic_str = f"Topic: {parameters.by_topic} \n" if parameters.by_topic else ""
+        from_date_str = (
+            f"From date: {parameters.from_date} \n" if parameters.from_date else ""
+        )
 
         now = datetime.now().isoformat()
-        header = f'Results generated at {now} for profile: "{profile_name}" ({len(self._input_articles)}) papers analysed: \n\n'
-        result = header + result
+        header = f"""Generated at {now} ({len(self._input_articles)}) papers analysed
+Profile: "{profile_name}"  
+{query_str}{topic_str}{from_date_str} 
+"""
         formatted_result = header + formatted_result
 
-        papers_str = PapersInDataWharehouse().papers_to_urls_str(self._input_articles)
-
-        ranking_data = RankGeneratedData(
-            from_date=parameters.from_date,
-            to_date=parameters.to_date,
-            prompt="",
-            summary=formatted_result,
-            llm_result=result,
-            papers_analysed=papers_str,
-        )
-        config.get_datawarehouse().write_event(
-            "state_of_the_art_summary", ranking_data.to_dict()
-        )
-
-        print("Sending email")
-        pdf.create_pdf(
-            data=formatted_result, output_path_description=f"recommender summary {profile_name}"
-        )
-
-        self._send_email(
-            formatted_result,
-            f"Sota summary batch {parameters.batch} at {now} for profile {profile_name}",
-        )
+        return formatted_result
 
     def _send_email(self, formatted_result, title):
+        print("Sending email")
         if os.environ.get("LLM_MOCK") or os.environ.get("SOTA_TEST"):
             print("Mocking email")
         else:
-            Mail().send(
+            SotaMail().send(
                 formatted_result,
                 title,
             )

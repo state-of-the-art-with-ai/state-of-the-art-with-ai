@@ -69,7 +69,7 @@ def read_content(pdf_path):
     return PAPER_CONTENT
 
 
-def merge_pdfs(output_path, pdfs: List[str]):
+def merge_pdfs(output_path: str, pdfs: List[str]):
     from PyPDF2 import PdfMerger
 
     merger = PdfMerger()

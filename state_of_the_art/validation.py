@@ -1,5 +1,6 @@
 import os
 
+
 def run_all():
     print("Starting CI loop")
     current_directory = os.path.dirname(os.path.realpath(__file__))

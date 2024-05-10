@@ -2,7 +2,7 @@ from typing import Optional
 from state_of_the_art.config import config
 import datetime
 
-from state_of_the_art.utils.mail import Mail
+from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.paper.paper import Paper
 import pandas as pd
 
@@ -119,7 +119,7 @@ Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
         return result
 
     def send_to_email(self):
-        Mail().send(
+        SotaMail().send(
             self.prepare_list(),
             "Bookmarks as of " + datetime.datetime.now().isoformat().split(".")[0],
         )
