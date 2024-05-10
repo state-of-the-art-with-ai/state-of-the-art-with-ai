@@ -1,4 +1,5 @@
 import os
+import sys
 
 from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
@@ -15,17 +16,16 @@ class PaperInsightExtractor:
     def __init__(self):
         self.profile = config.get_current_audience()
 
-    def answer_questions_from_clipboard(self):
-        import subprocess
-
-        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        self.generate(url)
-
-    def generate(self, abstract_url: str, question_topic=None):
+    def generate(self, abstract_url: str):
+        """
+        Generates insights for a given paper
+        """
         print("Generating insights for paper: ", abstract_url)
         abstract_url = abstract_url.strip()
-
         abstract_url = Paper.convert_pdf_to_abstract(abstract_url)
+
+        self.open_if_exists(abstract_url)
+
         local_location = Paper(arxiv_url=abstract_url).download()
 
         paper_title = abstract_url
@@ -36,7 +36,7 @@ class PaperInsightExtractor:
             print(f"Error loading paper from url {abstract_url} {e}")
 
         paper_content = pdf.read_content(local_location)
-        prompt = self._get_prompt(question_topic=question_topic)
+        prompt = self._get_prompt()
 
         result = LLM().call(prompt, paper_content)
         result = f"""Title: {paper_title}
@@ -45,36 +45,43 @@ Abstract: {abstract_url}
         """
         print(result)
 
-        question_topic = question_topic if question_topic else "all"
-        config.get_datawarehouse().write_event(
-            "sota_paper_insight",
-            {"abstract_url": abstract_url, "insights": result, "topic": question_topic},
-        )
         pdf.create_pdf(
             data=result, output_path="/tmp/current_paper.pdf", disable_open=True
         )
-        paper_path = pdf.create_pdf_path("paper " + paper_title)
+        paper_path = pdf.create_pdf_path("p " + paper_title)
         print("Saving paper insights to ", paper_path)
         pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", local_location])
+
+        config.get_datawarehouse().write_event(
+            "sota_paper_insight",
+            {"abstract_url": abstract_url, "insights": result, "pdf_path": paper_path},
+        )
 
         if os.environ.get("SOTA_TEST"):
             print("Skipping email")
         else:
             SotaMail().send("", f"Insights from {paper_title}", paper_path)
 
-    def _get_prompt(self, question_topic=None) -> str:
-        QUESTIONS = ""
+    def open_if_exists(self, abstract_url):
+        df = config.get_datawarehouse().event('sota_paper_insight')
+        filtered = df[(df['abstract_url'] == 'http://arxiv.org/abs/1904.05526v2') & ~(df['pdf_path'].isnull())]
+        if not filtered.empty:
+            pdf.open_pdf(filtered['pdf_path'].values[0])
+
+        print("Paper already processed")
+        sys.exit(0)
+
+
+    def _get_prompt(self) -> str:
 
         counter = 1
+        QUESTIONS = ""
         for key, question in self.profile.paper_questions.items():
             QUESTIONS += f"""===
 Question {counter} (Topic: {key})
 {question}
 ==="""
             counter += 1
-
-        if question_topic:
-            QUESTIONS = self.profile.paper_questions[question_topic]
 
         prompt = f"""You are an world class expert in Data Science and computer science.
 Your job is answering questions about the paper given to you as they are asked.
@@ -97,3 +104,9 @@ Question 1 (institution):
 """
 
         return prompt
+
+    def answer_questions_from_clipboard(self):
+        import subprocess
+
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        self.generate(url)
