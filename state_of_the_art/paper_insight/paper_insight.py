@@ -25,7 +25,7 @@ class PaperInsightExtractor:
         if self.open_if_exists(url):
             return
 
-        paper_title = url
+        paper_title = url.split("/")[-1].replace(".pdf", "")
         local_location = Paper(url=url).download()
 
         if ArxivPaper.is_arxiv_url(url):
