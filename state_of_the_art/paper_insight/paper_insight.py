@@ -44,8 +44,9 @@ class PaperInsightExtractor:
         if not Paper(pdf_url=url).exists_in_db(url):
             paper_title = url.split("/")[-1].replace(".pdf", "")
             pdf_url = url
+        print("Paper title: ", paper_title)
 
-        local_location = Downloader().download(pdf_url)
+        local_location = Downloader().download(pdf_url, title=paper_title)
 
         paper_content = pdf.read_content(local_location)
         prompt = self._get_prompt()
@@ -80,7 +81,9 @@ Abstract: {url}
         if filtered.empty:
             return False
 
-        pdf.open_pdf(filtered["pdf_path"].values[0])
+        path = filtered["pdf_path"].values[0]
+        print("Paper insights path: ", path)
+        pdf.open_pdf(path)
         print("Paper already processed")
         return True
 

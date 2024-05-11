@@ -13,11 +13,16 @@ class PapersReport:
         urls = papers["url"].tolist()
         urls = " ".join(urls)
         formatted_result = PapersFormatter().from_str(urls)
-        formatted_result = "Total papers: " + str(len(papers)) + "\nFrom Date: " + from_date + "\ " + formatted_result
+        formatted_result = (
+            "Total papers: "
+            + str(len(papers))
+            + "\nFrom Date: "
+            + from_date
+            + "\ "
+            + formatted_result
+        )
 
         pdf.create_pdf(
             data=formatted_result,
-            output_path_description=f"all papers in period from {from_date}")
-
-
-
+            output_path_description=f"all papers in period from {from_date}",
+        )

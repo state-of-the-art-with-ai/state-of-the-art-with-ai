@@ -27,12 +27,14 @@ def create_pdf(
     return output_path
 
 
-def create_pdf_path(description_path: str):
+def create_pdf_path(description_path: str, disable_timestamp=False):
     import datetime
 
     description_path = description_path.strip()
     now = datetime.datetime.now().isoformat().split(".")[0]
-    description_path = now + " " + description_path
+
+    if not disable_timestamp:
+        description_path = now + " " + description_path
     description_path = description_path.replace(" ", "_")
     description_path = "".join(x for x in description_path if x.isalnum() or x == "_")
     base_path = "/Users/jean.machado/projects/state-of-the-art-via-ai/reports/"
@@ -51,7 +53,7 @@ def open_pdf(output_path):
 
 
 def read_content(pdf_path):
-    print('Reading content from pdf: ', pdf_path)
+    print("Reading content from pdf: ", pdf_path)
     from pypdf import PdfReader
 
     reader = PdfReader(pdf_path)

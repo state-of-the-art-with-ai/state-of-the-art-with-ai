@@ -9,6 +9,7 @@ class Paper:
         self.pdf_url = pdf_url
         if not self.pdf_url.endswith(".pdf"):
             self.pdf_url += ".pdf"
+
     def exists_in_db(self, url):
         print(f"Checking if paper {url} exists in db")
         from state_of_the_art.paper.papers_data import PapersDataLoader
@@ -145,12 +146,6 @@ Url: {self.url}\n"""
         url = url.replace("pdf", "abs")
         url = url.replace("https://", "http://")
         return url
-
-    def get_title_filename(self):
-        # remove non alphanumeric characters
-        file_name = "".join(e for e in self.title if e.isalnum() or e in [" ", "_"])
-        file_name = file_name.replace(" ", "_")
-        return file_name + ".pdf"
 
     def download_and_open(self):
         self.download()
