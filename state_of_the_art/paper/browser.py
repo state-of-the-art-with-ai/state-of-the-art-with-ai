@@ -1,6 +1,6 @@
 import os
 
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 
 
 class BrowserPapers:
@@ -18,4 +18,4 @@ class BrowserPapers:
         print('"', paper_url, '"')
         print("Opening paper: ", paper_url)
         os.system(f"clipboard set_content {paper_url}")
-        Paper(arxiv_url=paper_url).download_and_open()
+        ArxivPaper(url=paper_url).download_and_open()

@@ -2,7 +2,7 @@ import os
 from typing import List
 
 from state_of_the_art.config import config
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 from state_of_the_art.utils.llm import LLM
 
 
@@ -11,7 +11,7 @@ class PaperRanker:
     def __init__(self):
         self._enable_abstract_in_ranking = False
 
-    def rank(self, *, articles: List[Paper], dry_run=False):
+    def rank(self, *, articles: List[ArxivPaper], dry_run=False):
         """
         Ranks existing papers by relevance
         """
@@ -37,7 +37,7 @@ class PaperRanker:
         )
         return result
 
-    def _format_input_articles(self, papers: List[Paper]) -> str:
+    def _format_input_articles(self, papers: List[ArxivPaper]) -> str:
         papers_str = " "
         counter = 1
         for i in papers:

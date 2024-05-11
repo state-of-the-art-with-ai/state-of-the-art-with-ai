@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from datetime import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
@@ -11,8 +11,8 @@ from state_of_the_art.register_papers.arxiv_miner import PaperMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
 from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.recommender.reports_data import ReportsData
-import sys
 from state_of_the_art.config import config
+import sys
 
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
@@ -24,7 +24,7 @@ class Recommender:
     Class responsible to the entire generation pipeline
     """
 
-    _input_articles: Optional[List[Paper]] = None
+    _input_articles: Optional[List[ArxivPaper]] = None
 
     def __init__(self):
         self._topic_search = TopicSearch()

@@ -3,7 +3,7 @@ from state_of_the_art.config import config
 import datetime
 
 from state_of_the_art.utils.mail import SotaMail
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 import pandas as pd
 
 
@@ -24,8 +24,8 @@ class Bookmark:
             comment = "registered interest"
 
         print(f"Registering paper {paper_url} in bookmarks")
-        if Paper.is_arxiv_url(paper_url):
-            Paper.register_from_url(paper_url)
+        if ArxivPaper.is_arxiv_url(paper_url):
+            ArxivPaper.register_from_url(paper_url)
 
         dwh = config.get_datawarehouse()
         dwh.write_event(
@@ -97,12 +97,12 @@ class Bookmark:
             comment = comment.strip()
             comment_str = f"\n Comment: {comment}" if comment else ""
 
-            if Paper.is_arxiv_url(paper_url):
-                paper_url = Paper.convert_pdf_to_abstract(paper_url)
+            if ArxivPaper.is_arxiv_url(paper_url):
+                paper_url = ArxivPaper.convert_pdf_to_abstract(paper_url)
 
             abstract_str = ""
             try:
-                paper = Paper.load_paper_from_url(paper_url)
+                paper = ArxivPaper.load_paper_from_url(paper_url)
                 paper_title = paper.title
                 published_str = f"Published: {paper.published_date_str()}"
                 abstract_str = f"\nAbstract: {paper.abstract}"

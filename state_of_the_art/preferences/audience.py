@@ -13,20 +13,15 @@ class Audience:
         "geology",
         "electrical engineering",
     ]
-
     DEFAULT_KEYWORDS_OF_INTEREST = None
-
     DEAFULT_DESCRIPTION = """Data Science and AI experts and enthusiasts"""
 
     DEFAULT_PAPER_QUESTIONS = {
         "institution": "Which institution published this paper?",
         "explain_me": "Guide me through understanding the main point of the paper even if you are not 100% in the topic",
-        "top_insights": """What are the key insights of the paper?
-    Highlight only key insights, ideally actionable ones.
-    The insights can come form the results of the paper or form literature review
-    Highlight 3-5 insights.
-    Avoid trivial insights that are common knowledge for your audience.
-    Avoid salesly insights that are not backed up by data.
+        "top_insights": """What are the most relevant insights of the paper?
+    Highlight key insights. The insights can come form the results of the paper and form literature review Highlight 3-6 insights.
+    Avoid trivial or salesly insights that are common knowledge for your audience or not backed by data.
     Highlight also insights from the literature review in the paper.
     Make sure to mention a literal quote from the paper that supports your insight
         """,

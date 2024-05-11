@@ -7,7 +7,7 @@ import tqdm
 import nltk
 from rank_bm25 import BM25Okapi as BM25
 
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 
 
@@ -68,7 +68,7 @@ class SemanticSearch:
 
 
 class Bm25Search:
-    def __init__(self, papers_data: List[Paper]):
+    def __init__(self, papers_data: List[ArxivPaper]):
         self.tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
         self.lemmatizer = nltk.stem.WordNetLemmatizer()
         self.papers_data = papers_data

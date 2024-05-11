@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 import pandas as pd
 import datetime
 from state_of_the_art.config import config
@@ -76,15 +76,15 @@ class PapersInDataWharehouse:
 
         return df
 
-    def get_all_papers(self) -> List[Paper]:
+    def get_all_papers(self) -> List[ArxivPaper]:
         df = self.load_papers()
         return self.to_papers(df)
 
-    def to_papers(self, df) -> Union[List[Paper], dict[str, Paper]]:
+    def to_papers(self, df) -> Union[List[ArxivPaper], dict[str, ArxivPaper]]:
 
         papers = []
         for i in df.iterrows():
-            papers.append(Paper.load_from_dict(i[1].to_dict()))
+            papers.append(ArxivPaper.load_from_dict(i[1].to_dict()))
         return papers
 
     def load_between_dates(self, start, end):
@@ -133,7 +133,7 @@ class PapersInDataWharehouse:
 
         return result
 
-    def load_papers_from_urls(self, urls) -> List[Paper]:
+    def load_papers_from_urls(self, urls) -> List[ArxivPaper]:
         papers = self.load_from_urls(urls, as_dict=True)
         result = []
         for i in urls:
@@ -142,17 +142,17 @@ class PapersInDataWharehouse:
                 continue
 
             paper_dict = papers[i].to_dict(orient="records")[0]
-            result.append(Paper.load_from_dict(paper_dict))
+            result.append(ArxivPaper.load_from_dict(paper_dict))
         return result
 
-    def df_to_papers(self, papers_df) -> List[Paper]:
+    def df_to_papers(self, papers_df) -> List[ArxivPaper]:
         papers_dict = papers_df.to_dict(orient="records")
         result = []
         for i in papers_dict:
-            paper = Paper(
+            paper = ArxivPaper(
                 title=i["title"],
                 abstract=i["abstract"],
-                arxiv_url=i["url"],
+                url=i["url"],
                 published=i["published"],
             )
             result.append(paper)
@@ -195,7 +195,7 @@ class PapersInDataWharehouse:
 
         return self.load_papers_between_published_dates(from_date, to_date)
 
-    def papers_to_urls_str(self, papers: List[Paper]) -> str:
+    def papers_to_urls_str(self, papers: List[ArxivPaper]) -> str:
         urls = ""
         for i in papers:
             urls += i.url + "\n"

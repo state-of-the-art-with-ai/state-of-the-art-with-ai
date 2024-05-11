@@ -1,9 +1,8 @@
 import os
-import sys
 
 from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper, Paper
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 
@@ -16,31 +15,30 @@ class PaperInsightExtractor:
     def __init__(self):
         self.profile = config.get_current_audience()
 
-    def generate(self, abstract_url: str):
+    def generate(self, url: str):
         """
         Generates insights for a given paper
         """
-        print("Generating insights for paper: ", abstract_url)
-        abstract_url = abstract_url.strip()
-        abstract_url = Paper.convert_pdf_to_abstract(abstract_url)
+        print("Generating insights for paper: ", url)
+        url = url.strip()
 
-        self.open_if_exists(abstract_url)
+        if self.open_if_exists(url):
+            return
 
-        local_location = Paper(arxiv_url=abstract_url).download()
+        paper_title = url
+        local_location = Paper(url=url).download()
 
-        paper_title = abstract_url
-        try:
-            paper = Paper.load_paper_from_url(abstract_url)
+        if ArxivPaper.is_arxiv_url(url):
+            url = ArxivPaper.convert_pdf_to_abstract(url)
+            paper = ArxivPaper.load_paper_from_url(url)
             paper_title = paper.title
-        except Exception as e:
-            print(f"Error loading paper from url {abstract_url} {e}")
 
         paper_content = pdf.read_content(local_location)
         prompt = self._get_prompt()
 
         result = LLM().call(prompt, paper_content)
         result = f"""Title: {paper_title}
-Abstract: {abstract_url}
+Abstract: {url}
 {result}
         """
         print(result)
@@ -54,7 +52,7 @@ Abstract: {abstract_url}
 
         config.get_datawarehouse().write_event(
             "sota_paper_insight",
-            {"abstract_url": abstract_url, "insights": result, "pdf_path": paper_path},
+            {"abstract_url": url, "insights": result, "pdf_path": paper_path},
         )
 
         if os.environ.get("SOTA_TEST"):
@@ -63,14 +61,14 @@ Abstract: {abstract_url}
             SotaMail().send("", f"Insights from {paper_title}", paper_path)
 
     def open_if_exists(self, abstract_url):
-        df = config.get_datawarehouse().event('sota_paper_insight')
-        filtered = df[(df['abstract_url'] == 'http://arxiv.org/abs/1904.05526v2') & ~(df['pdf_path'].isnull())]
-        if not filtered.empty:
-            pdf.open_pdf(filtered['pdf_path'].values[0])
+        df = config.get_datawarehouse().event("sota_paper_insight")
+        filtered = df[(df["abstract_url"] == abstract_url) & ~(df["pdf_path"].isnull())]
+        if filtered.empty:
+            return False
 
+        pdf.open_pdf(filtered["pdf_path"].values[0])
         print("Paper already processed")
-        sys.exit(0)
-
+        return True
 
     def _get_prompt(self) -> str:
 

@@ -1,7 +1,7 @@
 import arxiv
 from typing import Literal, List
 from state_of_the_art.config import config
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper import ArxivPaper
 from tqdm import tqdm
 
 
@@ -91,7 +91,7 @@ class PaperMiner:
         number_of_papers=None,
         sort_by: Literal["submitted", "relevance"] = "submitted",
         only_print=False,
-    ) -> List[Paper]:
+    ) -> List[ArxivPaper]:
         if not query and not id_list:
             print("No query provided, using default query")
             query = self.DEFAULT_QUERY
@@ -131,10 +131,10 @@ class PaperMiner:
         result = []
         order_counter = 1
         for r in search.results():
-            paper = Paper(
+            paper = ArxivPaper(
                 title=r.title,
                 abstract=r.summary,
-                arxiv_url=r.entry_id,
+                url=r.entry_id,
                 published=r.published,
             )
             result.append(paper)
@@ -150,7 +150,7 @@ class PaperMiner:
         arxiv_papers = self.tdw.event("arxiv_papers")
         return arxiv_papers["url"].values
 
-    def _register_given_papers(self, papers: List[Paper]):
+    def _register_given_papers(self, papers: List[ArxivPaper]):
         counter = 0
         skipped = 0
         registered = 0
