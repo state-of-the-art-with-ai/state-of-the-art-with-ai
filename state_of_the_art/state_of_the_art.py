@@ -1,5 +1,7 @@
+from state_of_the_art.paper.downloader import Downloader
 from state_of_the_art.paper.papers_data import PapersDataLoader
 from state_of_the_art.paper.browser import BrowserPapers as browser_papers
+from state_of_the_art.paper.papers_report import PapersReport
 from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
 from state_of_the_art.paper.paper import ArxivPaper
 
@@ -8,6 +10,7 @@ from state_of_the_art.recommender.recommender import Recommender
 from state_of_the_art.recommender.topic_based.searches import SemanticSearch
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art import validation
+
 
 
 class Sota:
@@ -26,6 +29,8 @@ class Sota:
         self.topic_search = TopicSearch
         self.SemanticSearch = SemanticSearch
         self._ci = validation
+        self.papers_report = PapersReport
+        self.downloader = Downloader
 
 
 def main():

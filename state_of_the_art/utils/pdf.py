@@ -51,6 +51,7 @@ def open_pdf(output_path):
 
 
 def read_content(pdf_path):
+    print('Reading content from pdf: ', pdf_path)
     from pypdf import PdfReader
 
     reader = PdfReader(pdf_path)

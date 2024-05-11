@@ -3,45 +3,18 @@ from typing import List
 from state_of_the_art.config import config
 
 
-class PaperDTO:
+class Paper:
 
     def __init__(self, *, pdf_url: str):
         self.pdf_url = pdf_url
         if not self.pdf_url.endswith(".pdf"):
             self.pdf_url += ".pdf"
-
-    def download(self) -> str:
-        """
-        Downloads a paper from a given url
-        :param url:
-        :return:
-        """
-
-        if not self.pdf_url.endswith(".pdf"):
-            raise Exception("Invalid file format. Only PDF files are supported")
-
-        destination = self.get_destination()
-
-        if os.path.exists(destination):
-            print(f"File {destination} already exists so wont download it again")
-            return destination
-
-        print(f"Downloading file {self.pdf_url} to {destination}")
-
-        import urllib
-
-        opener = urllib.request.build_opener()
-        opener.addheaders = [("User-agent", "Mozilla/5.0")]
-        urllib.request.install_opener(opener)
-        urllib.request.urlretrieve(self.pdf_url, destination)
-        return destination
-
     def exists_in_db(self, url):
         print(f"Checking if paper {url} exists in db")
         from state_of_the_art.paper.papers_data import PapersDataLoader
 
         result = PapersDataLoader().load_from_url(url)
-        if not result:
+        if not result or result.empty:
             return False
         return True
 
@@ -53,7 +26,7 @@ class PaperDTO:
         return self.pdf_url.split("/")[-1]
 
 
-class ArxivPaper(PaperDTO):
+class ArxivPaper(Paper):
     """
     Main dto to access papers functionality
 

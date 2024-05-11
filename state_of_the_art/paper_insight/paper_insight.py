@@ -1,8 +1,9 @@
 import os
 
 from state_of_the_art.config import config
+from state_of_the_art.paper.downloader import Downloader
 from state_of_the_art.utils.llm import LLM
-from state_of_the_art.paper.paper import ArxivPaper, PaperDTO
+from state_of_the_art.paper.paper import ArxivPaper, Paper
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 
@@ -40,11 +41,11 @@ class PaperInsightExtractor:
             paper = ArxivPaper.load_paper_from_url(url=abstract_url)
             paper_title = paper.title
 
-        if not PaperDTO(pdf_url=url).exists_in_db(url):
+        if not Paper(pdf_url=url).exists_in_db(url):
             paper_title = url.split("/")[-1].replace(".pdf", "")
             pdf_url = url
 
-        local_location = PaperDTO(pdf_url=pdf_url).download()
+        local_location = Downloader().download(pdf_url)
 
         paper_content = pdf.read_content(local_location)
         prompt = self._get_prompt()
