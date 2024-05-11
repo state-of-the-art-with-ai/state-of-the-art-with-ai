@@ -1,7 +1,7 @@
 from typing import Optional
 
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.papers_data import PapersInDataWharehouse
+from state_of_the_art.paper.papers_data import PapersDataLoader
 from state_of_the_art.preferences.audience import Audience
 from state_of_the_art.recommender.topic_based.searches import Bm25Search, SemanticSearch
 from state_of_the_art.recommender.topic_based.topic import Topic
@@ -11,7 +11,7 @@ from state_of_the_art.recommender.topic_based.topic_extraction import TopicExtra
 class TopicSearch:
 
     def __init__(self):
-        papers_data = PapersInDataWharehouse()
+        papers_data = PapersDataLoader()
         papers = papers_data.load_papers()
         self._papers_list = papers_data.df_to_papers(papers)
         self.bm25_search = Bm25Search(self._papers_list)

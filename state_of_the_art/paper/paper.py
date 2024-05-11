@@ -3,10 +3,12 @@ from typing import List
 from state_of_the_art.config import config
 
 
-class Paper:
+class PaperDTO:
 
-    def __init__(self, *, url: str):
-        self.url = url
+    def __init__(self, *, pdf_url: str):
+        self.pdf_url = pdf_url
+        if not self.pdf_url.endswith(".pdf"):
+            self.pdf_url += ".pdf"
 
     def download(self) -> str:
         """
@@ -14,11 +16,6 @@ class Paper:
         :param url:
         :return:
         """
-        self.pdf_url = self.url
-        if not self.url.endswith(".pdf"):
-            raise Exception(
-                "Invalid file extension format. Only PDF files are supported"
-            )
 
         if not self.pdf_url.endswith(".pdf"):
             raise Exception("Invalid file format. Only PDF files are supported")
@@ -34,10 +31,19 @@ class Paper:
         import urllib
 
         opener = urllib.request.build_opener()
-        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+        opener.addheaders = [("User-agent", "Mozilla/5.0")]
         urllib.request.install_opener(opener)
         urllib.request.urlretrieve(self.pdf_url, destination)
         return destination
+
+    def exists_in_db(self, url):
+        print(f"Checking if paper {url} exists in db")
+        from state_of_the_art.paper.papers_data import PapersDataLoader
+
+        result = PapersDataLoader().load_from_url(url)
+        if not result:
+            return False
+        return True
 
     def get_destination(self):
         file_name = self.get_filename()
@@ -47,18 +53,18 @@ class Paper:
         return self.pdf_url.split("/")[-1]
 
 
-class ArxivPaper(Paper):
+class ArxivPaper(PaperDTO):
     """
     Main dto to access papers functionality
 
     """
 
-    def __init__(self, *, url: str, published=None, title=None, abstract=None):
-        self.validate_abstract_url(url)
+    def __init__(self, *, pdf_url: str, published=None, title=None, abstract=None):
+        self.validate_abstract_url(pdf_url)
 
-        self.arxiv_url = url
+        self.arxiv_url = pdf_url
 
-        self.url = url
+        self.url = pdf_url
         self.pdf_url = None
         self.published = published
         self.title = title
@@ -67,33 +73,30 @@ class ArxivPaper(Paper):
     @staticmethod
     def load_from_dict(data):
         return ArxivPaper(
-            url=data["url"],
+            pdf_url=data["url"],
             published=data["published"],
             title=data["title"],
             abstract=data["abstract"],
         )
 
     @staticmethod
-    def register_from_url(url: str):
-        from state_of_the_art.register_papers.arxiv_miner import PaperMiner
-
-        url = ArxivPaper.convert_pdf_to_abstract(url)
-        PaperMiner().register_by_id(ArxivPaper.id_from_url(url))
-
-    @staticmethod
     def id_from_url(url):
-        return url.split("/")[-1]
+        return url.split("/")[-1].replace(".pdf", "")
 
     @staticmethod
     def load_paper_from_url(url) -> "ArxivPaper":
-        from state_of_the_art.paper.papers_data import PapersInDataWharehouse
 
-        result = PapersInDataWharehouse().load_from_url(url)
-        if result is None:
-            raise Exception(f"Paper with url {url} not found")
+        from state_of_the_art.paper.papers_data import PapersDataLoader
+
+        result = PapersDataLoader().load_from_url(url)
+
+        if result.empty:
+            raise Exception(f"Paper not found for url {url}")
+
+        result = PapersDataLoader().load_from_url(url)
         result = result.iloc[0].to_dict()
         return ArxivPaper(
-            url=result["url"],
+            pdf_url=result["url"],
             published=result["published"],
             title=result["title"],
             abstract=result["abstract"],

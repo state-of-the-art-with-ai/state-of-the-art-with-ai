@@ -4,10 +4,10 @@ from typing import Optional, List
 from datetime import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import ArxivPaper
-from state_of_the_art.paper.papers_data import PapersInDataWharehouse
+from state_of_the_art.paper.papers_data import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
-from state_of_the_art.register_papers.arxiv_miner import PaperMiner
+from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
 from state_of_the_art.recommender.report_parameters import RecommenderParameters
 from state_of_the_art.recommender.reports_data import ReportsData
@@ -65,7 +65,7 @@ class Recommender:
         )
 
         if not skip_register:
-            PaperMiner().register_new(
+            ArxivMiner().register_new(
                 dry_run=dry_run, max_papers_per_query=max_papers_per_query
             )
         else:
@@ -89,7 +89,7 @@ class Recommender:
         return result
 
     def _write_event(self, parameters, formatted_result, result):
-        papers_str = PapersInDataWharehouse().papers_to_urls_str(self._input_articles)
+        papers_str = PapersDataLoader().papers_to_urls_str(self._input_articles)
         ranking_data = RankGeneratedData(
             from_date=parameters.from_date,
             to_date=parameters.to_date,
@@ -123,8 +123,8 @@ class Recommender:
             stdindata = "\n".join(stdindata)
             return self._topic_search.extract_query_and_search(stdindata)
 
-        self._input_articles = PapersInDataWharehouse().to_papers(
-            PapersInDataWharehouse().get_latest_articles(
+        self._input_articles = PapersDataLoader().to_papers(
+            PapersDataLoader().get_latest_articles(
                 lookback_days=parameters.lookback_days,
                 from_date=parameters.from_date,
                 batch=parameters.batch,
@@ -167,7 +167,7 @@ Profile: "{profile_name}"
 
     def _load_papers_from_str(self, papers_str: str):
         urls = PapersUrlsExtractor().extract_urls(papers_str)
-        return PapersInDataWharehouse().load_from_urls(urls, fail_on_missing_ids=False)
+        return PapersDataLoader().load_from_urls(urls, fail_on_missing_ids=False)
 
     def latest(self):
         return ReportsData().get_latest_summary()

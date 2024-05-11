@@ -1,6 +1,6 @@
 from typing import List
 
-from state_of_the_art.paper.papers_data import PapersInDataWharehouse
+from state_of_the_art.paper.papers_data import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 
 
@@ -16,10 +16,10 @@ class PapersFormatter:
 
     def from_str(self, papers_str: str) -> str:
         urls = PapersUrlsExtractor().extract_urls(papers_str)
-        papers = PapersInDataWharehouse().load_papers_from_urls(urls)
+        papers = PapersDataLoader().load_papers_from_urls(urls)
         return self.from_papers(papers)
 
-    def from_papers(self, papers: List[PapersInDataWharehouse]) -> str:
+    def from_papers(self, papers: List[PapersDataLoader]) -> str:
         formatted_result = ""
         counter = 1
         for paper in papers:

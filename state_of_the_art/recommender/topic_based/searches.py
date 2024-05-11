@@ -8,7 +8,7 @@ import nltk
 from rank_bm25 import BM25Okapi as BM25
 
 from state_of_the_art.paper.paper import ArxivPaper
-from state_of_the_art.paper.papers_data import PapersInDataWharehouse
+from state_of_the_art.paper.papers_data import PapersDataLoader
 
 
 class SemanticSearch:
@@ -32,7 +32,7 @@ class SemanticSearch:
 
     def setup_papers(self):
         print("Setting up documents")
-        papers = PapersInDataWharehouse().get_all_papers()
+        papers = PapersDataLoader().get_all_papers()
         documents = []
         ids = []
 

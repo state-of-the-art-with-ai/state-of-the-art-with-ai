@@ -23,10 +23,6 @@ class Bookmark:
         if not comment:
             comment = "registered interest"
 
-        print(f"Registering paper {paper_url} in bookmarks")
-        if ArxivPaper.is_arxiv_url(paper_url):
-            ArxivPaper.register_from_url(paper_url)
-
         dwh = config.get_datawarehouse()
         dwh.write_event(
             self.EVENT_NAME,

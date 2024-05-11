@@ -5,7 +5,7 @@ from state_of_the_art.paper.paper import ArxivPaper
 from tqdm import tqdm
 
 
-class PaperMiner:
+class ArxivMiner:
     """
     Looks at arxiv api for papers
     """
@@ -75,8 +75,9 @@ class PaperMiner:
         )
 
     def register_by_id(self, id: str):
+        print("Registering paper in db by id: ", id)
         papers = self._find_papers(id_list=[str(id)], only_print=False)
-        print("Found_paper: ", papers)
+        print("Found_paper: ", str(papers))
         return self._register_given_papers(papers)
 
     def query_papers(self, query):
@@ -134,7 +135,7 @@ class PaperMiner:
             paper = ArxivPaper(
                 title=r.title,
                 abstract=r.summary,
-                url=r.entry_id,
+                pdf_url=r.entry_id,
                 published=r.published,
             )
             result.append(paper)

@@ -18,4 +18,4 @@ class BrowserPapers:
         print('"', paper_url, '"')
         print("Opening paper: ", paper_url)
         os.system(f"clipboard set_content {paper_url}")
-        ArxivPaper(url=paper_url).download_and_open()
+        ArxivPaper(pdf_url=paper_url).download_and_open()

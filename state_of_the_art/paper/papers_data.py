@@ -6,7 +6,7 @@ import datetime
 from state_of_the_art.config import config
 
 
-class PapersInDataWharehouse:
+class PapersDataLoader:
     TITLE_MAX_LENGH = 80
 
     def print(self, from_date=None, n=None):
@@ -152,7 +152,7 @@ class PapersInDataWharehouse:
             paper = ArxivPaper(
                 title=i["title"],
                 abstract=i["abstract"],
-                url=i["url"],
+                pdf_url=i["url"],
                 published=i["published"],
             )
             result.append(paper)

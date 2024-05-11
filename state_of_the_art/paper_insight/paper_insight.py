@@ -2,7 +2,7 @@ import os
 
 from state_of_the_art.config import config
 from state_of_the_art.utils.llm import LLM
-from state_of_the_art.paper.paper import ArxivPaper, Paper
+from state_of_the_art.paper.paper import ArxivPaper, PaperDTO
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 
@@ -19,19 +19,32 @@ class PaperInsightExtractor:
         """
         Generates insights for a given paper
         """
-        print("Generating insights for paper: ", url)
+        print("Paper: ", url)
         url = url.strip()
 
         if self.open_if_exists(url):
             return
 
-        paper_title = url.split("/")[-1].replace(".pdf", "")
-        local_location = Paper(url=url).download()
-
         if ArxivPaper.is_arxiv_url(url):
-            url = ArxivPaper.convert_pdf_to_abstract(url)
-            paper = ArxivPaper.load_paper_from_url(url)
+            if ArxivPaper.is_valid_abstract_url(url):
+                abstract_url = url
+                pdf_url = ArxivPaper.convert_abstract_to_pdf(url)
+            else:
+                pdf_url = url
+                abstract_url = ArxivPaper.convert_pdf_to_abstract(url)
+
+            if not ArxivPaper(pdf_url=abstract_url).exists_in_db(url):
+                from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
+
+                ArxivMiner().register_by_id(ArxivPaper.id_from_url(url))
+            paper = ArxivPaper.load_paper_from_url(url=abstract_url)
             paper_title = paper.title
+
+        if not PaperDTO(pdf_url=url).exists_in_db(url):
+            paper_title = url.split("/")[-1].replace(".pdf", "")
+            pdf_url = url
+
+        local_location = PaperDTO(pdf_url=pdf_url).download()
 
         paper_content = pdf.read_content(local_location)
         prompt = self._get_prompt()
