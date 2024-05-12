@@ -47,7 +47,7 @@ class ArxivMiner:
             papers = papers + self._find_papers(query=topic, sort_by="relevance")
             papers = papers + self._find_papers(query=topic, sort_by="submitted")
 
-        papers = [p for p in papers if p.url not in self.existing_papers_urls]
+        papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
         print("Found ", len(papers), " new papers")
 
         if dry_run:
@@ -73,6 +73,13 @@ class ArxivMiner:
         self._find_papers(
             query=query, number_of_papers=n, sort_by="submitted", only_print=True
         )
+
+    def register_paper_if_not_registered(self, paper):
+
+        if not paper.exists_in_db(paper.pdf_url):
+            self.register_by_id(ArxivPaper.id_from_url(paper.pdf_url))
+        else:
+            print("Paper already registered")
 
     def register_by_id(self, id: str):
         print("Registering paper in db by id: ", id)
@@ -139,7 +146,7 @@ class ArxivMiner:
                 published=r.published,
             )
             result.append(paper)
-            print(order_counter, paper.published, paper.title, paper.url)
+            print(order_counter, paper.published, paper.title, paper.abstract_url)
             order_counter += 1
         print("Found ", len(result), " papers")
 
@@ -160,13 +167,16 @@ class ArxivMiner:
         registered_now = []
         for paper in tqdm(papers):
             counter = counter + 1
-            if paper.url in self.existing_papers_urls or paper.url in registered_now:
+            if (
+                paper.abstract_url in self.existing_papers_urls
+                or paper.abstract_url in registered_now
+            ):
                 skipped += 1
                 continue
 
             registered += 1
             self.tdw.write_event("arxiv_papers", paper.to_dict())
-            registered_now.append(paper.url)
+            registered_now.append(paper.abstract_url)
 
         print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
         return registered, skipped

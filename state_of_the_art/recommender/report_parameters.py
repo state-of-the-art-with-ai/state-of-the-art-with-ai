@@ -16,6 +16,7 @@ class RecommenderParameters(BaseModel):
     # if we are receiving in the inpyut  atext with a  list of papers to rank
     papers_to_rank: Optional[str] = None
     batch_size: Optional[int] = config.RANK_MAX_PAPERS_TO_COMPUTE
+    number_of_papers_to_recommend: Optional[int] = None
 
     class Config:
         validate_assignment = True

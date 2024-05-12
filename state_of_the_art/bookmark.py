@@ -78,10 +78,16 @@ class Bookmark:
 
         return df
 
-    def list(self, n=5):
-        print(self.prepare_list(n=n))
+    def list(self, n=5, from_date=None):
+        print(self.prepare_list(n=n, from_date=from_date))
 
-    def prepare_list(self, n=None):
+    def prepare_list(self, n=None, from_date: Optional[str] = None):
+        from_date = (
+            datetime.datetime.strptime(from_date, "%Y-%m-%d").date()
+            if from_date
+            else None
+        )
+
         dict = self.load_df(n=n).to_dict(orient="index")
         result = "Bookmarks: \n\n"
         counter = 1
@@ -102,6 +108,9 @@ class Bookmark:
                 paper_title = paper.title
                 published_str = f"Published: {paper.published_date_str()}"
                 abstract_str = f"\nAbstract: {paper.abstract}"
+                if from_date:
+                    if paper.published < from_date:
+                        continue
             except Exception as e:
                 pass
             result += f"""{counter}. Title: {paper_title} 

@@ -5,15 +5,15 @@ from state_of_the_art.utils import pdf
 
 class Downloader:
 
-    def download(self, pdf_url:str, force_download=False, title=None):
+    def download(self, pdf_url: str, force_download=False, title=None):
         """
         Downloads a paper from a given url
         :param url:
         :return:
         """
         paper = Paper(pdf_url=pdf_url)
+        print(f"Downloading paper from {paper.pdf_url}")
         destination = self._get_destination(pdf_url, title=title)
-
 
         if os.path.exists(destination):
             if "FORCE_DOWNLOAD" in os.environ or force_download:
@@ -40,8 +40,9 @@ class Downloader:
 
     def remove(self, pdf_url):
         path = self._get_destination(pdf_url)
-        os.remove(path)
-        print(f"Removed file {path}")
+        if os.path.exists(path):
+            os.remove(path)
+            print(f"Removed file {path}")
 
     def open(self, pdf_url):
         path = self._get_destination(pdf_url)

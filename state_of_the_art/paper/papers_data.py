@@ -101,10 +101,6 @@ class PapersDataLoader:
     def load_from_url(self, url) -> Optional[pd.DataFrame]:
         papers = self.load_papers()
         result = papers[papers["url"] == url]
-
-        if result.empty:
-            return None
-
         return result
 
     def load_from_urls(
@@ -198,5 +194,5 @@ class PapersDataLoader:
     def papers_to_urls_str(self, papers: List[ArxivPaper]) -> str:
         urls = ""
         for i in papers:
-            urls += i.url + "\n"
+            urls += i.abstract_url + "\n"
         return urls

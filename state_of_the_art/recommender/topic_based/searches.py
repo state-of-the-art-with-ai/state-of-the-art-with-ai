@@ -1,70 +1,9 @@
-import os
-
-import sys
 from typing import List
-import tqdm
 
 import nltk
 from rank_bm25 import BM25Okapi as BM25
 
 from state_of_the_art.paper.paper import ArxivPaper
-from state_of_the_art.paper.papers_data import PapersDataLoader
-
-
-class SemanticSearch:
-
-    def __init__(self):
-        self.client = self.setup()
-
-    def setup(self):
-        import chromadb
-
-        self.chroma_path = os.environ["HOME"] + "/.chroma.db"
-        self.client = chromadb.PersistentClient(path=self.chroma_path)
-
-        try:
-            self.collection = self.client.get_collection("papers")
-        except:
-            print("Collection not found")
-            self.collection = self.setup_papers()
-
-        return self.client
-
-    def setup_papers(self):
-        print("Setting up documents")
-        papers = PapersDataLoader().get_all_papers()
-        documents = []
-        ids = []
-
-        collection = self.client.get_or_create_collection("papers")
-
-        for paper in tqdm.tqdm(papers):
-            collection.add(
-                documents=[paper.title + " " + paper.abstract],
-                ids=[paper.url],
-            )
-
-        print("Adding documents", len(documents))
-        self.collection = collection
-        print("Done setting up documents")
-
-        return collection
-
-    def search(self, query=None, n=20):
-
-        if not query:
-            if not sys.stdin.isatty():
-                data = sys.stdin.readlines()
-                query = "".join(data)
-
-        ids = self.collection.query(query_texts=[query], n_results=n)["ids"][0]
-        return ids
-
-    def info(self):
-        return {"docs_count": self.collection.count()}
-
-    def reset(self):
-        self.client.reset()
 
 
 class Bm25Search:

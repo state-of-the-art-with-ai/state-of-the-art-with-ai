@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from state_of_the_art.config import config
 
 
@@ -15,7 +15,7 @@ class Paper:
         from state_of_the_art.paper.papers_data import PapersDataLoader
 
         result = PapersDataLoader().load_from_url(url)
-        if not result or result.empty:
+        if result.empty:
             return False
         return True
 
@@ -33,13 +33,28 @@ class ArxivPaper(Paper):
 
     """
 
-    def __init__(self, *, pdf_url: str, published=None, title=None, abstract=None):
-        self.validate_abstract_url(pdf_url)
+    def __init__(
+        self,
+        *,
+        url: Optional[str] = None,
+        pdf_url: Optional[str] = None,
+        published=None,
+        title: Optional[str] = None,
+        abstract: Optional[str] = None,
+    ):
+        if url and not self.is_arxiv_url(url):
+            raise Exception(f'"{url}" is not a valid arxiv url')
+        if pdf_url and not self.is_arxiv_url(pdf_url):
+            raise Exception(f'"{url}" is not a valid arxiv url')
 
-        self.arxiv_url = pdf_url
+        if pdf_url and not url:
+            self.abstract_url = self.convert_pdf_to_abstract(pdf_url)
+            self.pdf_url = pdf_url.replace("http://", "https://")
 
-        self.url = pdf_url
-        self.pdf_url = None
+        if url and not pdf_url:
+            self.pdf_url = self.convert_abstract_to_pdf(url)
+            self.abstract_url = self.convert_pdf_to_abstract(url)
+
         self.published = published
         self.title = title
         self.abstract = abstract
@@ -59,18 +74,13 @@ class ArxivPaper(Paper):
 
     @staticmethod
     def load_paper_from_url(url) -> "ArxivPaper":
-
         from state_of_the_art.paper.papers_data import PapersDataLoader
-
         result = PapersDataLoader().load_from_url(url)
-
         if result.empty:
             raise Exception(f"Paper not found for url {url}")
-
-        result = PapersDataLoader().load_from_url(url)
         result = result.iloc[0].to_dict()
         return ArxivPaper(
-            pdf_url=result["url"],
+            url=result["url"],
             published=result["published"],
             title=result["title"],
             abstract=result["abstract"],
@@ -84,7 +94,7 @@ class ArxivPaper(Paper):
 
     def to_dict(self):
         return {
-            "url": self.arxiv_url,
+            "url": self.pdf_url,
             "published": self.published,
             "title": self.title,
             "abstract": self.abstract,
@@ -132,7 +142,7 @@ Url: {self.url}\n"""
     @staticmethod
     def convert_abstract_to_pdf(url):
         result = url.replace("abs", "pdf")
-
+        result = result.replace("http://", "https://")
         result += ".pdf"
         return result
 
@@ -144,17 +154,5 @@ Url: {self.url}\n"""
     def convert_pdf_to_abstract(url):
         url = url.replace(".pdf", "")
         url = url.replace("pdf", "abs")
-        url = url.replace("https://", "http://")
+        url = url.replace("http://", "https://")
         return url
-
-    def download_and_open(self):
-        self.download()
-        self.open()
-
-    def open(self):
-        """
-        Opens the paper in the default pdf reader of the desktop
-
-        :return:
-        """
-        os.system(f"open {self.get_destination(self.url)}")

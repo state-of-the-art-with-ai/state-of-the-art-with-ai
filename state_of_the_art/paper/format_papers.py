@@ -29,7 +29,7 @@ class PapersFormatter:
                 abstract = f"Abstract: {paper.abstract[0:self.max_abstract_size]}"
             formatted_result += f"""
 {counter}. {paper.title}  
-{paper.url}
+{paper.abstract_url}
 Published: {paper.published_date_str()}
 {abstract}\n\n"""
 

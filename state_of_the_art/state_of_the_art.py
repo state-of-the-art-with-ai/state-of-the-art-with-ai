@@ -5,7 +5,7 @@ from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.recommender.recommender import Recommender
-from state_of_the_art.recommender.topic_based.searches import SemanticSearch
+from state_of_the_art.recommender.topic_based.semantic_search import SemanticSearch
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art import validation
 
