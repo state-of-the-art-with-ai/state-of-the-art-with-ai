@@ -23,6 +23,7 @@ class PaperInsightExtractor:
         """
         print("Paper: ", url)
         url = url.strip()
+        url = url.replace("file://", "")
 
         if self.open_if_exists(url):
             return

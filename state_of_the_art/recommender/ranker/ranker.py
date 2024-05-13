@@ -15,6 +15,9 @@ class PaperRanker:
         """
         Ranks existing papers by relevance
         """
+        if not articles:
+            raise Exception("No articles to rank")
+
         prompt = self.get_prompt()
 
         if dry_run:

@@ -5,12 +5,16 @@ from state_of_the_art.utils import pdf
 
 class Downloader:
 
-    def download(self, pdf_url: str, force_download=False, title=None):
+    def download(self, pdf_url: str, force_download=False, title=None) -> str:
         """
         Downloads a paper from a given url
         :param url:
         :return:
         """
+        if not pdf_url.startswith("http"):
+            print("Not an http url spkipping download")
+            return pdf_url
+
         paper = Paper(pdf_url=pdf_url)
         print(f"Downloading paper from {paper.pdf_url}")
         destination = self._get_destination(pdf_url, title=title)

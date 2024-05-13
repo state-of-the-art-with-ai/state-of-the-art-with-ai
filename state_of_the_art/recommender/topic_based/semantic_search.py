@@ -5,13 +5,14 @@ import tqdm
 
 from state_of_the_art.paper.papers_data import PapersDataLoader
 
+
 class SemanticSearch:
     def __init__(self):
         self.client = self.setup()
 
-
     def _get_chroma_instance(self):
         import chromadb
+
         self.chroma_path = os.environ["HOME"] + "/.chroma.db"
         self.client = chromadb.PersistentClient(path=self.chroma_path)
         return self.client
@@ -29,11 +30,12 @@ class SemanticSearch:
     def setup_papers(self):
         print("Setting up documents")
 
-        existing_ids = self.client.get_or_create_collection('papers').get()['ids']
+        existing_ids = self.client.get_or_create_collection("papers").get()["ids"]
         papers = PapersDataLoader().get_all_papers()
-        missing_papers = [paper for paper in papers if paper.abstract_url not in existing_ids]
+        missing_papers = [
+            paper for paper in papers if paper.abstract_url not in existing_ids
+        ]
         print("Found ", len(missing_papers), " missing papers")
-
 
         collection = self.client.get_or_create_collection("papers")
         for paper in tqdm.tqdm(missing_papers):

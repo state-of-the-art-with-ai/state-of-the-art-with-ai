@@ -75,7 +75,6 @@ class ArxivMiner:
         )
 
     def register_paper_if_not_registered(self, paper):
-
         if not paper.exists_in_db(paper.pdf_url):
             self.register_by_id(ArxivPaper.id_from_url(paper.pdf_url))
         else:
@@ -172,6 +171,7 @@ class ArxivMiner:
                 or paper.abstract_url in registered_now
             ):
                 skipped += 1
+                print("Skipping already registered paper: ", paper.abstract_url)
                 continue
 
             registered += 1

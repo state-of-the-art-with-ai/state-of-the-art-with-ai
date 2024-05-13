@@ -45,7 +45,13 @@ class Bookmark:
         print("Interactive collecting paper input")
         import subprocess
 
-        url = subprocess.check_output("collect_input -n Url -p", shell=True, text=True)
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        url = url.strip()
+        print("Url content: ", url)
+
+        if not url.startswith("https://") and not url.startswith("http://"):
+            raise Exception(f"Given clipboard content '{url}' is not a url!")
+
         comment = subprocess.check_output(
             "collect_input -n Comment", shell=True, text=True
         )

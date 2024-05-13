@@ -53,6 +53,7 @@ def open_pdf(output_path):
 
 
 def read_content(pdf_path):
+    pdf_path = pdf_path.replace("file://", "")
     print("Reading content from pdf: ", pdf_path)
     from pypdf import PdfReader
 

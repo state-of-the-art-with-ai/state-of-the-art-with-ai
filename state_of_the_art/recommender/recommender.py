@@ -45,7 +45,7 @@ class Recommender:
         query: Optional[str] = None,
         by_topic: Optional[str] = None,
         description_from_clipboard=False,
-        number_of_papers_to_recommend=None,
+        number_of_recommendations=None,
     ):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
@@ -63,7 +63,7 @@ class Recommender:
             query=query,
             by_topic=by_topic,
             description_from_clipboard=description_from_clipboard,
-            number_of_papers_to_recommend=number_of_papers_to_recommend,
+            number_of_papers_to_recommend=number_of_recommendations,
         )
 
         if not skip_register:
@@ -93,7 +93,10 @@ class Recommender:
     def _rank(self, parameters: RecommenderParameters) -> str:
 
         if parameters.by_topic:
-            return self._topic_search.search_by_topic(parameters.by_topic, num_of_results=parameters.number_of_papers_to_recommend)
+            return self._topic_search.search_by_topic(
+                parameters.by_topic,
+                num_of_results=parameters.number_of_papers_to_recommend,
+            )
 
         if parameters.query:
             return self._topic_search.extract_query_and_search(parameters.query)
@@ -130,7 +133,11 @@ class Recommender:
 
         query_str = f"Query: {parameters.query} \n" if parameters.query else ""
         topic_str = f"Topic: {parameters.by_topic} \n" if parameters.by_topic else ""
-        number_of_papers = f"Num of results: {parameters.number_of_papers_to_recommend} \n" if parameters.number_of_papers_to_recommend else ""
+        number_of_papers = (
+            f"Num of results: {parameters.number_of_papers_to_recommend} \n"
+            if parameters.number_of_papers_to_recommend
+            else ""
+        )
         from_date_str = (
             f"From date: {parameters.from_date} \n" if parameters.from_date else ""
         )
@@ -157,6 +164,7 @@ Profile: "{profile_name}"
         config.get_datawarehouse().write_event(
             "state_of_the_art_summary", ranking_data.to_dict()
         )
+
     def _send_email(self, formatted_result, title):
         print("Sending email")
         if os.environ.get("LLM_MOCK") or os.environ.get("SOTA_TEST"):
