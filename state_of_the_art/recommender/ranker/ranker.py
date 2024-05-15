@@ -51,7 +51,7 @@ class PaperRanker:
             )
             papers_str += f"""
 {counter}. Title: {i.title}
-Arxiv URL: {i.url}
+Arxiv URL: {i.abstract_url}
 Published: {i.published_date_str()}
 {abstract_row}
 """
