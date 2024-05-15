@@ -9,6 +9,10 @@ open_ai_cost = {
         "input_cost_per_million": 10,
         "output_cost_per_million": 30,
     },
+    "gpt-4o": {
+        "input_cost_per_million": 5,
+        "output_cost_per_million": 15,
+    },
 }
 
 
@@ -20,7 +24,7 @@ def calculate_cost(
     if chars_output is not None:
         tokens_output = chars_output / 4
 
-    model = "gpt-4-turbo-preview"
+    model = config.GPT_MODEL
     input_cost_per_million = open_ai_cost[model]["input_cost_per_million"]
     output_cost_per_million = open_ai_cost[model]["output_cost_per_million"]
 

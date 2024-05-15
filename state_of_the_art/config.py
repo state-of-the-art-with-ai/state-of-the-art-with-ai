@@ -12,7 +12,7 @@ class Config:
     MINIMAL_CONFIRMATION_COST = 0.35
 
     # the maximum number of papers to compute while sorting the batch of papers
-    GPT_MODEL = "gpt-4-turbo-preview"
+    GPT_MODEL = "gpt-4o"
     RANK_MAX_PAPERS_TO_COMPUTE = 2000
     MAX_ARTICLES_TO_RETURN_RANK = 25
     # the maximum allowed context lenght for the open-ai model

@@ -93,26 +93,32 @@ class Recommender:
     def _rank(self, parameters: RecommenderParameters) -> str:
 
         if parameters.by_topic:
-            return self._topic_search.search_by_topic(
+            result, automated_query = self._topic_search.search_by_topic(
                 parameters.by_topic,
                 num_of_results=parameters.number_of_papers_to_recommend,
             )
 
+            parameters.machine_generated_query = automated_query
+
+            return result
+
         if parameters.query:
-            return self._topic_search.extract_query_and_search(parameters.query)
+            return self._topic_search.search_with_query(parameters.query)
+
 
         if parameters.problem_description:
             import subprocess
 
             output = subprocess.getoutput("clipboard get_content")
             print("Clipboard content: ", output)
-            return self.topic_search.extract_query_and_search(output)
+            parameters.machine_generated_query = self._topic_search.extract_query(output)
+            return self._topic_search.search_with_query(parameters.machine_generated_query)
 
         if not sys.stdin.isatty():
             print("Reading from stdin")
-            stdindata = sys.stdin.readlines()
-            stdindata = "\n".join(stdindata)
-            return self._topic_search.extract_query_and_search(stdindata)
+            stdindata = "\n".join(sys.stdin.readlines())
+            parameters.machine_generated_query = self._topic_search.extract_query(stdindata)
+            return self._topic_search.search_with_query(parameters.machine_generated_query)
 
         self._input_articles = PapersDataLoader().to_papers(
             PapersDataLoader().get_latest_articles(
@@ -132,6 +138,7 @@ class Recommender:
         profile_name = config.get_current_audience().name
 
         query_str = f"Query: {parameters.query} \n" if parameters.query else ""
+        machine_query_str = f"Machine query: {parameters.machine_generated_query} \n" if parameters.machine_generated_query else ""
         topic_str = f"Topic: {parameters.by_topic} \n" if parameters.by_topic else ""
         number_of_papers = (
             f"Num of results: {parameters.number_of_papers_to_recommend} \n"
@@ -145,7 +152,7 @@ class Recommender:
         now = datetime.now().isoformat()
         header = f"""Generated at {now} ({len(self._input_articles)}) papers analysed
 Profile: "{profile_name}"  
-{query_str}{topic_str}{from_date_str}{number_of_papers}
+{query_str}{machine_query_str}{topic_str}{from_date_str}{number_of_papers}
 """
         formatted_result = header + formatted_result
 

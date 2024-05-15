@@ -37,16 +37,13 @@ class TopicSearch:
 
         query = topic.semantic_query
         if not query:
-            return self.extract_query_and_search(topic.problem_description)
+            query = self.extract_query(topic.problem_description)
 
         print(f"Searching for topic {topic_name} with query {topic.semantic_query}")
+        return self.search_with_query(query, num_of_results), query
 
-        return self.search_with_query(query, num_of_results)
-
-    def extract_query_and_search(self, text: str):
-        query = TopicExtractor().extract_semantic_query(text)
-        print(f"Extracted semantic query: ", query)
-        return self.search_with_query(query)
+    def extract_query(self, text: str):
+        return TopicExtractor().extract_semantic_query(text)
 
     def search_with_query(self, query: str, num_of_results=None) -> str:
         formatter = PapersFormatter()
