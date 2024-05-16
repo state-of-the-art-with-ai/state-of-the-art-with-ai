@@ -9,7 +9,7 @@ from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
-from state_of_the_art.recommender.report_parameters import RecommenderParameters
+from state_of_the_art.recommender.report_parameters import RecommenderContext
 from state_of_the_art.recommender.reports_data import ReportsData
 from state_of_the_art.config import config
 import sys
@@ -51,7 +51,7 @@ class Recommender:
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
 
-        parameters = RecommenderParameters(
+        parameters = RecommenderContext(
             lookback_days=number_lookback_days,
             from_date=from_date,
             to_date=to_date,
@@ -90,7 +90,7 @@ class Recommender:
 
         return result
 
-    def _rank(self, parameters: RecommenderParameters) -> str:
+    def _rank(self, parameters: RecommenderContext) -> str:
 
         if parameters.by_topic:
             result, automated_query = self._topic_search.search_by_topic(
@@ -105,20 +105,27 @@ class Recommender:
         if parameters.query:
             return self._topic_search.search_with_query(parameters.query)
 
-
         if parameters.problem_description:
             import subprocess
 
             output = subprocess.getoutput("clipboard get_content")
             print("Clipboard content: ", output)
-            parameters.machine_generated_query = self._topic_search.extract_query(output)
-            return self._topic_search.search_with_query(parameters.machine_generated_query)
+            parameters.machine_generated_query = self._topic_search.extract_query(
+                output
+            )
+            return self._topic_search.search_with_query(
+                parameters.machine_generated_query
+            )
 
         if not sys.stdin.isatty():
             print("Reading from stdin")
             stdindata = "\n".join(sys.stdin.readlines())
-            parameters.machine_generated_query = self._topic_search.extract_query(stdindata)
-            return self._topic_search.search_with_query(parameters.machine_generated_query)
+            parameters.machine_generated_query = self._topic_search.extract_query(
+                stdindata
+            )
+            return self._topic_search.search_with_query(
+                parameters.machine_generated_query
+            )
 
         self._input_articles = PapersDataLoader().to_papers(
             PapersDataLoader().get_latest_articles(
@@ -133,12 +140,16 @@ class Recommender:
 
         return result
 
-    def _format_results(self, result: str, parameters: RecommenderParameters):
+    def _format_results(self, result: str, parameters: RecommenderContext):
         formatted_result = PapersFormatter().from_str(result)
         profile_name = config.get_current_audience().name
 
         query_str = f"Query: {parameters.query} \n" if parameters.query else ""
-        machine_query_str = f"Machine query: {parameters.machine_generated_query} \n" if parameters.machine_generated_query else ""
+        machine_query_str = (
+            f"Machine query: {parameters.machine_generated_query} \n"
+            if parameters.machine_generated_query
+            else ""
+        )
         topic_str = f"Topic: {parameters.by_topic} \n" if parameters.by_topic else ""
         number_of_papers = (
             f"Num of results: {parameters.number_of_papers_to_recommend} \n"

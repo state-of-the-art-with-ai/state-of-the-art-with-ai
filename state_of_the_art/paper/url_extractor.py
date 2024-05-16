@@ -1,6 +1,7 @@
 from typing import List
 from urlextract import URLExtract
 
+
 class PapersUrlsExtractor:
     def extract_urls(self, data: str) -> List[str]:
 
