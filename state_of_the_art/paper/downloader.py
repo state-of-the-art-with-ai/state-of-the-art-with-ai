@@ -4,7 +4,6 @@ from state_of_the_art.utils import pdf
 
 
 class Downloader:
-
     def download(self, pdf_url: str, force_download=False, title=None) -> str:
         """
         Downloads a paper from a given url

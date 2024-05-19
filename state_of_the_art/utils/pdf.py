@@ -9,7 +9,6 @@ def create_pdf(
     output_path: Optional[str] = None,
     disable_open=False,
 ):
-
     from fpdf import FPDF
 
     if not output_path:
@@ -25,7 +24,6 @@ def create_pdf(
         open_pdf(output_path)
 
     print("Pdf created successfully at  ", output_path)
-
 
     return output_path
 

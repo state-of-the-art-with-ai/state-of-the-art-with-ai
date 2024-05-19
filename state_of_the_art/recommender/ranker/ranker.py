@@ -7,7 +7,6 @@ from state_of_the_art.utils.llm.llm import LLM
 
 
 class PaperRanker:
-
     def __init__(self):
         self._enable_abstract_in_ranking = False
 

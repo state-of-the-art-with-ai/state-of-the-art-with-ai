@@ -6,6 +6,6 @@ from unittest import mock
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_generate():
     recommender = Recommender()
-    result = recommender.generate(skip_register=True, query='test jean')
+    result = recommender.generate(skip_register=True, query="test jean")
     assert result is not None
     assert len(result) > 0

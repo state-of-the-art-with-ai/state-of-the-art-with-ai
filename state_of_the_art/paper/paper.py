@@ -3,7 +3,6 @@ from state_of_the_art.config import config
 
 
 class Paper:
-
     def __init__(self, *, pdf_url: str):
         self.pdf_url = pdf_url
         if not self.pdf_url.endswith(".pdf"):

@@ -14,6 +14,8 @@ class PaperInsightExtractor:
     Looks into a single paper and extracts insights
     """
 
+    TABLE_NAME = "sota_paper_insight"
+
     def __init__(self):
         self.profile = config.get_current_audience()
 
@@ -58,7 +60,7 @@ Abstract: {url}
         pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", local_location])
 
         config.get_datawarehouse().write_event(
-            "sota_paper_insight",
+            self.TABLE_NAME,
             {"abstract_url": url, "insights": result, "pdf_path": paper_path},
         )
 
@@ -68,7 +70,7 @@ Abstract: {url}
             SotaMail().send("", f"Insights from {paper_title}", paper_path)
 
     def open_if_exists(self, abstract_url):
-        df = config.get_datawarehouse().event("sota_paper_insight")
+        df = config.get_datawarehouse().event(self.TABLE_NAME)
         filtered = df[(df["abstract_url"] == abstract_url) & ~(df["pdf_path"].isnull())]
         if filtered.empty:
             return False
@@ -80,7 +82,6 @@ Abstract: {url}
         return True
 
     def _get_prompt(self) -> str:
-
         counter = 1
         QUESTIONS = ""
         for key, question in self.profile.paper_questions.items():

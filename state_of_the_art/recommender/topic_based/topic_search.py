@@ -10,7 +10,6 @@ from state_of_the_art.recommender.topic_based.topic_extraction import TopicExtra
 
 
 class TopicSearch:
-
     def __init__(self):
         papers_data = PapersDataLoader()
         papers = papers_data.load_papers()

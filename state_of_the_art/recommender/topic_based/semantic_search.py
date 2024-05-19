@@ -50,7 +50,6 @@ class SemanticSearch:
         return collection
 
     def search(self, query=None, n=20):
-
         if not query:
             if not sys.stdin.isatty():
                 data = sys.stdin.readlines()

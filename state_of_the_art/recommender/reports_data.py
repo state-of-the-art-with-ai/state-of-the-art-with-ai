@@ -3,7 +3,6 @@ from state_of_the_art.config import config
 
 class ReportsData:
     def get_summary(self):
-
         return config.get_datawarehouse().event("state_of_the_art_summary")
 
     def schema(self):

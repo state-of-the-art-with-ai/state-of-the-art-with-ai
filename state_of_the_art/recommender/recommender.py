@@ -10,7 +10,6 @@ from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
 from state_of_the_art.recommender.report_parameters import RecommenderContext
-from state_of_the_art.recommender.reports_data import ReportsData
 from state_of_the_art.config import config
 import sys
 
@@ -24,11 +23,9 @@ class Recommender:
     Class responsible to the entire generation pipeline
     """
 
+    TABLE_NAME = "state_of_the_art_summary"
     _input_articles: Optional[List[ArxivPaper]] = None
-
-    def __init__(self):
-        self._topic_search = TopicSearch()
-        self._input_articles = self._topic_search._papers_list
+    _topic_search: Optional[TopicSearch] = None
 
     def generate(
         self,
@@ -51,7 +48,7 @@ class Recommender:
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
 
-        parameters = RecommenderContext(
+        context = RecommenderContext(
             lookback_days=number_lookback_days,
             from_date=from_date,
             to_date=to_date,
@@ -73,26 +70,47 @@ class Recommender:
         else:
             print("Skipping registering papers")
 
-        result = self._rank(parameters)
-        formatted_result = self._format_results(result, parameters)
-        self._write_event(parameters, formatted_result, result)
+        result = self._rank(context)
+        formatted_result = self._format_results(result, context)
         profile_name = config.get_current_audience().name.upper()
 
-        pdf.create_pdf(
+        location = pdf.create_pdf(
             data=formatted_result,
-            output_path_description=f"recommender summary {profile_name} {parameters.by_topic if parameters.by_topic else ""} ",
+            output_path_description=f"recommender summary {profile_name} {context.by_topic if context.by_topic else ""} ",
         )
+        context.generated_pdf_location = location
+
+        self._write_event(context, formatted_result, result)
+
         self._send_email(
             formatted_result,
-            f"Sota summary batch {parameters.batch} for profile {profile_name}",
+            f"Sota summary batch {context.batch} for profile {profile_name}",
         )
 
         return result
 
-    def _rank(self, parameters: RecommenderContext) -> str:
+    def open_latest(self):
+        """
+        Open the latest generated summary
+        """
+        df = config.get_datawarehouse().event(self.TABLE_NAME)
+        dict = df.iloc[-1].to_dict()
 
+        if dict["pdf_location"]:
+            pdf.open_pdf(dict["pdf_location"])
+        else:
+            print("No pdf path found")
+
+    def _get_topic_search(self):
+        if not self._topic_search:
+            self._topic_search = TopicSearch()
+            self._input_articles = self._topic_search._papers_list
+
+        return self._topic_search
+
+    def _rank(self, parameters: RecommenderContext) -> str:
         if parameters.by_topic:
-            result, automated_query = self._topic_search.search_by_topic(
+            result, automated_query = self._get_topic_search().search_by_topic(
                 parameters.by_topic,
                 num_of_results=parameters.number_of_papers_to_recommend,
             )
@@ -102,27 +120,27 @@ class Recommender:
             return result
 
         if parameters.query:
-            return self._topic_search.search_with_query(parameters.query)
+            return self._get_topic_search().search_with_query(parameters.query)
 
         if parameters.problem_description:
             import subprocess
 
             output = subprocess.getoutput("clipboard get_content")
             print("Clipboard content: ", output)
-            parameters.machine_generated_query = self._topic_search.extract_query(
+            parameters.machine_generated_query = self._get_topic_search().extract_query(
                 output
             )
-            return self._topic_search.search_with_query(
+            return self._get_topic_search().search_with_query(
                 parameters.machine_generated_query
             )
 
         if not sys.stdin.isatty():
             print("Reading from stdin")
             stdindata = "\n".join(sys.stdin.readlines())
-            parameters.machine_generated_query = self._topic_search.extract_query(
+            parameters.machine_generated_query = self._get_topic_search().extract_query(
                 stdindata
             )
-            return self._topic_search.search_with_query(
+            return self._get_topic_search().search_with_query(
                 parameters.machine_generated_query
             )
 
@@ -177,14 +195,13 @@ Profile: "{profile_name}"
             summary=formatted_result,
             llm_result=result,
             papers_analysed=papers_str,
+            pdf_location=parameters.generated_pdf_location,
         )
         if os.environ.get("SOTA_TEST"):
             print("Mocking event, not writing to datawarehouse")
             return
 
-        config.get_datawarehouse().write_event(
-            "state_of_the_art_summary", ranking_data.to_dict()
-        )
+        config.get_datawarehouse().write_event(self.TABLE_NAME, ranking_data.to_dict())
 
     def _send_email(self, formatted_result, title):
         print("Sending email")
@@ -200,6 +217,3 @@ Profile: "{profile_name}"
     def _load_papers_from_str(self, papers_str: str):
         urls = PapersUrlsExtractor().extract_urls(papers_str)
         return PapersDataLoader().load_from_urls(urls, fail_on_missing_ids=False)
-
-    def latest(self):
-        return ReportsData().get_latest_summary()

@@ -6,17 +6,20 @@ from state_of_the_art.config import config
 from state_of_the_art.utils.llm.gpt_openai import call_chatgpt, calculate_cost
 from state_of_the_art.utils.llm.mistral import Mistral
 
+
 class LLM:
     """Wrapper for llm call"""
-    def __init__(self, model_type='openai'):
-        self.model_type = 'mistral' if os.environ.get('USE_MISTRAL') else model_type
 
-        if self.model_type == 'openai':
+    def __init__(self, model_type="openai"):
+        self.model_type = "mistral" if os.environ.get("USE_MISTRAL") else model_type
+
+        if self.model_type == "openai":
             self.call_llm = call_chatgpt
-        if self.model_type == 'mistral':
+        elif self.model_type == "mistral":
             self.call_llm = Mistral().call_llm
+        else:
+            raise Exception(f"Model {self.model_type} not supported")
         print(f"Using model {self.model_type}")
-
 
     def call(
         self,
@@ -45,10 +48,8 @@ class LLM:
             print("Input now: ")
             print(prompt_input)
 
-        if self.model_type == 'openai':
-            self._cost_check(
-                prompt, prompt_input, expected_ouput_len
-            )
+        if self.model_type == "openai":
+            self._cost_check(prompt, prompt_input, expected_ouput_len)
 
         return self.call_llm(prompt, prompt_input)
 

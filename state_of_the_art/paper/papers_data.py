@@ -81,7 +81,6 @@ class PapersDataLoader:
         return self.to_papers(df)
 
     def to_papers(self, df) -> Union[List[ArxivPaper], dict[str, ArxivPaper]]:
-
         papers = []
         for i in df.iterrows():
             papers.append(ArxivPaper.load_from_dict(i[1].to_dict()))
