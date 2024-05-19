@@ -1,4 +1,4 @@
-from state_of_the_art.utils.llm import LLM
+from state_of_the_art.utils.llm.llm import LLM
 
 
 class TopicExtractor:

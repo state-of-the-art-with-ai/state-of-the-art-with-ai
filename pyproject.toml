@@ -25,6 +25,8 @@ urlextract = "^1.9.0"
 tiny-data-warehouse = ">=0.1.5"
 tqdm = "^4.66.2"
 fpdf = "^1.7.2"
+llama-index = "^0.10.37"
+llama-index-llms-ollama = "^0.1.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
