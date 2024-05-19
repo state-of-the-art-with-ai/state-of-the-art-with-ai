@@ -6,7 +6,7 @@ class PapersUrlsExtractor:
     def extract_urls(self, data: str) -> List[str]:
 
         if not isinstance(data, str):
-            raise Exception("Data to extract papers must be a string")
+            raise Exception("Data to extract papers must be a string found: ", type(data))
 
         extractor = URLExtract()
         return extractor.find_urls(data)
