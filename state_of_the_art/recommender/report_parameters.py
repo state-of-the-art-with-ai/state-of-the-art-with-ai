@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator
-from typing import Optional
+from typing import Optional, Literal
 from state_of_the_art.config import config
 
 
@@ -19,6 +19,7 @@ class RecommenderContext(BaseModel):
     batch_size: Optional[int] = config.RANK_MAX_PAPERS_TO_COMPUTE
     number_of_papers_to_recommend: Optional[int] = None
     generated_pdf_location: Optional[str] = None
+    type: Optional[Literal["latest", "topic"]] = None
 
     class Config:
         validate_assignment = True

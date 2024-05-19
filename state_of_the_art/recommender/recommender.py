@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Optional, List
 
 from datetime import datetime
@@ -11,7 +12,6 @@ from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
 from state_of_the_art.recommender.report_parameters import RecommenderContext
 from state_of_the_art.config import config
-import sys
 
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
@@ -101,55 +101,57 @@ class Recommender:
         else:
             print("No pdf path found")
 
-    def _get_topic_search(self):
+    def _get_topic_search(self) -> TopicSearch:
         if not self._topic_search:
             self._topic_search = TopicSearch()
             self._input_articles = self._topic_search._papers_list
 
         return self._topic_search
 
-    def _rank(self, parameters: RecommenderContext) -> str:
-        if parameters.by_topic:
+    def _rank(self, context: RecommenderContext) -> str:
+        if context.by_topic:
             result, automated_query = self._get_topic_search().search_by_topic(
-                parameters.by_topic,
-                num_of_results=parameters.number_of_papers_to_recommend,
+                context.by_topic,
+                num_of_results=context.number_of_papers_to_recommend,
             )
 
-            parameters.machine_generated_query = automated_query
+            context.machine_generated_query = automated_query
 
             return result
 
-        if parameters.query:
-            return self._get_topic_search().search_with_query(parameters.query)
+        if context.query:
+            return self._get_topic_search().search_with_query(context.query)
 
-        if parameters.problem_description:
+        if context.problem_description:
             import subprocess
 
             output = subprocess.getoutput("clipboard get_content")
             print("Clipboard content: ", output)
-            parameters.machine_generated_query = self._get_topic_search().extract_query(
+            context.machine_generated_query = self._get_topic_search().extract_query(
                 output
             )
             return self._get_topic_search().search_with_query(
-                parameters.machine_generated_query
+                context.machine_generated_query
             )
 
         if not sys.stdin.isatty():
             print("Reading from stdin")
             stdindata = "\n".join(sys.stdin.readlines())
-            parameters.machine_generated_query = self._get_topic_search().extract_query(
+            context.machine_generated_query = self._get_topic_search().extract_query(
                 stdindata
             )
             return self._get_topic_search().search_with_query(
-                parameters.machine_generated_query
+                context.machine_generated_query
             )
+        # if we arrrive here we want to rank the latest articles
+        context.type = "latest"
 
         self._input_articles = PapersDataLoader().to_papers(
             PapersDataLoader().get_latest_articles(
-                lookback_days=parameters.lookback_days,
-                from_date=parameters.from_date,
-                batch=parameters.batch,
-                batch_size=parameters.batch_size,
+                lookback_days=context.lookback_days,
+                from_date=context.from_date,
+                batch=context.batch,
+                batch_size=context.batch_size,
             )
         )
 
@@ -158,7 +160,7 @@ class Recommender:
         return result
 
     def _format_results(self, result: str, parameters: RecommenderContext):
-        formatted_result = PapersFormatter().from_str(result)
+        formatted_ranked_result = PapersFormatter().from_str(result)
         profile_name = config.get_current_audience().name
 
         query_str = f"Query: {parameters.query} \n" if parameters.query else ""
@@ -182,9 +184,14 @@ class Recommender:
 Profile: "{profile_name}"  
 {query_str}{machine_query_str}{topic_str}{from_date_str}{number_of_papers}
 """
-        formatted_result = header + formatted_result
+        formatted_ranked_result = header + formatted_ranked_result
 
-        return formatted_result
+        if self._input_articles:
+            articles_as_input = PapersFormatter().from_papers(self._input_articles)
+            formatted_ranked_result += f""" -----------------------------
+Papers analysed: \n{articles_as_input}"""
+
+        return formatted_ranked_result
 
     def _write_event(self, parameters, formatted_result, result):
         papers_str = PapersDataLoader().papers_to_urls_str(self._input_articles)
