@@ -6,11 +6,11 @@ from state_of_the_art.config import config
 from state_of_the_art.utils.llm.gpt_openai import call_chatgpt, calculate_cost
 from state_of_the_art.utils.llm.mistral import Mistral
 
-
 class LLM:
     """Wrapper for llm call"""
-    def __init__(self):
-        self.model_type = 'mistral' if os.environ.get('USE_MISTRAL') else 'openai'
+    def __init__(self, model_type='openai'):
+        self.model_type = 'mistral' if os.environ.get('USE_MISTRAL') else model_type
+
         if self.model_type == 'openai':
             self.call_llm = call_chatgpt
         if self.model_type == 'mistral':
@@ -42,7 +42,6 @@ class LLM:
         if "PRINT_PROMPT" in os.environ:
             print("Prompt: ")
             print(prompt)
-
             print("Input now: ")
             print(prompt_input)
 

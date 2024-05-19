@@ -49,7 +49,6 @@ class PaperInsightExtractor:
 Abstract: {url}
 {result}
         """
-        print(result)
 
         pdf.create_pdf(
             data=result, output_path="/tmp/current_paper.pdf", disable_open=True
