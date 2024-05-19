@@ -24,6 +24,9 @@ def create_pdf(
     if not disable_open and not os.environ.get("SOTA_TEST"):
         open_pdf(output_path)
 
+    print("Pdf created successfully at  ", output_path)
+
+
     return output_path
 
 

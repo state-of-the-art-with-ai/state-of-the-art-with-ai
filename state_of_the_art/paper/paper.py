@@ -1,4 +1,3 @@
-import os
 from typing import List, Optional
 from state_of_the_art.config import config
 

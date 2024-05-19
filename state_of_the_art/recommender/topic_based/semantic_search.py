@@ -21,7 +21,7 @@ class SemanticSearch:
         self._get_chroma_instance()
         try:
             self.collection = self.client.get_collection("papers")
-        except:
+        except Exception:
             print("Collection not found")
             self.collection = self.setup_papers()
 

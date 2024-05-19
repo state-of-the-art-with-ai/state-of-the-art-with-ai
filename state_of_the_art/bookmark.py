@@ -117,7 +117,7 @@ class Bookmark:
                 if from_date:
                     if paper.published < from_date:
                         continue
-            except Exception as e:
+            except Exception:
                 pass
             result += f"""{counter}. Title: {paper_title} 
 {paper_url} {comment_str}

@@ -82,7 +82,6 @@ class Recommender:
             data=formatted_result,
             output_path_description=f"recommender summary {profile_name} {parameters.by_topic if parameters.by_topic else ""} ",
         )
-
         self._send_email(
             formatted_result,
             f"Sota summary batch {parameters.batch} for profile {profile_name}",
@@ -179,6 +178,10 @@ Profile: "{profile_name}"
             llm_result=result,
             papers_analysed=papers_str,
         )
+        if os.environ.get("SOTA_TEST"):
+            print("Mocking event, not writing to datawarehouse")
+            return
+
         config.get_datawarehouse().write_event(
             "state_of_the_art_summary", ranking_data.to_dict()
         )
@@ -187,11 +190,12 @@ Profile: "{profile_name}"
         print("Sending email")
         if os.environ.get("LLM_MOCK") or os.environ.get("SOTA_TEST"):
             print("Mocking email")
-        else:
-            SotaMail().send(
-                formatted_result,
-                title,
-            )
+            return
+
+        SotaMail().send(
+            formatted_result,
+            title,
+        )
 
     def _load_papers_from_str(self, papers_str: str):
         urls = PapersUrlsExtractor().extract_urls(papers_str)

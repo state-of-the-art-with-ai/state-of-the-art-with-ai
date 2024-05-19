@@ -17,7 +17,7 @@ class PaperInsightExtractor:
     def __init__(self):
         self.profile = config.get_current_audience()
 
-    def generate(self, url: str):
+    def generate(self, url: str, open_existing=True):
         """
         Generates insights for a given paper
         """
@@ -25,7 +25,7 @@ class PaperInsightExtractor:
         url = url.strip()
         url = url.replace("file://", "")
 
-        if self.open_if_exists(url):
+        if open_existing and self.open_if_exists(url):
             return
 
         if ArxivPaper.is_arxiv_url(url):

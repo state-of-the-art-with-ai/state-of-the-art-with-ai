@@ -58,7 +58,7 @@ class Audience:
         self.paper_questions = (
             paper_questions if paper_questions else Audience.DEFAULT_PAPER_QUESTIONS
         )
-        if topics and type(topics) != dict:
+        if topics and not isinstance(topics, dict):
             raise ValueError("topics should be a dict, found ", type(topics))
 
         self.topics = topics

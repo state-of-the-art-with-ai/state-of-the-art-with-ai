@@ -5,7 +5,7 @@ from urlextract import URLExtract
 class PapersUrlsExtractor:
     def extract_urls(self, data: str) -> List[str]:
 
-        if not type(data) == str:
+        if not isinstance(data, str):
             raise Exception("Data to extract papers must be a string")
 
         extractor = URLExtract()
