@@ -1,7 +1,6 @@
 from typing import List, Optional
 from state_of_the_art.config import config
 
-
 class Paper:
     def __init__(self, *, pdf_url: str):
         self.pdf_url = pdf_url
@@ -30,6 +29,8 @@ class ArxivPaper(Paper):
     Main dto to access papers functionality
 
     """
+    abstract_url: Optional[str] = None
+    pdf_url: Optional[str] = None
 
     def __init__(
         self,
@@ -42,8 +43,15 @@ class ArxivPaper(Paper):
     ):
         if url and not self.is_arxiv_url(url):
             raise Exception(f'"{url}" is not a valid arxiv url')
+
         if pdf_url and not self.is_arxiv_url(pdf_url):
             raise Exception(f'"{url}" is not a valid arxiv url')
+
+        url = url.strip() if url else None
+        url = ArxivPaper._remove_versions_from_url(url)
+
+        if pdf_url:
+            pdf_url = ArxivPaper._remove_versions_from_url(pdf_url.split(".pdf")[0]) + ".pdf"
 
         if pdf_url and not url:
             self.abstract_url = self.convert_pdf_to_abstract(pdf_url)
@@ -56,6 +64,22 @@ class ArxivPaper(Paper):
         self.published = published
         self.title = title
         self.abstract = abstract
+
+    @staticmethod
+    def _remove_versions_from_url(url: Optional[str]):
+        if not url:
+            return url
+
+        if url.endswith("v1"):
+            return url[:-2]
+
+        if url.endswith("v2"):
+            return url[:-2]
+
+        if url.endswith("v3"):
+            return url[:-2]
+
+        return url
 
     @staticmethod
     def load_from_dict(data):
@@ -73,10 +97,10 @@ class ArxivPaper(Paper):
     @staticmethod
     def load_paper_from_url(url) -> "ArxivPaper":
         from state_of_the_art.paper.papers_data import PapersDataLoader
-
         result = PapersDataLoader().load_from_url(url)
         if result.empty:
-            raise Exception(f"Paper not found for url {url}")
+            raise Exception(f'Paper not found for url "{url}"')
+
         result = result.iloc[0].to_dict()
         return ArxivPaper(
             url=result["url"],
@@ -93,16 +117,15 @@ class ArxivPaper(Paper):
 
     def to_dict(self):
         return {
-            "url": self.pdf_url,
+            "pdf_url": self.pdf_url,
+            "abstract_url": self.abstract_url,
             "published": self.published,
             "title": self.title,
             "abstract": self.abstract,
         }
 
-    def __str__(self):
-        return f"""Title: {self.title}\n
-Published: {self.published_date_str()}
-Url: {self.url}\n"""
+    def __repr__(self):
+        return f"""{self.to_dict()}"""
 
     def safe_abstract(self):
         return "".join(
@@ -146,7 +169,7 @@ Url: {self.url}\n"""
         return result
 
     @staticmethod
-    def is_arxiv_url(url):
+    def is_arxiv_url(url: str):
         return url.startswith("http://arxiv.org") or url.startswith("https://arxiv.org")
 
     @staticmethod

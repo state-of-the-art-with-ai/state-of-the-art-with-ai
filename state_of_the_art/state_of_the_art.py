@@ -8,6 +8,7 @@ from state_of_the_art.recommender.recommender import Recommender
 from state_of_the_art.recommender.topic_based.semantic_search import SemanticSearch
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art import validation
+from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 
 
 class Sota:
@@ -25,6 +26,7 @@ class Sota:
         self._ci = validation
         self.papers_report = PapersReport
         self.downloader = Downloader
+        self.ArxivMiner = ArxivMiner
 
 
 def main():

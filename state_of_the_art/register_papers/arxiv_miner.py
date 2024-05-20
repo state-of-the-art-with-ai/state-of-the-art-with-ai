@@ -74,7 +74,7 @@ class ArxivMiner:
             query=query, number_of_papers=n, sort_by="submitted", only_print=True
         )
 
-    def register_paper_if_not_registered(self, paper):
+    def register_paper_if_not_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
             self.register_by_id(ArxivPaper.id_from_url(paper.pdf_url))
         else:
@@ -83,7 +83,7 @@ class ArxivMiner:
     def register_by_id(self, id: str):
         print("Registering paper in db by id: ", id)
         papers = self._find_papers(id_list=[str(id)], only_print=False)
-        print("Found_paper: ", str(papers))
+        print("Found papers: ", str(papers))
         return self._register_given_papers(papers)
 
     def query_papers(self, query):

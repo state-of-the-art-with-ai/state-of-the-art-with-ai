@@ -2,6 +2,7 @@ from typing import Optional
 from state_of_the_art.config import config
 import datetime
 
+from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.paper.paper import ArxivPaper
 import pandas as pd
@@ -13,6 +14,49 @@ class Bookmark:
     """
 
     EVENT_NAME = "paper_bookmarks"
+
+    def list(self, n=None, from_published_date: Optional[str] = None, return_instead_of_print=False,
+             abstract_included=False):
+        # convert str to date
+        from_published_date = datetime.datetime.strptime(from_published_date,
+                                                         "%Y-%m-%d").date() if from_published_date else None
+
+        dict = self.load_df(n=n).to_dict(orient="index")
+        result = "Bookmarks: \n\n"
+        counter = 1
+        for i in dict:
+            paper_title = "Title not registered"
+            published_str = ""
+            paper_url = ArxivPaper(url=dict[i]["paper_url"]).abstract_url if ArxivPaper.is_arxiv_url(
+                dict[i]["paper_url"]) else dict[i]["paper_url"]
+            comment = dict[i]["comment"]
+            comment = comment.strip()
+            comment_str = f"\nComment: {comment}" if comment else ""
+
+            abstract_str = ""
+            try:
+                paper = ArxivPaper.load_paper_from_url(ArxivPaper._remove_versions_from_url(paper_url))
+
+                paper_title = paper.title
+                published_str = f"Published: {paper.published_date_str()}"
+                abstract_str = f"\nAbstract: {paper.abstract}" if abstract_included else ""
+                if from_published_date:
+                    if paper.published.date() < from_published_date:
+                        continue
+            except Exception as e:
+                print(f"Error: {e}")
+            result += f"""{counter}. Title: {paper_title} 
+    {paper_url} {comment_str}
+    Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
+    {published_str} {abstract_str[0:500]}
+
+    """
+            counter += 1
+
+        if return_instead_of_print:
+            return result
+        else:
+            print(result)
 
     def add(self, paper_url, comment: Optional[str] = None):
         paper_url = paper_url.strip()
@@ -65,7 +109,6 @@ class Bookmark:
     def load_df(self, n=None) -> pd.DataFrame:
         df = self._base_df()
 
-        # join duplicates
         df = (
             df.groupby("paper_url")
             .agg(
@@ -84,53 +127,20 @@ class Bookmark:
 
         return df
 
-    def list(self, n=5, from_date=None):
-        print(self.prepare_list(n=n, from_date=from_date))
-
-    def prepare_list(self, n=None, from_date: Optional[str] = None):
-        from_date = (
-            datetime.datetime.strptime(from_date, "%Y-%m-%d").date()
-            if from_date
-            else None
-        )
-
-        dict = self.load_df(n=n).to_dict(orient="index")
-        result = "Bookmarks: \n\n"
-        counter = 1
-        for i in dict:
-            paper_title = "Title not found"
-            published_str = ""
-            paper_url = dict[i]["paper_url"]
-            comment = dict[i]["comment"]
-            comment = comment.strip()
-            comment_str = f"\n Comment: {comment}" if comment else ""
-
-            if ArxivPaper.is_arxiv_url(paper_url):
-                paper_url = ArxivPaper.convert_pdf_to_abstract(paper_url)
-
-            abstract_str = ""
-            try:
-                paper = ArxivPaper.load_paper_from_url(paper_url)
-                paper_title = paper.title
-                published_str = f"Published: {paper.published_date_str()}"
-                abstract_str = f"\nAbstract: {paper.abstract}"
-                if from_date:
-                    if paper.published < from_date:
-                        continue
-            except Exception:
-                pass
-            result += f"""{counter}. Title: {paper_title} 
-{paper_url} {comment_str}
-Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
-{published_str} {abstract_str[0:500]}
-\n
-"""
-            counter += 1
-
-        return result
 
     def send_to_email(self):
         SotaMail().send(
-            self.prepare_list(),
+            self.list(return_instead_of_print=True),
             "Bookmarks as of " + datetime.datetime.now().isoformat().split(".")[0],
         )
+
+    def register_bookmarks_papers(self):
+        df = self.load_df()
+
+        arxiv_miner = ArxivMiner()
+
+        for i in df.index:
+            paper_url = df.loc[i, "paper_url"]
+            if ArxivPaper.is_arxiv_url(paper_url):
+                paper = ArxivPaper(url=paper_url)
+                arxiv_miner.register_paper_if_not_registered(paper)

@@ -187,7 +187,7 @@ Profile: "{profile_name}"
         formatted_ranked_result = header + formatted_ranked_result
 
         if self._input_articles:
-            articles_as_input = PapersFormatter().from_papers(self._input_articles)
+            articles_as_input = PapersFormatter().from_papers(self._input_articles[0:200])
             formatted_ranked_result += f""" -----------------------------
 Papers analysed: \n{articles_as_input}"""
 
