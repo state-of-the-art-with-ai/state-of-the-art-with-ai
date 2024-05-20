@@ -5,8 +5,8 @@ import datetime
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.utils import pdf
 import pandas as pd
-
 
 class Bookmark:
     """
@@ -15,14 +15,15 @@ class Bookmark:
 
     EVENT_NAME = "paper_bookmarks"
 
-    def list(self, n=None, from_published_date: Optional[str] = None, return_instead_of_print=False,
-             abstract_included=False):
+    def list(self, n=None, from_published_date: Optional[str] = None,  abstract_included=False):
         # convert str to date
         from_published_date = datetime.datetime.strptime(from_published_date,
                                                          "%Y-%m-%d").date() if from_published_date else None
 
         dict = self.load_df(n=n).to_dict(orient="index")
-        result = "Bookmarks: \n\n"
+        result= "From published date: " + str(from_published_date) + "\n" if from_published_date else ''
+        result+= "Bookmarks:\n\n"
+
         counter = 1
         for i in dict:
             paper_title = "Title not registered"
@@ -31,7 +32,7 @@ class Bookmark:
                 dict[i]["paper_url"]) else dict[i]["paper_url"]
             comment = dict[i]["comment"]
             comment = comment.strip()
-            comment_str = f"\nComment: {comment}" if comment else ""
+            comment_str = f"Comment: {comment}" if comment else ""
 
             abstract_str = ""
             try:
@@ -46,17 +47,18 @@ class Bookmark:
             except Exception as e:
                 print(f"Error: {e}")
             result += f"""{counter}. Title: {paper_title} 
-    {paper_url} {comment_str}
-    Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
-    {published_str} {abstract_str[0:500]}
+{paper_url}
+{comment_str}
+Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
+{published_str} {abstract_str[0:500]}
 
-    """
+"""
             counter += 1
 
-        if return_instead_of_print:
-            return result
-        else:
-            print(result)
+
+        pdf_location = pdf.create_pdf(data=result, output_path_description="Bookmarks")
+        print(result)
+        return pdf_location
 
     def add(self, paper_url, comment: Optional[str] = None):
         paper_url = paper_url.strip()
@@ -77,7 +79,6 @@ class Bookmark:
             },
         )
         self.send_to_email()
-        self.list(n=10)
 
     def register_url_from_clipboard(self):
         import subprocess
@@ -130,8 +131,9 @@ class Bookmark:
 
     def send_to_email(self):
         SotaMail().send(
-            self.list(return_instead_of_print=True),
-            "Bookmarks as of " + datetime.datetime.now().isoformat().split(".")[0],
+            content='',
+            subject="Bookmarks as of " + datetime.datetime.now().isoformat().split(".")[0],
+            attachment=self.list(),
         )
 
     def register_bookmarks_papers(self):
