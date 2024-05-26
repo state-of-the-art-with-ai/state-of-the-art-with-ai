@@ -1,6 +1,7 @@
 from typing import List, Optional
 from state_of_the_art.config import config
 
+
 class Paper:
     def __init__(self, *, pdf_url: str):
         self.pdf_url = pdf_url
@@ -29,6 +30,7 @@ class ArxivPaper(Paper):
     Main dto to access papers functionality
 
     """
+
     abstract_url: Optional[str] = None
     pdf_url: Optional[str] = None
 
@@ -51,7 +53,9 @@ class ArxivPaper(Paper):
         url = ArxivPaper._remove_versions_from_url(url)
 
         if pdf_url:
-            pdf_url = ArxivPaper._remove_versions_from_url(pdf_url.split(".pdf")[0]) + ".pdf"
+            pdf_url = (
+                ArxivPaper._remove_versions_from_url(pdf_url.split(".pdf")[0]) + ".pdf"
+            )
 
         if pdf_url and not url:
             self.abstract_url = self.convert_pdf_to_abstract(pdf_url)
@@ -97,6 +101,7 @@ class ArxivPaper(Paper):
     @staticmethod
     def load_paper_from_url(url) -> "ArxivPaper":
         from state_of_the_art.paper.papers_data import PapersDataLoader
+
         result = PapersDataLoader().load_from_url(url)
         if result.empty:
             raise Exception(f'Paper not found for url "{url}"')

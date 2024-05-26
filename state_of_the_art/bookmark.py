@@ -8,6 +8,7 @@ from state_of_the_art.paper.paper import ArxivPaper
 from state_of_the_art.utils import pdf
 import pandas as pd
 
+
 class Bookmark:
     """
     Bookmarking papers for future reference
@@ -15,32 +16,48 @@ class Bookmark:
 
     EVENT_NAME = "paper_bookmarks"
 
-    def list(self, n=None, from_published_date: Optional[str] = None,  abstract_included=False):
+    def list(
+        self, n=None, from_published_date: Optional[str] = None, abstract_included=False
+    ):
         # convert str to date
-        from_published_date = datetime.datetime.strptime(from_published_date,
-                                                         "%Y-%m-%d").date() if from_published_date else None
+        from_published_date = (
+            datetime.datetime.strptime(from_published_date, "%Y-%m-%d").date()
+            if from_published_date
+            else None
+        )
 
         dict = self.load_df(n=n).to_dict(orient="index")
-        result= "From published date: " + str(from_published_date) + "\n" if from_published_date else ''
-        result+= "Bookmarks:\n\n"
+        result = (
+            "From published date: " + str(from_published_date) + "\n"
+            if from_published_date
+            else ""
+        )
+        result += "Bookmarks:\n\n"
 
         counter = 1
         for i in dict:
             paper_title = "Title not registered"
             published_str = ""
-            paper_url = ArxivPaper(url=dict[i]["paper_url"]).abstract_url if ArxivPaper.is_arxiv_url(
-                dict[i]["paper_url"]) else dict[i]["paper_url"]
+            paper_url = (
+                ArxivPaper(url=dict[i]["paper_url"]).abstract_url
+                if ArxivPaper.is_arxiv_url(dict[i]["paper_url"])
+                else dict[i]["paper_url"]
+            )
             comment = dict[i]["comment"]
             comment = comment.strip()
             comment_str = f"Comment: {comment}" if comment else ""
 
             abstract_str = ""
             try:
-                paper = ArxivPaper.load_paper_from_url(ArxivPaper._remove_versions_from_url(paper_url))
+                paper = ArxivPaper.load_paper_from_url(
+                    ArxivPaper._remove_versions_from_url(paper_url)
+                )
 
                 paper_title = paper.title
                 published_str = f"Published: {paper.published_date_str()}"
-                abstract_str = f"\nAbstract: {paper.abstract}" if abstract_included else ""
+                abstract_str = (
+                    f"\nAbstract: {paper.abstract}" if abstract_included else ""
+                )
                 if from_published_date:
                     if paper.published.date() < from_published_date:
                         continue
@@ -54,7 +71,6 @@ Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
 
 """
             counter += 1
-
 
         pdf_location = pdf.create_pdf(data=result, output_path_description="Bookmarks")
         print(result)
@@ -128,11 +144,11 @@ Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
 
         return df
 
-
     def send_to_email(self):
         SotaMail().send(
-            content='',
-            subject="Bookmarks as of " + datetime.datetime.now().isoformat().split(".")[0],
+            content="",
+            subject="Bookmarks as of "
+            + datetime.datetime.now().isoformat().split(".")[0],
             attachment=self.list(),
         )
 

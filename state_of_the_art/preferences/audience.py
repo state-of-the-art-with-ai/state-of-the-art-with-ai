@@ -67,7 +67,7 @@ class Audience:
     def get_topics(self) -> dict:
         return self.topics
 
-    def get_preferences(self) -> str:
+    def get_preferences(self, include_keywords_to_exclude=True) -> str:
         """
         Returns all the preferences of the profile encoded in a string
         """
@@ -78,7 +78,13 @@ class Audience:
         else:
             keywords_str = ""
 
+        keywords_to_exclude_str = (
+            f"""Non relevant topics (make sure they are not mentioned in the results): \n - {'\n - '.join(self.keywords_to_exclude)}"""
+            if include_keywords_to_exclude
+            else ""
+        )
+
         return f"""{self.audience_description}
 {keywords_str}
-Non relevant topics (make sure they are not mentioned in the results): \n - {'\n - '.join(self.keywords_to_exclude)}
+{keywords_to_exclude_str}
         """

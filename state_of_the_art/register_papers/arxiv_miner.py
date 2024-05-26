@@ -17,7 +17,9 @@ class ArxivMiner:
         self.config = config
         tdw = config.get_datawarehouse()
         arxiv_papers = tdw.event("arxiv_papers")
-        self.existing_papers_urls = arxiv_papers["url"].values if not arxiv_papers.empty else []
+        self.existing_papers_urls = (
+            arxiv_papers["url"].values if not arxiv_papers.empty else []
+        )
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
@@ -33,9 +35,9 @@ class ArxivMiner:
             print("Dry run, just printing, not registering them")
 
         if topic:
-            topics_to_mine = [topic]
+            topics_to_mine = self._get_topic_keywords(topic)
         else:
-            topics_to_mine = self._get_default_topics()
+            topics_to_mine = self._get_topics_to_mine()
 
         print(
             f"Registering papers for the following ({len(topics_to_mine)}) keywords: ",
@@ -57,7 +59,13 @@ class ArxivMiner:
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
-    def _get_default_topics(self) -> List[str]:
+    def _get_topic_keywords(self, filter_topic_name: str) -> List[str]:
+        audience_topics = config.get_current_audience().get_topics()
+        if filter_topic_name in audience_topics:
+            return audience_topics[filter_topic_name].get_arxiv_search_keywords()
+        return []
+
+    def _get_topics_to_mine(self) -> List[str]:
         audience_keywords = config.get_current_audience().keywords
         topics_to_mine = audience_keywords
         audience_topics = config.get_current_audience().get_topics().values()

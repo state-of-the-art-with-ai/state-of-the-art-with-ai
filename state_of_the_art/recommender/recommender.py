@@ -27,6 +27,9 @@ class Recommender:
     _input_articles: Optional[List[ArxivPaper]] = None
     _topic_search: Optional[TopicSearch] = None
 
+    def __init__(self):
+        self._miner = ArxivMiner()
+
     def generate(
         self,
         *,
@@ -64,7 +67,7 @@ class Recommender:
         )
 
         if not skip_register:
-            ArxivMiner().register_new(
+            self._miner.register_new(
                 dry_run=dry_run, max_papers_per_query=max_papers_per_query
             )
         else:
@@ -110,6 +113,12 @@ class Recommender:
 
     def _rank(self, context: RecommenderContext) -> str:
         if context.by_topic:
+
+            if context.skip_register:
+                self._miner.register_new(
+                    dry_run=False, max_papers_per_query=None, topic=context.by_topic
+                )
+
             result, automated_query = self._get_topic_search().search_by_topic(
                 context.by_topic,
                 num_of_results=context.number_of_papers_to_recommend,
@@ -187,7 +196,9 @@ Profile: "{profile_name}"
         formatted_ranked_result = header + formatted_ranked_result
 
         if self._input_articles:
-            articles_as_input = PapersFormatter().from_papers(self._input_articles[0:200])
+            articles_as_input = PapersFormatter().from_papers(
+                self._input_articles[0:200]
+            )
             formatted_ranked_result += f""" -----------------------------
 Papers analysed: \n{articles_as_input}"""
 
