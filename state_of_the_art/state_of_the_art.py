@@ -1,7 +1,7 @@
 from state_of_the_art.paper.downloader import Downloader
 from state_of_the_art.paper.papers_data import PapersDataLoader
 from state_of_the_art.paper.papers_report import PapersReport
-from state_of_the_art.paper_insight.paper_insight import PaperInsightExtractor
+from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 
 from state_of_the_art.bookmark import Bookmark as bookmark
 from state_of_the_art.recommender.recommender import Recommender
@@ -19,7 +19,7 @@ class Sota:
     def __init__(self):
         self.recommender = Recommender
         self.papers = PapersDataLoader()
-        self.PaperInsightExtractor = PaperInsightExtractor
+        self.PaperInsightExtractor = InsightExtractor
         self.bookmark = bookmark()
         self.topic_search = TopicSearch
         self.SemanticSearch = SemanticSearch

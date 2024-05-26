@@ -113,7 +113,6 @@ class Recommender:
 
     def _rank(self, context: RecommenderContext) -> str:
         if context.by_topic:
-
             if context.skip_register:
                 self._miner.register_new(
                     dry_run=False, max_papers_per_query=None, topic=context.by_topic
