@@ -19,7 +19,7 @@ class Sota:
     def __init__(self):
         self.recommender = Recommender
         self.papers = PapersDataLoader()
-        self.PaperInsightExtractor = InsightExtractor
+        self.InsightExtractor = InsightExtractor
         self.bookmark = bookmark()
         self.topic_search = TopicSearch
         self.SemanticSearch = SemanticSearch
