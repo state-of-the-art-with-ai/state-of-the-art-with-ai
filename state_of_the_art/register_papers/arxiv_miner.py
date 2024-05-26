@@ -17,7 +17,7 @@ class ArxivMiner:
         self.config = config
         tdw = config.get_datawarehouse()
         arxiv_papers = tdw.event("arxiv_papers")
-        self.existing_papers_urls = arxiv_papers["url"].values
+        self.existing_papers_urls = arxiv_papers["url"].values if not arxiv_papers.empty else []
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
@@ -155,6 +155,8 @@ class ArxivMiner:
 
     def load_existing_papers_urls(self):
         arxiv_papers = self.tdw.event("arxiv_papers")
+        if arxiv_papers.empty:
+            return []
         return arxiv_papers["url"].values
 
     def _register_given_papers(self, papers: List[ArxivPaper]):

@@ -117,6 +117,7 @@ class ArxivPaper(Paper):
 
     def to_dict(self):
         return {
+            "url": self.abstract_url,
             "pdf_url": self.pdf_url,
             "abstract_url": self.abstract_url,
             "published": self.published,
