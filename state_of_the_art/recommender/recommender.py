@@ -66,8 +66,8 @@ class Recommender:
             number_of_papers_to_recommend=number_of_recommendations,
         )
 
-        if not skip_register:
-            self._miner.register_new(
+        if not skip_register and not context.by_topic:
+            self._miner.register_latest(
                 dry_run=dry_run, max_papers_per_query=max_papers_per_query
             )
         else:
@@ -113,10 +113,9 @@ class Recommender:
 
     def _rank(self, context: RecommenderContext) -> str:
         if context.by_topic:
-            if context.skip_register:
-                self._miner.register_new(
-                    dry_run=False, max_papers_per_query=None, topic=context.by_topic
-                )
+            self._miner.register_by_relevance(
+                dry_run=False, max_papers_per_query=None, topic_name=context.by_topic
+            )
 
             result, automated_query = self._get_topic_search().search_by_topic(
                 context.by_topic,

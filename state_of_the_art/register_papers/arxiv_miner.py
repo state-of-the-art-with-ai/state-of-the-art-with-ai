@@ -23,7 +23,7 @@ class ArxivMiner:
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
-    def register_new(self, dry_run=False, max_papers_per_query=None, topic=None):
+    def register_latest(self, dry_run=False, max_papers_per_query=None, topic=None):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
@@ -45,8 +45,8 @@ class ArxivMiner:
         )
 
         papers = []
-        for topic in topics_to_mine:
-            papers = papers + self._find_papers(query=topic, sort_by="relevance")
+
+        for topic in tqdm(topics_to_mine):
             papers = papers + self._find_papers(query=topic, sort_by="submitted")
 
         papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
@@ -54,6 +54,51 @@ class ArxivMiner:
 
         if dry_run:
             return len(papers), 0
+
+        total_registered, total_skipped = self._register_given_papers(papers)
+        print("New papers ", total_registered, " papers")
+        print("Skipped ", total_skipped, " papers")
+
+    def register_by_relevance(
+        self, dry_run=False, max_papers_per_query=None, topic_name=None
+    ):
+        """
+        Register papers by looking in arxiv api with the keyworkds of the audience configuration
+        :param dry_run:
+        :param disable_relevance_miner:
+        :return:
+        """
+        self.max_papers_per_query = max_papers_per_query
+        if dry_run:
+            print("Dry run, just printing, not registering them")
+
+        if topic_name:
+            topics_to_mine = self._get_topic_keywords(topic_name)
+        else:
+            topics_to_mine = self._get_topics_to_mine()
+
+        print(
+            f"Registering papers for the following ({len(topics_to_mine)}) keywords: ",
+            topics_to_mine,
+        )
+
+        papers = []
+        for topic_name in topics_to_mine:
+            papers = papers + self._find_papers(query=topic_name, sort_by="relevance")
+
+        papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
+        print("Found ", len(papers), " new papers")
+
+        if dry_run:
+            return len(papers), 0
+
+        total_registered, total_skipped = self._register_given_papers(papers)
+        print("New papers ", total_registered, " papers")
+        print("Skipped ", total_skipped, " papers")
+
+    def register_latest_by_query(self, query):
+        papers = self._find_papers(query=query, number_of_papers=10)
+        print("Found ", len(papers), " new papers")
 
         total_registered, total_skipped = self._register_given_papers(papers)
         print("New papers ", total_registered, " papers")
@@ -74,7 +119,7 @@ class ArxivMiner:
 
         return topics_to_mine
 
-    def inspect_latest(self, *, query=None, n=10):
+    def find_latest_by_query(self, query=None, n=10):
         """ "
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
@@ -125,12 +170,13 @@ class ArxivMiner:
         )
 
         print(
+            "Arxiv query parameters:",
             {
                 "query": query,
                 "sort_by": sort_by,
                 "id_list": id_list,
                 "number_of_papers": number_of_papers,
-            }
+            },
         )
 
         if id_list:

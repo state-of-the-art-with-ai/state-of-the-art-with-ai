@@ -1,7 +1,7 @@
 from state_of_the_art.preferences.default_questions import DEFAULT_PAPER_QUESTIONS
 
-class Audience:
 
+class Audience:
     DEFAULT_KEYWORS_EXCLUDE = [
         "physics",
         "biology",
@@ -18,7 +18,6 @@ class Audience:
     ]
     DEFAULT_KEYWORDS_OF_INTEREST = None
     DEAFULT_DESCRIPTION = """Data Science and AI experts and enthusiasts"""
-
 
     def __init__(
         self,

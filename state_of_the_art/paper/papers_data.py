@@ -88,7 +88,7 @@ class PapersDataLoader:
 
     def load_between_dates(self, start, end):
         df = self.load_papers()
-        print("Date filters (from, to): ", start, end)
+        print("Date filters of publication (from, to): ", start, end)
         return df[
             (df["published"].dt.strftime("%Y-%m-%d") >= start)
             & (df["published"].dt.strftime("%Y-%m-%d") <= end)

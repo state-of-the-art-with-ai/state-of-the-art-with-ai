@@ -119,6 +119,9 @@ Abstract: {url}
             return False
 
         path = filtered["pdf_path"].values[0]
+        if not os.path.exists(path):
+            print("File not found: ", path)
+            return False
         print("Paper insights path: ", path)
         pdf.open_pdf(path)
         print("Paper already processed")

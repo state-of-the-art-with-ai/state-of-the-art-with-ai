@@ -77,11 +77,17 @@ def read_content(pdf_path):
 def merge_pdfs(output_path: str, pdfs: List[str]):
     from PyPDF2 import PdfMerger
 
-    merger = PdfMerger()
-    for pdf in pdfs:
-        merger.append(pdf)
-    merger.write(output_path)
-    merger.close()
+    try:
+        merger = PdfMerger()
+        for pdf in pdfs:
+            merger.append(pdf)
+        merger.write(output_path)
+        merger.close()
+    except Exception as e:
+        print("Error merging pdfs: ", e)
+        for a_pdf in pdfs:
+            open_pdf(a_pdf)
+        return
     if not os.environ.get("SOTA_TEST"):
         open_pdf(output_path)
 
