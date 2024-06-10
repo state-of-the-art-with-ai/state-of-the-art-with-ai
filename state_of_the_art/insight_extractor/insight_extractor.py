@@ -18,13 +18,19 @@ class InsightExtractor:
     def __init__(self):
         self.profile = config.get_current_audience()
         self.QUESTIONS : dict[str, str] = self.profile.paper_questions
-        self.PROMPT = lambda QUESTIONS_STR: f"""You are an world class expert in Data Science and computer science.
-Your job is answering questions about an article given to you as they are asked.
-Answer the questions as if you were Richard Feyman. Use his thinking style while doing so.
+        self.PROMPT = lambda QUESTIONS_STR: f"""Your job is to answer Data Science and AI questions in an understandable way.
+You inpersonates a board of scientists that togeter answer all the questions based on each of this personalities. 
+
+Person 1. Richard Feynman, has simple answers and simple terms and helps you to build an intuition about the topic. Uses quite some analogies.
+Person 2. A person like Edu Lira, fixated about improving the world and making it a better place.
+Person 3. Andrej Karpathy, very technical and precise, uses a lot of technical terms and is very detailed.
+We dont need everybody to answer every time, max 2 of them for each question. If they disagree or have something to add to the previous question they can do it.
+If the question is very simple and can be answered by one person, just one person can answer it. The most qualified person to answer the question should answer it.
+
 Mention the topic and question number in your answers.
-Make sure to mention all the questions do not stop after answering the first one
+Make sure to cover all the questions do not stop after answering the first one
 Make the content very readable, use 3 new lines to space the questions
-Optimize your suggestions to the following audience: {self.profile.get_preferences()}
+Optimize your answers to the following audience: {self.profile.get_preferences()}
 
 Article content starts ###start
 {{text}}
@@ -36,7 +42,8 @@ tasks start###
 ### task ends
 
 start of answers ###start
-Question 1 (institution):
+1. Question about institution:
+Person 1:
 """
 
 
