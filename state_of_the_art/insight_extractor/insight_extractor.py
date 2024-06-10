@@ -8,7 +8,6 @@ from state_of_the_art.paper.paper import ArxivPaper, Paper
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 
-
 class InsightExtractor:
     """
     Looks into a single paper and extracts insights
@@ -18,6 +17,28 @@ class InsightExtractor:
 
     def __init__(self):
         self.profile = config.get_current_audience()
+        self.QUESTIONS : dict[str, str] = self.profile.paper_questions
+        self.PROMPT = lambda QUESTIONS_STR: f"""You are an world class expert in Data Science and computer science.
+Your job is answering questions about an article given to you as they are asked.
+Answer the questions as if you were Richard Feyman. Use his thinking style while doing so.
+Mention the topic and question number in your answers.
+Make sure to mention all the questions do not stop after answering the first one
+Make the content very readable, use 3 new lines to space the questions
+Optimize your suggestions to the following audience: {self.profile.get_preferences()}
+
+Article content starts ###start
+{{text}}
+### end of article content
+
+The tasks now follow
+tasks start###
+{QUESTIONS_STR}
+### task ends
+
+start of answers ###start
+Question 1 (institution):
+"""
+
 
     def extract_from_url(self, url: str, open_existing=True):
         """
@@ -80,7 +101,7 @@ Abstract: {url}
 
         return paper_content, paper_title, local_location
 
-    def _get_website_content(self, url):
+    def _get_website_content(self, url: str):
         from urllib.request import urlopen, Request
         from bs4 import BeautifulSoup
 
@@ -136,33 +157,14 @@ Abstract: {url}
     def _get_prompt(self) -> str:
         counter = 1
         QUESTIONS = ""
-        for key, question in self.profile.paper_questions.items():
+        for key, question in self.QUESTIONS.items():
             QUESTIONS += f"""===
-Question {counter} (Topic: {key})
+Topic: {key}
 {question}
 ==="""
             counter += 1
 
-        prompt = f"""You are an world class expert in Data Science and computer science.
-Your job is answering questions about an article given to you as they are asked.
-Mention the topic and question number in your answers.
-Make sure to mention all the questions do not stop after answering the first one
-Space the questions with 3 new lines
-Optimize your suggestions to the following audience: {self.profile.get_preferences()}
-
-Article content starts ###start
-{{text}}
-### end of article content
-
-The tasks now follow
-tasks start###
-{QUESTIONS}
-### task ends
-
-start of answers ###start
-Question 1 (institution):
-"""
-
+        prompt = self.PROMPT(QUESTIONS)
         return prompt
 
     def answer_questions_from_clipboard(self):

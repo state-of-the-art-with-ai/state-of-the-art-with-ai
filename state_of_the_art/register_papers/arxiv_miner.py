@@ -3,6 +3,7 @@ from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import ArxivPaper
 from tqdm import tqdm
+import logging
 
 
 class ArxivMiner:
@@ -50,7 +51,7 @@ class ArxivMiner:
             papers = papers + self._find_papers(query=topic, sort_by="submitted")
 
         papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
-        print("Found ", len(papers), " new papers")
+        logging.info("Found ", len(papers), " new papers")
 
         if dry_run:
             return len(papers), 0
@@ -119,12 +120,16 @@ class ArxivMiner:
 
         return topics_to_mine
 
+    def find_latest_published_date(self):
+        result = self.find_latest_by_query('AI')
+        return result[0].published_date_str
+
     def find_latest_by_query(self, query=None, n=10):
         """ "
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
-        self._find_papers(
-            query=query, number_of_papers=n, sort_by="submitted", only_print=True
+        return self._find_papers(
+            query=query, number_of_papers=n, sort_by="submitted"
         )
 
     def register_paper_if_not_registered(self, paper: ArxivPaper):
@@ -169,14 +174,13 @@ class ArxivMiner:
             else arxiv.SortCriterion.Relevance
         )
 
-        print(
-            "Arxiv query parameters:",
-            {
+        logging.info(
+            "Arxiv query parameters:", "".join({
                 "query": query,
                 "sort_by": sort_by,
                 "id_list": id_list,
                 "number_of_papers": number_of_papers,
-            },
+            }),
         )
 
         if id_list:
@@ -199,9 +203,9 @@ class ArxivMiner:
                 published=r.published,
             )
             result.append(paper)
-            print(order_counter, paper.published, paper.title, paper.abstract_url)
+            logging.info(order_counter, paper.published, paper.title, paper.abstract_url)
             order_counter += 1
-        print("Found ", len(result), " papers")
+        logging.info("Found ", len(result), " papers")
 
         if only_print:
             return
@@ -227,7 +231,7 @@ class ArxivMiner:
                 or paper.abstract_url in registered_now
             ):
                 skipped += 1
-                print("Skipping already registered paper: ", paper.abstract_url)
+                logging.info("Skipping already registered paper: ", paper.abstract_url)
                 continue
 
             registered += 1
