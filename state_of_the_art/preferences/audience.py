@@ -57,7 +57,7 @@ class Audience:
         """
 
         if self.keywords:
-            keywords_str = f"""Important relevant topics: \n - {'\n - '.join(self.keywords)}
+            keywords_str = f"""Topics keywords your audience is interested on: \n - {'\n - '.join(self.keywords)}
            """
         else:
             keywords_str = ""

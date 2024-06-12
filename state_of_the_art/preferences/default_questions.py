@@ -7,7 +7,8 @@ Define them well with examples do not assume the reader knows them. Use contrast
     Avoid trivial or salesly insights that are common knowledge for your audience or not backed by data. Highlight also insights from the literature review in the paper.
     Make sure to mention a literal quote from the paper that supports your insight""",
     "recommended_actions": """What are top actions recommended as learnings from this paper? """,
-    'why_read_it': 'describe why somebody like your audience should read this paper? write a small description of why, share some learning from the paper in the description and define the term if its too niche',
+    'why_read_it': 'describe why anybody like the audience  would be interested in reading this paper, what they could benefit from,  share some learning from the paper in the description and define the term if its too niche. Dont be too verbose here, go directly to the point',
+    'key_highlight_of_the_paper': 'What is the most interesting highlight of the paper that would make the reader most satisfied after reading? Everybody gives their opinion',
     "insight_not_in_abstract": """What is the most interesting insight that is not in the abstract? Quote the interesting part literally and explain why its interesting""",
     "literature_review": "What is the most interesting learning from this paper literature review? Quote the interesting part literally and explain why its interesting",
     "methodology": """Is the methodoloy and claims of the  paper sound? What are the weaknessess? Be skeptical, do not spare words to make a clear case covering its weakneesses. Act like a scientific reviewer and provide a critique of the methodology of the paper""",
