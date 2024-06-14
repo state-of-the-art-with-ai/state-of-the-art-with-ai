@@ -7,14 +7,16 @@ def call_chatgpt(prompt_str: str, input_str: str) -> str:
     from langchain import PromptTemplate, LLMChain
 
     # goes up to 2.0
-    temperature = float(os.environ.get("LLM_TEMPERATURE", '0.0'))
+    temperature = float(os.environ.get("LLM_TEMPERATURE", "0.0"))
 
     if temperature != 0.0:
         print(f"Using custom temperature {temperature}")
 
     prompt_template = PromptTemplate(template=prompt_str, input_variables=["text"])
     llm = ChatOpenAI(
-        temperature=temperature, model=config.GPT_MODEL, openai_api_key=config.OPEN_API_KEY
+        temperature=temperature,
+        model=config.GPT_MODEL,
+        openai_api_key=config.OPEN_API_KEY,
     )
     chain = LLMChain(llm=llm, prompt=prompt_template)
     # two weeks ago

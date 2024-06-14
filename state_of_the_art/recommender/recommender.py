@@ -49,8 +49,39 @@ class Recommender:
     ):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
-        """
 
+        Parameters:
+        - number_lookback_days: int, optional
+            The number of days to look back for papers to register and rank.
+        - from_date: str, optional
+            The starting date to consider when looking for papers.
+        - to_date: str, optional
+            The ending date to consider when looking for papers.
+        - skip_register: bool, default False
+            If True, skip the paper registration step.
+        - dry_run: bool, default False
+            If True, perform a dry run without actually registering or ranking papers.
+        - batch: int, default 1
+            The batch number for the current run.
+        - batch_size: int, optional
+            The number of papers to process in each batch.
+        - max_papers_per_query: int, optional
+            The maximum number of papers to retrieve per query.
+        - papers_to_rank: List[str], optional
+            A list of paper IDs to rank.
+        - query: str, optional
+            A query string to filter papers by.
+        - by_topic: str, optional
+            A topic to filter papers by.
+        - description_from_clipboard: bool, default False
+            If True, use the description from the clipboard for ranking.
+        - number_of_recommendations: int, optional
+            The number of papers to recommend.
+
+        Returns:
+        - result: Any
+            The result of the ranking process.
+        """
         context = RecommenderContext(
             lookback_days=number_lookback_days,
             from_date=from_date,

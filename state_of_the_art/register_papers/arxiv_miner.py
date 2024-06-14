@@ -121,16 +121,14 @@ class ArxivMiner:
         return topics_to_mine
 
     def find_latest_published_date(self):
-        result = self.find_latest_by_query('AI')
+        result = self.find_latest_by_query("AI")
         return result[0].published_date_str
 
     def find_latest_by_query(self, query=None, n=10):
         """ "
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
-        return self._find_papers(
-            query=query, number_of_papers=n, sort_by="submitted"
-        )
+        return self._find_papers(query=query, number_of_papers=n, sort_by="submitted")
 
     def register_paper_if_not_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
@@ -175,12 +173,15 @@ class ArxivMiner:
         )
 
         logging.info(
-            "Arxiv query parameters:", "".join({
-                "query": query,
-                "sort_by": sort_by,
-                "id_list": id_list,
-                "number_of_papers": number_of_papers,
-            }),
+            "Arxiv query parameters:",
+            "".join(
+                {
+                    "query": query,
+                    "sort_by": sort_by,
+                    "id_list": id_list,
+                    "number_of_papers": number_of_papers,
+                }
+            ),
         )
 
         if id_list:
@@ -203,7 +204,9 @@ class ArxivMiner:
                 published=r.published,
             )
             result.append(paper)
-            logging.info(order_counter, paper.published, paper.title, paper.abstract_url)
+            logging.info(
+                order_counter, paper.published, paper.title, paper.abstract_url
+            )
             order_counter += 1
         logging.info("Found ", len(result), " papers")
 

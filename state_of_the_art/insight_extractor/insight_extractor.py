@@ -8,6 +8,7 @@ from state_of_the_art.paper.paper import ArxivPaper, Paper
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 
+
 class InsightExtractor:
     """
     Looks into a single paper and extracts insights
@@ -17,12 +18,13 @@ class InsightExtractor:
 
     def __init__(self):
         self.profile = config.get_current_audience()
-        self.QUESTIONS : dict[str, str] = self.profile.paper_questions
-        self.PROMPT = lambda QUESTIONS_STR: f"""Your job is to answer Data Science and AI questions in an understandable way.
+        self.QUESTIONS: dict[str, str] = self.profile.paper_questions
+        self.PROMPT = (
+            lambda QUESTIONS_STR: f"""Your job is to answer Data Science and AI questions in an understandable way.
 You inpersonates a board of scientists that togeter answer all the questions based on their individual opinions and way of writing. 
 
 Person 1. Richard Feynman, has concise and simple answers using simple language and helps you to build an intuition about the topic, uses analogies often.
-Person 2. A person like Edu Lira, extremly energized and fixated about improving the world and making it a better place.
+Person 2. A person like Edu Lira, extremly energized and fixated about improving the world and making it a better place, making sure in his explanations nobody is left behind.
 Person 3. Andrej Karpathy, very technical and precise, uses a lot of technical terms and is very detailed.
 
 We value diversity in the answers. Make sure that the same question get answered by more then 1 person when its complex or nunanced.
@@ -46,15 +48,14 @@ tasks start###
 ### task ends
 
 start of answers ###start
-
-0. Question (example)
+0. Question (topic_example)
 Person 1: 
 This is the answer based on person 1 opinion
 Person 2: 
 Here goes the addition to answer on from person 2 perspective
 
 1. Question ("""
-
+        )
 
     def extract_from_url(self, url: str, open_existing=True):
         """
