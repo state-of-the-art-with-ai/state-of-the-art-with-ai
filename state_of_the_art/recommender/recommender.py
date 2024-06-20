@@ -98,6 +98,22 @@ class Recommender:
         )
 
         if not skip_register and not context.by_topic:
+            last_date_with_papers = self._miner.find_latest_published_date()
+
+            date_from = context.from_date
+            if not date_from:
+                lookback_days = context.lookback_days  if context.lookback_days else 2
+                import datetime 
+                today = datetime.datetime.now()
+                delta = datetime.timedelta(days = lookback_days)
+                date_from = today - delta
+                date_from = date_from.date()
+
+
+        
+            if last_date_with_papers < date_from:
+                raise Exception("No new papers found since ", str(last_date_with_papers), 'and you are looking from ', str(date_from))
+
             self._miner.register_latest(
                 dry_run=dry_run, max_papers_per_query=max_papers_per_query
             )

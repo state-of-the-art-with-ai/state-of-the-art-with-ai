@@ -3,6 +3,7 @@ from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import ArxivPaper
 from tqdm import tqdm
+import datetime 
 import logging
 
 
@@ -122,7 +123,8 @@ class ArxivMiner:
 
     def find_latest_published_date(self):
         result = self.find_latest_by_query("AI")
-        return result[0].published_date_str
+        date_str = result[0].published_date_str()
+        return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
     def find_latest_by_query(self, query=None, n=10):
         """ "
