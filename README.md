@@ -1,4 +1,4 @@
-# state-of-the-art-radar
+# State of the art with AI
 
 Extract personalized insights from the state of the art in Machine Learning, AI and Computer Science.
 
