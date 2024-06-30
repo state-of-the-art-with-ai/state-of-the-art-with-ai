@@ -35,6 +35,7 @@ class Recommender:
         *,
         number_lookback_days=None,
         from_date=None,
+        date_from=None,
         to_date=None,
         skip_register=False,
         dry_run=False,
@@ -82,9 +83,10 @@ class Recommender:
         - result: Any
             The result of the ranking process.
         """
+
         context = RecommenderContext(
             lookback_days=number_lookback_days,
-            from_date=from_date,
+            from_date=from_date if from_date else date_from,
             to_date=to_date,
             skip_register=skip_register,
             dry_run=dry_run,
