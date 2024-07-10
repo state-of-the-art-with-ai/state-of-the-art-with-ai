@@ -1,5 +1,5 @@
 import arxiv
-from typing import Literal, List
+from typing import Literal, List, Optional
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import ArxivPaper
 from tqdm import tqdm
@@ -104,7 +104,9 @@ class ArxivMiner:
         So i assume it should always return something recent
         """
         result = self.find_latest_by_query("AI")
-        date_str = result[0].published_date_str()
+        if not result:
+            raise Exception("Did not find any paper with Query AI")
+        date_str = result.published_date_str()
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
     def register_latest_by_query(self, query):
@@ -131,11 +133,14 @@ class ArxivMiner:
         return topics_to_mine
 
 
-    def find_latest_by_query(self, query=None, n=10):
+    def find_latest_by_query(self, query=None) -> Optional[ArxivPaper]:
         """ "
         Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
         """
-        return self._find_papers(query=query, number_of_papers=n, sort_by="submitted")
+        result = self._find_papers(query=query, number_of_papers=1, sort_by="submitted")
+        if not result:
+            return None
+        return result[0]
 
     def register_paper_if_not_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
@@ -179,17 +184,16 @@ class ArxivMiner:
             else arxiv.SortCriterion.Relevance
         )
 
-        logging.info(
+        print(
             "Arxiv query parameters:",
-            "".join(
+            str(
                 {
                     "query": query,
                     "sort_by": sort_by,
                     "id_list": id_list,
                     "number_of_papers": number_of_papers,
                 }
-            ),
-        )
+            ))
 
         if id_list:
             print("Searching by id list: ", id_list)

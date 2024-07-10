@@ -38,7 +38,7 @@ class TopicSearch:
         if not query:
             query = self.extract_query(topic.problem_description)
 
-        print(f"Searching for topic {topic_name} with query {topic.semantic_query}")
+        print(f"Searching for topic {topic_name} with transformed query {query}")
         return self.search_with_query(query, num_of_results), query
 
     def extract_query(self, text: str):
