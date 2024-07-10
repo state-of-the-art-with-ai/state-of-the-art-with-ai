@@ -47,7 +47,6 @@ class ArxivMiner:
         )
 
         papers = []
-
         for topic in tqdm(topics_to_mine):
             papers = papers + self._find_papers(query=topic, sort_by="submitted")
 
@@ -103,10 +102,10 @@ class ArxivMiner:
         Return the latest date with papers in arxiv with the Query AI
         So i assume it should always return something recent
         """
-        result = self.find_latest_by_query("AI")
+        result = self._find_papers(query="machine learning", number_of_papers=1, sort_by="submitted")
         if not result:
             raise Exception("Did not find any paper with Query AI")
-        date_str = result.published_date_str()
+        date_str = result[0].published_date_str()
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
     def register_latest_by_query(self, query):
@@ -129,18 +128,7 @@ class ArxivMiner:
         audience_topics = config.get_current_audience().get_topics().values()
         for topic in audience_topics:
             topics_to_mine = topics_to_mine + topic.get_arxiv_search_keywords()
-
         return topics_to_mine
-
-
-    def find_latest_by_query(self, query=None) -> Optional[ArxivPaper]:
-        """ "
-        Check with papers are latest submitted in arxiv, useful to undertand if we need to register more
-        """
-        result = self._find_papers(query=query, number_of_papers=1, sort_by="submitted")
-        if not result:
-            return None
-        return result[0]
 
     def register_paper_if_not_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
@@ -150,13 +138,13 @@ class ArxivMiner:
 
     def register_by_id(self, id: str):
         print("Registering paper in db by id: ", id)
-        papers = self._find_papers(id_list=[str(id)], only_print=False)
+        papers = self._find_papers(id_list=[str(id)])
         print("Found papers: ", str(papers))
         return self._register_given_papers(papers)
 
     def query_papers(self, query):
         self._find_papers(
-            query, number_of_papers=15, sort_by="relevance", only_print=True
+            query=query, number_of_papers=15, sort_by="relevance", only_print=True
         )
 
     def _find_papers(
@@ -164,8 +152,7 @@ class ArxivMiner:
         id_list=None,
         query=None,
         number_of_papers=None,
-        sort_by: Literal["submitted", "relevance"] = "submitted",
-        only_print=False,
+        sort_by: Literal["submitted", "relevance"] = "submitted"
     ) -> List[ArxivPaper]:
         if not query and not id_list:
             print("No query provided, using default query")
@@ -201,6 +188,7 @@ class ArxivMiner:
                 id_list=id_list, max_results=number_of_papers, sort_by=sort
             )
         else:
+            print("Searching by query: ", query)
             search = arxiv.Search(
                 query=query, max_results=number_of_papers, sort_by=sort
             )
@@ -219,10 +207,8 @@ class ArxivMiner:
                 order_counter, paper.published, paper.title, paper.abstract_url
             )
             order_counter += 1
-        logging.info("Found ", len(result), " papers")
+        print("Found ", len(result), " papers")
 
-        if only_print:
-            return
         return result
 
     def load_existing_papers_urls(self):

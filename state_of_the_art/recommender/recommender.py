@@ -38,7 +38,6 @@ class Recommender:
         date_from=None,
         to_date=None,
         skip_register=False,
-        dry_run=False,
         batch=1,
         batch_size=None,
         max_papers_per_query=None,
@@ -60,8 +59,6 @@ class Recommender:
             The ending date to consider when looking for papers.
         - skip_register: bool, default False
             If True, skip the paper registration step.
-        - dry_run: bool, default False
-            If True, perform a dry run without actually registering or ranking papers.
         - batch: int, default 1
             The batch number for the current run.
         - batch_size: int, optional
@@ -92,7 +89,6 @@ class Recommender:
             from_date=from_date if from_date else date_from,
             to_date=to_date,
             skip_register=skip_register,
-            dry_run=dry_run,
             batch=batch,
             batch_size=batch_size,
             papers_to_rank=papers_to_rank,
@@ -102,8 +98,12 @@ class Recommender:
             number_of_papers_to_recommend=number_of_recommendations,
         )
 
-        if not skip_register and not context.by_topic:
+        if skip_register or context.by_topic:
+            print("Skipping global registration")
+        else:
             last_date_with_papers = self._miner.latest_date_with_papers()
+            if not context.query and last_date_with_papers < date_from:
+                raise Exception("No new papers found since ", str(last_date_with_papers), 'and you are looking from ', str(date_from))
 
             date_from = context.from_date
             if not date_from:
@@ -113,16 +113,9 @@ class Recommender:
                 date_from = today - delta
                 date_from = date_from.date()
 
-
-        
-            if last_date_with_papers < date_from and not context.query:
-                raise Exception("No new papers found since ", str(last_date_with_papers), 'and you are looking from ', str(date_from))
-
             self._miner.register_latest(
-                dry_run=dry_run, max_papers_per_query=max_papers_per_query
+                max_papers_per_query=max_papers_per_query
             )
-        else:
-            print("Skipping registering papers")
 
         result = self._rank(context)
         formatted_result = self._format_results(result, context)
@@ -165,7 +158,7 @@ class Recommender:
     def _rank(self, context: RecommenderContext) -> str:
         if context.by_topic:
             self._miner.register_by_relevance(
-                dry_run=False, max_papers_per_query=None, topic_name=context.by_topic
+                max_papers_per_query=None, topic_name=context.by_topic
             )
 
             result, automated_query = self._get_topic_search().search_by_topic(
