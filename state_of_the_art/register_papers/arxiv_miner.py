@@ -98,6 +98,15 @@ class ArxivMiner:
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
+    def latest_date_with_papers(self) -> datetime.date:
+        """
+        Return the latest date with papers in arxiv with the Query AI
+        So i assume it should always return something recent
+        """
+        result = self.find_latest_by_query("AI")
+        date_str = result[0].published_date_str()
+        return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+
     def register_latest_by_query(self, query):
         papers = self._find_papers(query=query, number_of_papers=10)
         print("Found ", len(papers), " new papers")
@@ -121,10 +130,6 @@ class ArxivMiner:
 
         return topics_to_mine
 
-    def find_latest_published_date(self):
-        result = self.find_latest_by_query("AI")
-        date_str = result[0].published_date_str()
-        return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
     def find_latest_by_query(self, query=None, n=10):
         """ "

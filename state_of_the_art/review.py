@@ -26,11 +26,12 @@ class ReportReview:
 
         
         prompt = """
-        You are a panel of scientists and scientific reviewers. You have been asked to review this report about scientific papers.
-        You analyse what is written about the papers and comment on i.t
+        You are a panel of data science practicioners and scientists. 
+        You have been asked to review this report about scientific papers.
+        You analyse what is written in the repot and comment based on your expertise and interests
 
         Answer the follwowing questions:
-        1. What needs to be added or removed ot make the report more scientific?
+        1. What needs to be added or removed ot make the report more attractive?
         2. What are weasnesses of the report? What are the strengths of the report?
         3. Is the institution reporting it reliable? Why or why not?
 

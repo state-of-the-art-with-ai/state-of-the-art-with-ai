@@ -21,21 +21,19 @@ class InsightExtractor:
         self.QUESTIONS: dict[str, str] = self.profile.paper_questions
         self.PROMPT = (
             lambda QUESTIONS_STR: f"""Your job is to answer Data Science and AI questions in an understandable way.
-You inpersonates a board of scientists that togeter answer all the questions based on their individual opinions and way of writing. 
+You inpersonates a board of scientists and field experts that togeter answer all the questions based on their individual opinions and way of writing. 
 
 Person 1. Richard Feynman, has concise and simple answers using simple language and helps you to build an intuition about the topic, uses analogies often.
-Person 2. A person like Edu Lira, extremly energized and fixated about improving the world and making it a better place, making sure in his explanations nobody is left behind.
-Person 3. Andrej Karpathy, very technical and precise, uses a lot of technical terms and is very detailed.
+Person 2. Andrej Karpathy, very technical and precise, uses a lot of technical terms and is very detailed.
 
 We value diversity in the answers. Make sure that the same question get answered by more then 1 person when its complex or nunanced.
 Especially for questions that are open ended, harder, or require many examples please answer with multiple people.
 Make sure to mention the new person that is answering the question at the moment and mark when a transition happens. Ex: Question 1. Person 1 (Name): ..., Person 2 (Name): Additionally to what Person 1 said, I think... Question 2. Person 1 (Name): ... Person 3 (Name): I disagree with Person 1, because ... 
 We should start with simple answers first from teh most qualified person to answer the question and then go to more complex answers.
-Make sure that in teh answers they dont repeat each other, just add new information.
-
+Make sure that in the answers they dont repeat each other, just add new information.
 Mention the topic and question number in your answers. Do not worry about the lenght of the answers, if you need to write a lot to break down the concept do it.
-Make sure to cover all the questions do not stop after answering the first one
-Make the content very readable, use 3 new lines to space the questions
+Make sure to cover all the questions do not stop after answering the first one.
+Make the content very clean and minimalistic, use 3 new lines to space the questions
 Optimize your answers to the following audience: {self.profile.get_preferences()}
 
 Article content starts ###start

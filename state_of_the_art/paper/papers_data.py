@@ -9,17 +9,14 @@ from state_of_the_art.config import config
 class PapersDataLoader:
     TITLE_MAX_LENGH = 80
 
-    def print(self, from_date=None, n=None):
+    def print(self, n=None):
         """
         Entrypoint to display papers. We add options to this function to change the display logic
         Rather than introducing more functions.
         """
         to_date = datetime.date.today().isoformat()
 
-        if from_date and to_date:
-            papers = self.load_between_dates(from_date, to_date)
-        else:
-            papers = self.load_papers()
+        papers = self.load_papers()
 
         papers = self.sort_by_recently_published(papers)
         if n:
@@ -49,8 +46,8 @@ class PapersDataLoader:
             if from_date
             else (
                 datetime.date.today() - datetime.timedelta(days=lookback_days)
-            ).isoformat()
-        )
+            )
+        ).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()
 
         articles = self.load_between_dates(from_date, to_date)
@@ -86,7 +83,7 @@ class PapersDataLoader:
             papers.append(ArxivPaper.load_from_dict(i[1].to_dict()))
         return papers
 
-    def load_between_dates(self, start, end):
+    def load_between_dates(self, start: str, end: str):
         df = self.load_papers()
         print("Date filters of publication (from, to): ", start, end)
         return df[

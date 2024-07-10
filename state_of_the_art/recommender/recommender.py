@@ -2,7 +2,7 @@ import os
 import sys
 from typing import Optional, List
 
-from datetime import datetime
+import datetime 
 from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import ArxivPaper
 from state_of_the_art.paper.papers_data import PapersDataLoader
@@ -83,6 +83,9 @@ class Recommender:
         - result: Any
             The result of the ranking process.
         """
+        from_date  = datetime.datetime.strptime(from_date, '%Y-%m-%d').date() if from_date else None
+        date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d').date() if date_from else None
+
 
         context = RecommenderContext(
             lookback_days=number_lookback_days,
@@ -100,12 +103,11 @@ class Recommender:
         )
 
         if not skip_register and not context.by_topic:
-            last_date_with_papers = self._miner.find_latest_published_date()
+            last_date_with_papers = self._miner.latest_date_with_papers()
 
             date_from = context.from_date
             if not date_from:
                 lookback_days = context.lookback_days  if context.lookback_days else 2
-                import datetime 
                 today = datetime.datetime.now()
                 delta = datetime.timedelta(days = lookback_days)
                 date_from = today - delta
@@ -113,7 +115,7 @@ class Recommender:
 
 
         
-            if last_date_with_papers < date_from:
+            if last_date_with_papers < date_from and not context.query:
                 raise Exception("No new papers found since ", str(last_date_with_papers), 'and you are looking from ', str(date_from))
 
             self._miner.register_latest(
@@ -235,7 +237,7 @@ class Recommender:
             f"From date: {parameters.from_date} \n" if parameters.from_date else ""
         )
 
-        now = datetime.now().isoformat()
+        now = datetime.datetime.now().isoformat()
         header = f"""Generated at {now} ({len(self._input_articles)}) papers analysed
 Profile: "{profile_name}"  
 {query_str}{machine_query_str}{topic_str}{from_date_str}{number_of_papers}
