@@ -8,6 +8,7 @@ class RecommenderContext(BaseModel):
     """
     The default object to interact with the report API
     """
+
     DEFAULT_SUMMARY_LOOKBACK_DAYS = 2
     by_topic: Optional[str] = None
     lookback_days: Optional[int] = None
