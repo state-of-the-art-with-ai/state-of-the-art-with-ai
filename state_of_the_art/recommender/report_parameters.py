@@ -5,6 +5,10 @@ import datetime
 
 
 class RecommenderContext(BaseModel):
+    """
+    The default object to interact with the report API
+    """
+    DEFAULT_SUMMARY_LOOKBACK_DAYS = 2
     by_topic: Optional[str] = None
     lookback_days: Optional[int] = None
     from_date: Optional[Union[str, datetime.date]] = None
@@ -28,3 +32,17 @@ class RecommenderContext(BaseModel):
     @validator("batch_size")
     def set_name(cls, batch_size):
         return batch_size or config.RANK_MAX_PAPERS_TO_COMPUTE
+
+    @validator("from_date")
+    def set_from_date(cls, from_date):
+        if not from_date:
+            default_date = (
+                datetime.datetime.now()
+                - datetime.timedelta(days=config.DEFAULT_REPORT_LOOKBACK_DAYS)
+            ).date()
+
+        return (
+            datetime.datetime.strptime(from_date, "%Y-%m-%d").date()
+            if from_date
+            else default_date
+        )

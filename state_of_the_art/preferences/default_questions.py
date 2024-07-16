@@ -12,10 +12,10 @@ The insights can come form the results of the paper and form literature review H
 
     
     """,
-    'insights deep dive': '''For the top 3 insights you selected as most relevant, go deeper and analyse why they are relevant.
+    "insights deep dive": """For the top 3 insights you selected as most relevant, go deeper and analyse why they are relevant.
 Make sure to mention a the literal parts from the paper that supports your insight.
 Explain it from a hihg level and also form a bottom up perspective.
-    ''',
+    """,
     "define_terms": """Which terms are the top 10 (at most) critical to understand the paper?
 Prioritize mathematical terms definitons. Define them shortly and clearly. ideally 1 sentence no more than 2 per defintion.
 Use analogies or examples to make the definitions clear when needed""",

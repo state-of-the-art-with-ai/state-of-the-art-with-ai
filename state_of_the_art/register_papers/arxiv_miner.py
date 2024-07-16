@@ -1,9 +1,9 @@
 import arxiv
-from typing import Literal, List, Optional
+from typing import Literal, List
 from state_of_the_art.config import config
 from state_of_the_art.paper.paper import ArxivPaper
 from tqdm import tqdm
-import datetime 
+import datetime
 import logging
 
 
@@ -102,7 +102,9 @@ class ArxivMiner:
         Return the latest date with papers in arxiv with the Query AI
         So i assume it should always return something recent
         """
-        result = self._find_papers(query="machine learning", number_of_papers=1, sort_by="submitted")
+        result = self._find_papers(
+            query="machine learning", number_of_papers=1, sort_by="submitted"
+        )
         if not result:
             raise Exception("Did not find any paper with Query AI")
         date_str = result[0].published_date_str()
@@ -152,7 +154,7 @@ class ArxivMiner:
         id_list=None,
         query=None,
         number_of_papers=None,
-        sort_by: Literal["submitted", "relevance"] = "submitted"
+        sort_by: Literal["submitted", "relevance"] = "submitted",
     ) -> List[ArxivPaper]:
         if not query and not id_list:
             print("No query provided, using default query")
@@ -180,7 +182,8 @@ class ArxivMiner:
                     "id_list": id_list,
                     "number_of_papers": number_of_papers,
                 }
-            ))
+            ),
+        )
 
         if id_list:
             print("Searching by id list: ", id_list)

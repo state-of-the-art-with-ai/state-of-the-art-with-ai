@@ -2,7 +2,7 @@ import os
 import sys
 from typing import Optional, List
 
-import datetime 
+import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.paper import ArxivPaper
 from state_of_the_art.paper.papers_data import PapersDataLoader
@@ -33,11 +33,9 @@ class Recommender:
     def generate(
         self,
         *,
-        number_lookback_days=None,
-        from_date=None,
-        date_from=None,
-        to_date=None,
-        skip_register=False,
+        number_lookback_days: Optional[int] = None,
+        from_date: Optional[str] = None,
+        skip_register: bool = False,
         batch=1,
         batch_size=None,
         max_papers_per_query=None,
@@ -49,45 +47,11 @@ class Recommender:
     ):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
-
-        Parameters:
-        - number_lookback_days: int, optional
-            The number of days to look back for papers to register and rank.
-        - from_date: str, optional
-            The starting date to consider when looking for papers.
-        - to_date: str, optional
-            The ending date to consider when looking for papers.
-        - skip_register: bool, default False
-            If True, skip the paper registration step.
-        - batch: int, default 1
-            The batch number for the current run.
-        - batch_size: int, optional
-            The number of papers to process in each batch.
-        - max_papers_per_query: int, optional
-            The maximum number of papers to retrieve per query.
-        - papers_to_rank: List[str], optional
-            A list of paper IDs to rank.
-        - query: str, optional
-            A query string to filter papers by.
-        - by_topic: str, optional
-            A topic to filter papers by.
-        - description_from_clipboard: bool, default False
-            If True, use the description from the clipboard for ranking.
-        - number_of_recommendations: int, optional
-            The number of papers to recommend.
-
-        Returns:
-        - result: Any
-            The result of the ranking process.
         """
-        from_date  = datetime.datetime.strptime(from_date, '%Y-%m-%d').date() if from_date else None
-        date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d').date() if date_from else None
-
 
         context = RecommenderContext(
             lookback_days=number_lookback_days,
-            from_date=from_date if from_date else date_from,
-            to_date=to_date,
+            from_date=from_date,
             skip_register=skip_register,
             batch=batch,
             batch_size=batch_size,
@@ -102,20 +66,15 @@ class Recommender:
             print("Skipping global registration")
         else:
             last_date_with_papers = self._miner.latest_date_with_papers()
-            if not context.query and last_date_with_papers < date_from:
-                raise Exception("No new papers found since ", str(last_date_with_papers), 'and you are looking from ', str(date_from))
+            if not context.query and last_date_with_papers < context.from_date:
+                raise Exception(
+                    "No new papers found since ",
+                    str(last_date_with_papers),
+                    "and you are looking from ",
+                    str(context.from_date),
+                )
 
-            date_from = context.from_date
-            if not date_from:
-                lookback_days = context.lookback_days  if context.lookback_days else 2
-                today = datetime.datetime.now()
-                delta = datetime.timedelta(days = lookback_days)
-                date_from = today - delta
-                date_from = date_from.date()
-
-            self._miner.register_latest(
-                max_papers_per_query=max_papers_per_query
-            )
+            self._miner.register_latest(max_papers_per_query=max_papers_per_query)
 
         result = self._rank(context)
         formatted_result = self._format_results(result, context)
@@ -210,7 +169,7 @@ class Recommender:
 
         return result
 
-    def _format_results(self, result: str, parameters: RecommenderContext):
+    def _format_results(self, result: str, parameters: RecommenderContext) -> str:
         formatted_ranked_result = PapersFormatter().from_str(result)
         profile_name = config.get_current_audience().name
 
@@ -250,7 +209,7 @@ Papers analysed: \n{articles_as_input}"""
         papers_str = PapersDataLoader().papers_to_urls_str(self._input_articles)
         ranking_data = RankGeneratedData(
             from_date=parameters.from_date,
-            to_date=parameters.to_date,
+            to_date=parameters.to_date if parameters.to_date else None,
             prompt="",
             summary=formatted_result,
             llm_result=result,

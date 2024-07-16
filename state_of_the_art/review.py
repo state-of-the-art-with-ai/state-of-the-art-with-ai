@@ -1,30 +1,23 @@
-
-
-
 from state_of_the_art.utils import pdf
 from state_of_the_art.utils.llm.llm import LLM
 from typing import Optional
 
 
 class ReportReview:
-
     def review_from_clipboard(self):
-        import subprocess; 
-        
-        content = subprocess.getoutput('clipboard get_content')
+        import subprocess
+
+        content = subprocess.getoutput("clipboard get_content")
         self.review_content(content)
 
-
-
     def review_content(self, content: Optional[str] = None):
-
         if not content:
             print("Content not provided via argument. Reading from stdin")
             import sys
+
             data = sys.stdin.readlines()
             content = "".join(data)
 
-        
         prompt = """
         You are a panel of data science practicioners and scientists. 
         You have been asked to review this report about scientific papers.
@@ -43,7 +36,4 @@ class ReportReview:
 
         pdf.create_pdf(data=result, output_path_description="review_report")
 
-
         return result
-
-        

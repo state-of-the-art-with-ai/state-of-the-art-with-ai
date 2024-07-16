@@ -14,10 +14,7 @@ class PapersDataLoader:
         Entrypoint to display papers. We add options to this function to change the display logic
         Rather than introducing more functions.
         """
-        to_date = datetime.date.today().isoformat()
-
         papers = self.load_papers()
-
         papers = self.sort_by_recently_published(papers)
         if n:
             papers = papers.head(n)
@@ -44,9 +41,7 @@ class PapersDataLoader:
         from_date = (
             from_date
             if from_date
-            else (
-                datetime.date.today() - datetime.timedelta(days=lookback_days)
-            )
+            else (datetime.date.today() - datetime.timedelta(days=lookback_days))
         ).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()
 

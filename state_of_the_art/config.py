@@ -3,11 +3,11 @@ from state_of_the_art.preferences.audience import Audience
 from tiny_data_warehouse import DataWarehouse
 
 
-
 class Tables:
     # for generated summaries
-    SUMMARIES = 'state_of_the_art_summary'
-    INSIGHTS = 'sota_paper_insight'
+    SUMMARIES = "state_of_the_art_summary"
+    INSIGHTS = "sota_paper_insight"
+
 
 class Config:
     HOME = os.path.expanduser("~")
@@ -16,7 +16,7 @@ class Config:
     DEFAUL_MAX_PAPERS_TO_MINE_PER_QUERY = 75
     DEFAULT_LOOK_BACK_DAYS = 1
     MINIMAL_CONFIRMATION_COST = 0.35
-
+    DEFAULT_REPORT_LOOKBACK_DAYS = 2
 
     # the maximum number of papers to compute while sorting the batch of papers
     GPT_MODEL = "gpt-4o"
