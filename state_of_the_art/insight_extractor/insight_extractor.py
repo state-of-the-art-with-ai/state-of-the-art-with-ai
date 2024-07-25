@@ -1,12 +1,10 @@
 import os
 
 from state_of_the_art.config import config
-from state_of_the_art.paper.downloader import Downloader
-from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.utils.llm.llm import LLM
-from state_of_the_art.paper.paper import ArxivPaper, Paper
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
+from state_of_the_art.insight_extractor.content_extractor import get_content_from_url
 
 
 class InsightExtractor:
@@ -16,9 +14,95 @@ class InsightExtractor:
 
     TABLE_NAME = "sota_paper_insight"
 
+    def extract_from_url_in_clipboard(self):
+        """
+        loads the url frrom clipboard then calls the extract function
+        """
+        import subprocess
+
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        self.extract_from_url(url)
+
+    def extract_from_url(self, url: str, open_existing=True):
+        """
+        Generates insights for a given paper
+        """
+
+        url = self._clean_url(url)
+
+        if open_existing and self._open_insight_summary_if_exists(url):
+            return
+
+        article_content, title, document_pdf_location = get_content_from_url(url)
+        result = InsigthPrompt().get_result(article_content)
+
+        result = f"""Title: {title}
+Abstract: {url}
+{result}
+        """
+
+        pdf.create_pdf(
+            data=result, output_path="/tmp/current_paper.pdf", disable_open=True
+        )
+        paper_path = pdf.create_pdf_path("p " + title)
+        print("Saving paper insights to ", paper_path)
+        pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", document_pdf_location])
+
+        config.get_datawarehouse().write_event(
+            self.TABLE_NAME,
+            {"abstract_url": url, "insights": result, "pdf_path": paper_path},
+        )
+
+        if os.environ.get("SOTA_TEST"):
+            print("Skipping email")
+        else:
+            SotaMail().send("", f"Insights from {title}", paper_path)
+
+
+    def _open_insight_summary_if_exists(self, abstract_url) -> bool:
+        df = config.get_datawarehouse().event(self.TABLE_NAME)
+        filtered = df[(df["abstract_url"] == abstract_url) & ~(df["pdf_path"].isnull())]
+        if filtered.empty:
+            return False
+
+        path = filtered["pdf_path"].values[0]
+        if not os.path.exists(path):
+            print("File not found: ", path)
+            return False
+        print("Paper insights path: ", path)
+        pdf.open_pdf(path)
+        print("Paper already processed")
+        return True
+
+    def _clean_url(self, url):
+        print("Given url: ", url)
+        url = url.strip()
+        url = url.replace("file://", "")
+        return url
+
+
+class BasePrompt():
     def __init__(self):
         self.profile = config.get_current_audience()
         self.QUESTIONS: dict[str, str] = self.profile.paper_questions
+        self.profile = config.get_current_audience()
+
+class InsigthPrompt(BasePrompt):
+    def __init__(self):
+        super().__init__()
+
+    def get_result(self, text: str) -> str:
+        return LLM().call(self.get_prompt(), text)
+
+    def get_prompt(self) -> str:
+        counter = 1
+        QUESTIONS = ""
+        for key, question in self.QUESTIONS.items():
+            QUESTIONS += f"""===
+Topic ({key}): {question}
+==="""
+            counter += 1
+
         self.PROMPT = (
             lambda QUESTIONS_STR: f"""Your job is to answer Data Science and AI questions in an understandable way.
 You inpersonates a board of scientists and field experts that togeter answer all the questions based on their individual opinions and way of writing. 
@@ -55,138 +139,5 @@ Here goes the addition to answer on from person 2 perspective
 1. Question ("""
         )
 
-    def extract_from_url_in_clipboard(self):
-        """
-        loads the url frrom clipboard then calls the extract function
-        """
-        import subprocess
-
-        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        self.extract_from_url(url)
-
-    def extract_from_url(self, url: str, open_existing=True):
-        """
-        Generates insights for a given paper
-        """
-
-        url = self._clean_url(url)
-
-        if open_existing and self._open_if_exists(url):
-            return
-
-        if self._is_pdf_url(url):
-            document_content, title, document_pdf_location = self._get_pdf_content(url)
-        else:
-            document_content, title, document_pdf_location = self._get_website_content(
-                url
-            )
-
-        prompt = self._get_prompt()
-
-        result = LLM().call(prompt, document_content)
-        result = f"""Title: {title}
-Abstract: {url}
-{result}
-        """
-
-        pdf.create_pdf(
-            data=result, output_path="/tmp/current_paper.pdf", disable_open=True
-        )
-        paper_path = pdf.create_pdf_path("p " + title)
-        print("Saving paper insights to ", paper_path)
-        pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", document_pdf_location])
-
-        config.get_datawarehouse().write_event(
-            self.TABLE_NAME,
-            {"abstract_url": url, "insights": result, "pdf_path": paper_path},
-        )
-
-        if os.environ.get("SOTA_TEST"):
-            print("Skipping email")
-        else:
-            SotaMail().send("", f"Insights from {title}", paper_path)
-
-    def _is_pdf_url(self, url):
-        return url.endswith(".pdf") or ArxivPaper.is_arxiv_url(url)
-
-    def _get_pdf_content(self, url):
-        if ArxivPaper.is_arxiv_url(url):
-            paper = ArxivPaper(url=url)
-            ArxivMiner().register_paper_if_not_registered(paper)
-            paper = ArxivPaper.load_paper_from_url(url=paper.abstract_url)
-            paper_title = paper.title
-        else:
-            paper = Paper(pdf_url=url)
-            paper_title = url.split("/")[-1].replace(".pdf", "")
-        print("Paper title: ", paper_title)
-
-        local_location = Downloader().download(paper.pdf_url, title=paper_title)
-        paper_content = pdf.read_content(local_location)
-
-        return paper_content, paper_title, local_location
-
-    def _get_website_content(self, url: str):
-        from urllib.request import urlopen, Request
-        from bs4 import BeautifulSoup
-
-        req = Request(url=url, headers={"User-Agent": "Mozilla/5.0"})
-        html = urlopen(req).read()
-
-        soup = BeautifulSoup(html, features="html.parser")
-
-        # kill all script and style elements
-        for script in soup(["script", "style"]):
-            script.extract()  # rip it out
-
-        # get text
-        text = soup.get_text()
-
-        # break into lines and remove leading and trailing space on each
-        lines = (line.strip() for line in text.splitlines())
-        # break multi-headlines into a line each
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        # drop blank lines
-        text = "\n".join(chunk for chunk in chunks if chunk)
-
-        # get teh page title
-        title = soup.title.string
-
-        location = pdf.create_pdf(
-            data=text, output_path_description="webpage " + title, disable_open=True
-        )
-
-        return text, title, location
-
-    def _open_if_exists(self, abstract_url):
-        df = config.get_datawarehouse().event(self.TABLE_NAME)
-        filtered = df[(df["abstract_url"] == abstract_url) & ~(df["pdf_path"].isnull())]
-        if filtered.empty:
-            return False
-
-        path = filtered["pdf_path"].values[0]
-        if not os.path.exists(path):
-            print("File not found: ", path)
-            return False
-        print("Paper insights path: ", path)
-        pdf.open_pdf(path)
-        print("Paper already processed")
-        return True
-
-    def _clean_url(self, url):
-        print("Given url: ", url)
-        url = url.strip()
-        url = url.replace("file://", "")
-        return url
-
-    def _get_prompt(self) -> str:
-        counter = 1
-        QUESTIONS = ""
-        for key, question in self.QUESTIONS.items():
-            QUESTIONS += f"""===
-Topic ({key}): {question}
-==="""
-            counter += 1
-
         prompt = self.PROMPT(QUESTIONS)
         return prompt
-
