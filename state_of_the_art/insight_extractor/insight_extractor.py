@@ -55,6 +55,15 @@ Here goes the addition to answer on from person 2 perspective
 1. Question ("""
         )
 
+    def extract_from_url_in_clipboard(self):
+        """
+        loads the url frrom clipboard then calls the extract function
+        """
+        import subprocess
+
+        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
+        self.extract_from_url(url)
+
     def extract_from_url(self, url: str, open_existing=True):
         """
         Generates insights for a given paper
@@ -181,8 +190,3 @@ Topic ({key}): {question}
         prompt = self.PROMPT(QUESTIONS)
         return prompt
 
-    def answer_questions_from_clipboard(self):
-        import subprocess
-
-        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        self.extract_from_url(url)

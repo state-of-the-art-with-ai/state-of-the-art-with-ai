@@ -208,7 +208,7 @@ Papers analysed: \n{articles_as_input}"""
     def _write_event(self, parameters, formatted_result, result):
         papers_str = PapersDataLoader().papers_to_urls_str(self._input_articles)
         ranking_data = RankGeneratedData(
-            from_date=parameters.from_date,
+            from_date=parameters.from_date.isoformat(),
             to_date=parameters.to_date if parameters.to_date else None,
             prompt="",
             summary=formatted_result,

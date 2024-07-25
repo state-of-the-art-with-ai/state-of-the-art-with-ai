@@ -10,6 +10,7 @@ from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art import validation
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.review import ReportReview
+from state_of_the_art.insight_extractor.summarize_and_sharpen import Sharpen
 
 
 class Sota:
@@ -29,6 +30,7 @@ class Sota:
         self.downloader = Downloader
         self.ArxivMiner = ArxivMiner
         self.ReportReview = ReportReview
+        self.Sharpen = Sharpen
 
 
 def main():
