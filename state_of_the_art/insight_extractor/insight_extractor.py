@@ -23,7 +23,7 @@ class InsightExtractor:
         url = subprocess.check_output("clipboard get_content", shell=True, text=True)
         self.extract_from_url(url)
 
-    def extract_from_url(self, url: str, open_existing=True):
+    def extract_from_url(self, url: str, open_existing=True, function_call=False):
         """
         Generates insights for a given paper
         """
@@ -34,7 +34,10 @@ class InsightExtractor:
             return
 
         article_content, title, document_pdf_location = get_content_from_url(url)
-        result = InsigthPrompt().get_result(article_content)
+        if function_call:
+            result = InsigthStructured().get_result(article_content)
+        else: 
+            result = InsigthPrompt().get_result(article_content)
 
         result = f"""Title: {title}
 Abstract: {url}
@@ -141,3 +144,55 @@ Here goes the addition to answer on from person 2 perspective
 
         prompt = self.PROMPT(QUESTIONS)
         return prompt
+    
+class InsigthStructured(BasePrompt):
+    def __init__(self):
+        super().__init__()
+
+    def get_result(self, text: str) -> str:
+        from openai import OpenAI
+
+        client = OpenAI(
+            api_key=config.OPEN_API_KEY
+        )
+        result = client.chat.completions.create(
+            model = 'gpt-4o',
+            messages = [{'role': 'user', 'content': text}],
+            functions = [
+                {
+                    "name": "get_top_insights",
+                    "description": "you extract the most insightful and actionable information from the given paper content",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "universities": {
+                                "type": "string",
+                                "description": "the insitutions that published the paper"
+                            },
+                            "top_insights": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 3,
+                                "maxItems": 5,
+                                "description": "the most valuable insights from the paper",
+                            },
+                            "core_terms_defintion": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 5,
+                                "description": "define core terms in the paper",
+                            },
+                        },
+                    }
+                }
+            ],
+            function_call = 'auto'
+        )
+        result = str(result.choices[0].message.function_call.arguments)
+        import json
+        print("Result", result)
+        return json.dumps(json.loads(result), indent=4)
