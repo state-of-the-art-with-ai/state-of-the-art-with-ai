@@ -23,7 +23,7 @@ class InsightExtractor:
         url = subprocess.check_output("clipboard get_content", shell=True, text=True)
         self.extract_from_url(url)
 
-    def extract_from_url(self, url: str, open_existing=True, function_call=False):
+    def extract_from_url(self, url: str, open_existing=True, function_call=True, email_skip=False):
         """
         Generates insights for a given paper
         """
@@ -35,6 +35,7 @@ class InsightExtractor:
 
         article_content, title, document_pdf_location = get_content_from_url(url)
         if function_call:
+            print("Calling gpt function")
             result = InsigthStructured().get_result(article_content)
         else: 
             result = InsigthPrompt().get_result(article_content)
@@ -56,7 +57,7 @@ Abstract: {url}
             {"abstract_url": url, "insights": result, "pdf_path": paper_path},
         )
 
-        if os.environ.get("SOTA_TEST"):
+        if os.environ.get("SOTA_TEST") or email_skip:
             print("Skipping email")
         else:
             SotaMail().send("", f"Insights from {title}", paper_path)
@@ -160,14 +161,26 @@ class InsigthStructured(BasePrompt):
             messages = [{'role': 'user', 'content': text}],
             functions = [
                 {
-                    "name": "get_top_insights",
-                    "description": "you extract the most insightful and actionable information from the given paper content",
+                    "name": "get_insights_from_paper",
+                    "description":f"""This function returns expert data science insights that ecompasses the knwoeldge of all world top scientists.
+It returns the most insightful and actionable information from the given paper content
+The written style is in richard feyman style of explanations
+It optimized the answers for the following audience: {self.profile.get_preferences()[0:300]}
+""",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "universities": {
+                            "institutions": {
                                 "type": "string",
                                 "description": "the insitutions that published the paper"
+                            },
+                            "published_date": {
+                                "type": "string",
+                                "description": "when the paper was published?"
+                            },
+                            "published_where": {
+                                "type": "string",
+                                "description": "where paper was published?"
                             },
                             "top_insights": {
                                 "type": "array",
@@ -176,16 +189,56 @@ class InsigthStructured(BasePrompt):
                                 },
                                 "minItems": 3,
                                 "maxItems": 5,
-                                "description": "the most valuable insights from the paper",
+                                "description": """returns most valuable insights from the paper max 3 sentences per insight
+                                The insights cover well which problem they are trying to solve.
+                                """,
+                            },
+                            "going_deep": {
+                                "type": "string",
+                                "description": "return a summary on explaining in an clear way the core of the paper"
                             },
                             "core_terms_defintion": {
                                 "type": "array",
                                 "items": {
                                     "type": "string"
                                 },
-                                "minItems": 5,
-                                "description": "define core terms in the paper",
+                                "minItems": 4,
+                                "description": "define core terms in the paper use analogies if needed when they are very complex",
                             },
+                            "strenghs_from_paper": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 3,
+                                "description": "what are particular strenghts of this paper that make them stand out in relation to others in similar field?",
+                            },
+                            "weakeness_from_paper": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 2,
+                                "description": "what are particular weakenessess of this paper that make it less useful?",
+                            },
+                            "top_recommended_actions": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 3,
+                                "description": "what are actionable recommendations from this paper?",
+                            },
+                            'external_resoruces_recommendations': {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 3,
+                                "description":"""returns further resources recommendations from the board of experts if somebody whants to go deep into it.
+                                Books, articles, papers or people to follow related to the topic that helps to get a deeper understanding of it.
+                                """
+                            }
                         },
                     }
                 }
