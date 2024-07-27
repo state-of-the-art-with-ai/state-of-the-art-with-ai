@@ -1,4 +1,5 @@
 import os
+import datetime
 from typing import List, Optional
 
 
@@ -29,7 +30,6 @@ def create_pdf(
 
 
 def create_pdf_path(description_path: str, disable_timestamp=False):
-    import datetime
 
     description_path = description_path.strip()
     now = datetime.datetime.now().isoformat().split(".")[0]
@@ -49,6 +49,11 @@ def create_pdf_path(description_path: str, disable_timestamp=False):
 
 def open_pdf(output_path):
     import os
+
+    if os.environ.get("SOTA_TEST"):
+        print("SOTA_TEST set wont open the pdf")
+        return
+
 
     os.system(f"open {output_path}")
 
@@ -88,8 +93,8 @@ def merge_pdfs(output_path: str, pdfs: List[str]):
         for a_pdf in pdfs:
             open_pdf(a_pdf)
         return
-    if not os.environ.get("SOTA_TEST"):
-        open_pdf(output_path)
+
+    open_pdf(output_path)
 
 
 if __name__ == "__main__":

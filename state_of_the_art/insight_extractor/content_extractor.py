@@ -1,19 +1,23 @@
-
-
 from state_of_the_art.paper.downloader import Downloader
 from state_of_the_art.paper.paper import ArxivPaper, Paper
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.utils import pdf
+import os
 
 
 def is_pdf_url(url) -> bool:
     return url.endswith(".pdf") or ArxivPaper.is_arxiv_url(url)
 
+
 def get_content_from_url(url):
+    if os.environ.get("SOTA_TEST"):
+        return "Test content", "Test title", "test.pdf"
+
     if is_pdf_url(url):
         return get_pdf_content(url)
-    
+
     return get_website_content(url)
+
 
 def get_pdf_content(url):
     if ArxivPaper.is_arxiv_url(url):
