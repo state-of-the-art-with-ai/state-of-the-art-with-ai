@@ -37,7 +37,11 @@ class ReportParameters(BaseModel):
     @validator("from_date")
     def set_from_date(cls, from_date, values):
         default_date = None
-        lookback_days = values.get("lookback_days") if values.get("lookback_days") else config.DEFAULT_REPORT_LOOKBACK_DAYS
+        lookback_days = (
+            values.get("lookback_days")
+            if values.get("lookback_days")
+            else config.DEFAULT_REPORT_LOOKBACK_DAYS
+        )
         if not from_date:
             default_date = (
                 datetime.datetime.now() - datetime.timedelta(days=lookback_days)

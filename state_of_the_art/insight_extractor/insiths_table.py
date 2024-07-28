@@ -15,7 +15,7 @@ class InsightsTable:
     TABLE_NAME = "sota_paper_insights_new"
 
     def read(self) -> pd.DataFrame:
-        return config.get_datawarehouse().read(self.TABLE_NAME)
+        return config.get_datawarehouse().event(self.TABLE_NAME)
 
     def add_insight(self, insight: str, paper_id: str, score: int):
         self.validate_score(score)
@@ -26,3 +26,8 @@ class InsightsTable:
 
     def validate_score(self, score: int):
         assert score in [0, 1, 3, 5], f"Invalid score {score}"
+
+    def clipboard_content(self):
+        import subprocess
+
+        return subprocess.getoutput("clipboard get_content")
