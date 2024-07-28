@@ -1,6 +1,10 @@
 import os
+import json
+from typing import Tuple
 
 from state_of_the_art.config import config
+from state_of_the_art.insight_extractor.insiths_table import InsightsTable
+from state_of_the_art.utils.clipboard import get_clipboard_content
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 from state_of_the_art.insight_extractor.content_extractor import get_content_from_url
@@ -18,12 +22,11 @@ class InsightExtractor:
         """
         loads the url frrom clipboard then calls the extract function
         """
-        import subprocess
+        self.extract_from_url(get_clipboard_content())
 
-        url = subprocess.check_output("clipboard get_content", shell=True, text=True)
-        self.extract_from_url(url)
-
-    def extract_from_url(self, url: str, open_existing=True, email_skip=False):
+    def extract_from_url(
+        self, url: str, open_existing: bool = True, email_skip: bool = False
+    ):
         """
         Generates insights for a given paper
         """
@@ -34,7 +37,7 @@ class InsightExtractor:
             return
 
         article_content, title, document_pdf_location = get_content_from_url(url)
-        result = InsigthStructured().get_result(article_content)
+        result, structured_result = InsigthStructured().get_result(article_content)
 
         result = f"""Title: {title}
 Abstract: {url}
@@ -52,6 +55,11 @@ Abstract: {url}
             self.TABLE_NAME,
             {"abstract_url": url, "insights": result, "pdf_path": paper_path},
         )
+
+        if not os.environ.get("SOTA_TEST"):
+            insights_table = InsightsTable()
+            for insight in structured_result["top_insights"]:
+                insights_table.add_insight(insight=insight, paper_id=url, score=1)
 
         if os.environ.get("SOTA_TEST") or email_skip:
             print("Skipping email")
@@ -80,20 +88,15 @@ Abstract: {url}
         return url
 
 
-class BasePrompt:
+class InsigthStructured:
     def __init__(self):
         self.profile = config.get_current_audience()
         self.QUESTIONS: dict[str, str] = self.profile.paper_questions
         self.profile = config.get_current_audience()
 
-
-class InsigthStructured(BasePrompt):
-    def __init__(self):
-        super().__init__()
-
-    def get_result(self, text: str) -> str:
+    def get_result(self, text: str) -> Tuple[str, dict]:
         if os.environ.get("SOTA_TEST"):
-            return "Mocked result"
+            return "Mocked result", None
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
         result = client.chat.completions.create(
@@ -164,8 +167,7 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
                                 "items": {"type": "string"},
                                 "minItems": 3,
                                 "description": """returns further resources recommendations from the board of experts if somebody whants to go deep into it.
-                                Books, articles, papers or people to follow related to the topic that helps to get a deeper understanding of it.
-                                """,
+                                Books, articles, papers or people to follow related to the topic that helps to get a deeper understanding of it.""",
                             },
                         },
                     },
@@ -173,8 +175,6 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
             ],
             function_call="auto",
         )
-        result = str(result.choices[0].message.function_call.arguments)
-        import json
-
-        print("Result", result)
-        return json.dumps(json.loads(result), indent=4)
+        structured_results = result.choices[0].message.function_call.arguments
+        structured_results = json.loads(str(structured_results))
+        return json.dumps(structured_results, indent=3), structured_results

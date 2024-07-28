@@ -8,7 +8,7 @@ class InsightsTable:
 
     5: Very Good insight
     3: Good insight
-    1: Okay insight
+    1: Neutral (Not Evaluated)
     0: Not useful insight
     """
 

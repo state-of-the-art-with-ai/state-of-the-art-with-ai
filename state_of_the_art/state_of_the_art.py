@@ -22,6 +22,7 @@ class Sota:
         self.recommender = Recommender
         self.papers = PapersDataLoader()
         self.InsightExtractor = InsightExtractor
+        self.ie = InsightExtractor
         self.bookmark = bookmark()
         self.topic_search = TopicSearch
         self.SemanticSearch = SemanticSearch
