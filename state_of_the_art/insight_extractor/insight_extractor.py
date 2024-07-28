@@ -42,9 +42,7 @@ Abstract: {url}
         """
 
         pdf.create_pdf(
-            data=result,
-            output_path="/tmp/current_paper.pdf",
-            disable_open=True
+            data=result, output_path="/tmp/current_paper.pdf", disable_open=True
         )
         paper_path = pdf.create_pdf_path("p " + title)
         print("Saving paper insights to ", paper_path)

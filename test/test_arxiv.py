@@ -1,6 +1,6 @@
 import pytest
 
-from utils import has_internet
+from state_of_the_art.utils.internet import has_internet
 
 
 @pytest.mark.skipif(not has_internet(), reason="No internet")

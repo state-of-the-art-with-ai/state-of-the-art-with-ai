@@ -1,10 +1,10 @@
 from pydantic import BaseModel, validator
-from typing import Optional, Literal, Union
+from typing import Optional, Literal
 from state_of_the_art.config import config
 import datetime
 
 
-class RecommenderContext(BaseModel):
+class ReportParameters(BaseModel):
     """
     The default object to interact with the report API
     """
@@ -12,8 +12,8 @@ class RecommenderContext(BaseModel):
     DEFAULT_SUMMARY_LOOKBACK_DAYS = 2
     by_topic: Optional[str] = None
     lookback_days: Optional[int] = None
-    from_date: Optional[Union[str, datetime.date]] = None
-    to_date: Optional[Union[str, datetime.date]] = None
+    from_date: Optional[datetime.date] = None
+    to_date: Optional[datetime.date] = None
     problem_description: bool = False
     skip_register: bool = False
     dry_run: bool = False
@@ -35,11 +35,12 @@ class RecommenderContext(BaseModel):
         return batch_size or config.RANK_MAX_PAPERS_TO_COMPUTE
 
     @validator("from_date")
-    def set_from_date(cls, from_date):
+    def set_from_date(cls, from_date, values):
+        default_date = None
+        lookback_days = values.get("lookback_days") if values.get("lookback_days") else config.DEFAULT_REPORT_LOOKBACK_DAYS
         if not from_date:
             default_date = (
-                datetime.datetime.now()
-                - datetime.timedelta(days=config.DEFAULT_REPORT_LOOKBACK_DAYS)
+                datetime.datetime.now() - datetime.timedelta(days=lookback_days)
             ).date()
 
         return (

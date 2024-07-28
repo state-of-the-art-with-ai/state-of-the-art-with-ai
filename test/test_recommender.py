@@ -1,4 +1,4 @@
-from state_of_the_art.recommender.recommender import Recommender
+from state_of_the_art.recommender.generator import Recommender
 import os
 from unittest import mock
 

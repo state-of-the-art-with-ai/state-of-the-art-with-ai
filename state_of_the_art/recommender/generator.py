@@ -10,7 +10,7 @@ from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.recommender.ranker.ranker import PaperRanker
-from state_of_the_art.recommender.report_parameters import RecommenderContext
+from state_of_the_art.recommender.report_parameters import ReportParameters
 from state_of_the_art.config import config
 
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
@@ -49,7 +49,7 @@ class Recommender:
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
         """
 
-        context = RecommenderContext(
+        context = ReportParameters(
             lookback_days=number_lookback_days,
             from_date=from_date,
             skip_register=skip_register,
@@ -114,7 +114,7 @@ class Recommender:
 
         return self._topic_search
 
-    def _rank(self, context: RecommenderContext) -> str:
+    def _rank(self, context: ReportParameters) -> str:
         if context.by_topic:
             self._miner.register_by_relevance(
                 max_papers_per_query=None, topic_name=context.by_topic
@@ -169,7 +169,7 @@ class Recommender:
 
         return result
 
-    def _format_results(self, result: str, parameters: RecommenderContext) -> str:
+    def _format_results(self, result: str, parameters: ReportParameters) -> str:
         formatted_ranked_result = PapersFormatter().from_str(result)
         profile_name = config.get_current_audience().name
 

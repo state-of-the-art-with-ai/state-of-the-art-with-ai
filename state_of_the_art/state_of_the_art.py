@@ -4,7 +4,7 @@ from state_of_the_art.paper.papers_report import PapersReport
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 
 from state_of_the_art.bookmark import Bookmark as bookmark
-from state_of_the_art.recommender.recommender import Recommender
+from state_of_the_art.recommender.generator import Recommender
 from state_of_the_art.recommender.topic_based.semantic_search import SemanticSearch
 from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art import validation

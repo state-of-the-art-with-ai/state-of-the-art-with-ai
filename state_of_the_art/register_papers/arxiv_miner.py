@@ -6,6 +6,8 @@ from tqdm import tqdm
 import datetime
 import logging
 
+from state_of_the_art.utils.internet import has_internet
+
 
 class ArxivMiner:
     """
@@ -102,6 +104,9 @@ class ArxivMiner:
         Return the latest date with papers in arxiv with the Query AI
         So i assume it should always return something recent
         """
+        if not has_internet():
+            raise Exception("No Internet connectino found")
+
         result = self._find_papers(
             query="machine learning", number_of_papers=1, sort_by="submitted"
         )

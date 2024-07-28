@@ -29,8 +29,7 @@ def create_pdf(
     return output_path
 
 
-def create_pdf_path(description_path: str, disable_timestamp=False):
-
+def create_pdf_path(description_path: str, disable_timestamp=False) -> str:
     description_path = description_path.strip()
     now = datetime.datetime.now().isoformat().split(".")[0]
 
@@ -53,7 +52,6 @@ def open_pdf(output_path):
     if os.environ.get("SOTA_TEST"):
         print("SOTA_TEST set wont open the pdf")
         return
-
 
     os.system(f"open {output_path}")
 
