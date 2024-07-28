@@ -11,6 +11,7 @@ from state_of_the_art import validation
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.review import ReportReview
 from state_of_the_art.insight_extractor.summarize_and_sharpen import Sharpen
+from state_of_the_art import episode_headlines
 
 
 class Sota:
@@ -32,6 +33,7 @@ class Sota:
         self.ArxivMiner = ArxivMiner
         self.ReportReview = ReportReview
         self.Sharpen = Sharpen
+        self.episode_headlines = episode_headlines
 
 
 def main():

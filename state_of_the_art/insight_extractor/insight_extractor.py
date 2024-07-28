@@ -25,7 +25,7 @@ class InsightExtractor:
         self.extract_from_url(get_clipboard_content())
 
     def extract_from_url(
-        self, url: str, open_existing: bool = True, email_skip: bool = False
+        self, url: str, open_existing: bool = False, email_skip: bool = False
     ):
         """
         Generates insights for a given paper
@@ -86,7 +86,6 @@ Abstract: {url}
         url = url.strip()
         url = url.replace("file://", "")
         return url
-
 
 class InsigthStructured:
     def __init__(self):
