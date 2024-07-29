@@ -11,6 +11,7 @@ class InsightsTable:
     1: Neutral (Not Evaluated)
     0: Not useful insight
     """
+    SCORE_VALUES = [0, 1, 3, 5]
 
     TABLE_NAME = "sota_paper_insights_new"
 
@@ -25,9 +26,18 @@ class InsightsTable:
         )
 
     def validate_score(self, score: int):
-        assert score in [0, 1, 3, 5], f"Invalid score {score}"
+        assert score in self.SCORE_VALUES, f"Invalid score {score}"
 
     def clipboard_content(self):
         import subprocess
 
         return subprocess.getoutput("clipboard get_content")
+    
+    def update_score(self, uuid: str, score: int):
+        self.validate_score(score)
+        df = self.read()
+
+        df.loc[df["tdw_uuid"] == uuid, "score"] = score
+
+        config.get_datawarehouse().replace_df(self.TABLE_NAME, df, dry_run=False)
+
