@@ -3,16 +3,15 @@ import streamlit as st
 st.title('Papers Overview')
 
 
-st.button('Generate Report')
-
-col1, col2 = st.columns([1, 1])
-
-with col1:
+with st.popover("Settings"):
     st.number_input("Number of days", 0, 30)
-with col2:
     st.text_input("Query")
+    st.text_area("Problem description")
+    st.text("Topic name")
+    st.button("Save topic")
 
 
+st.button('Generate Report')
 with st.sidebar:
     st.button("Logout")
 
@@ -23,5 +22,5 @@ papers = [
 
 ]
 
-for paper in papers:
-    st.markdown(f"##### [{paper['title']}](paper_dive) [Paper](pdf)")
+for k, paper in enumerate(papers):
+    st.markdown(f"##### {k+1} [{paper['title']}](paper_dive) [Paper](pdf)")
