@@ -105,7 +105,7 @@ class ArxivMiner:
         So i assume it should always return something recent
         """
         if not has_internet():
-            raise Exception("No Internet connectino found")
+            raise Exception("No internet connection found")
 
         result = self._find_papers(
             query="machine learning", number_of_papers=1, sort_by="submitted"

@@ -1,22 +1,27 @@
-from state_of_the_art.app.data import papers
+from state_of_the_art.app.data import papers, topics
 import streamlit as st
 
-st.title('Papers Recommender')
+st.title("Papers Recommender")
 
 
-st.selectbox("For Profile", ['jean', 'gdp', 'mlp', 'mlops'])
+st.selectbox("For Profile", ["jean", "gdp", "mlp", "mlops"])
 
-st.text_area("Query / Problem description")
+st.text_area("Query / Problem description", value=topics[0]["description"])
 
-with st.expander("Topics Details"):
-    st.selectbox("Existing Topic", ['Select', 'ethics', 'mlops'])
+with st.expander("Search Details"):
+    st.selectbox("Existing Topic", [topic["name"] for topic in topics])
     st.text("Topic name")
-    st.selectbox("Search type", ['topic_summary', 'literal'])
-    c1, c2  = st.columns(2)
+    st.selectbox("Search type", ["topic_summary", "literal"])
+    c1, c2 = st.columns(2)
     c1.button("Save topic")
-    c2.button('Delete topic')
+    c2.button("Delete topic")
 
-st.button('Generate')
+mine = st.checkbox('Mine new papers', True)
+
+if st.button("Generate"):
+    from state_of_the_art.recommender.generator import Recommender
+    Recommender().generate(skip_register=not mine)
+
 with st.sidebar:
     st.button("Logout")
 

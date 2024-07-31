@@ -1,14 +1,14 @@
 import streamlit as st
 
 pages = {
-    "Pages": [
-    st.Page("pages/papers_recommender.py", title="Get recommendations of papers"),
-    st.Page("pages/paper_dive.py", title="Dive into a paper"),
-    st.Page("pages/evaluations.py", title="Your Evalutions"),
+    "Papers": [
+        st.Page("pages/papers_recommender.py", title="Get Paper Recommendations"),
+        st.Page("pages/paper_dive.py", title="Dive into a Paper"),
     ],
     "Personalization": [
-        st.Page("pages/profiles.py", title="Personalize your profile"),
-        st.Page("pages/topics.py", title="Your Topics of Interest"),
+        st.Page("pages/profiles.py", title="Profile"),
+        st.Page("pages/topics.py", title="Topics of Interest"),
+        st.Page("pages/evaluations.py", title="Your Evalutions"),
     ]
 }
 

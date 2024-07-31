@@ -20,3 +20,15 @@ insights = [
     {'text': "RegionDrag offers an innovative region-based approach for image editing, drastically reducing the editing time to about 1.5 seconds for a 512x512 image compared to up to 3 minutes using point-drag methods." },
     {'text': "This method leverages dense mapping between handle and target regions along with attention-swapping techniques to ensure high fidelity and alignment with user intentions." }
 ]
+topics = [
+    {'name': 'Elasticity', 'description': """Hypothesis: If we understand segment elasticity THEN we will increase NR at stable ROAS BECAUSE we will set targets that match relationship between bids and competition.
+Scope: 3 measurements in quarter that cover 100% of spend
+Milestones
+
+- Andri onboarding
+- Refine timeline together Tests to cover 100% of spend
+- Run 3 tests
+"""},
+    {'name': 'Ethics', 'description': 'Ethics is the branch of philosophy that involves systematizing, defending, and recommending concepts of right and wrong conduct. The field of ethics, along with aesthetics, concerns matters of value, and thus comprises the branch of philosophy called axiology. Ethics seeks to resolve questions of human morality by'},
+    {'name': 'MLops', 'description': "MLOPs is a practice for collaboration and communication between data scientists and IT professionals while automating the process of machine learning model deployment and management. It is a combination of 'machine learning' and 'operations'."}
+]

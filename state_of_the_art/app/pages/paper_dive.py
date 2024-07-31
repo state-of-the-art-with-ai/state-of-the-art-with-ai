@@ -7,15 +7,11 @@ paper =  {
     'url': "https://arxiv.org/abs/2407.18248"
 }
 
-st.text_input("Open another paper", value='', key='paper_url', help="Enter the URL of the paper") 
-st.button("Open")
+st.text_input("Paper URL", value='', key='paper_url', help="Enter the URL of the paper") 
+st.button("Extract Insights")
 
 
 st.markdown(f"### Paper: {paper['title']}")
-st.link_button("Open this paper", paper['url'])
-
-st.button("Extract insights")
-
 st.markdown("#### Insights")
 
 for k, insight in enumerate(insights):
