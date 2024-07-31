@@ -4,11 +4,10 @@ import streamlit as st
 st.title("Papers Recommender")
 
 
-st.selectbox("For Profile", ["jean", "gdp", "mlp", "mlops"])
-
 st.text_area("Query / Problem description", value=topics[0]["description"])
 
 with st.expander("Search Details"):
+    st.selectbox("For Profile", ["jean", "gdp", "mlp", "mlops"])
     st.selectbox("Existing Topic", [topic["name"] for topic in topics])
     st.text("Topic name")
     st.selectbox("Search type", ["topic_summary", "literal"])
