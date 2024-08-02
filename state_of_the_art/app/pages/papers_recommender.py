@@ -4,7 +4,7 @@ import streamlit as st
 st.title("Papers Recommender")
 
 
-st.text_area("Query / Problem description", value=topics[0]["description"])
+problem_description = st.text_area("Query / Description", value=None)
 
 with st.expander("Search Details"):
     st.selectbox("For Profile", ["jean", "gdp", "mlp", "mlops"])
@@ -19,7 +19,7 @@ mine = st.checkbox('Mine new papers', True)
 
 if st.button("Generate"):
     from state_of_the_art.recommender.generator import Recommender
-    Recommender().generate(skip_register=not mine)
+    Recommender().generate(skip_register=not mine, problem_description=problem_description)
 
 with st.sidebar:
     st.button("Logout")

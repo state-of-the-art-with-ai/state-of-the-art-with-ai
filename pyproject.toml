@@ -29,6 +29,7 @@ llama-index = "^0.10.37"
 llama-index-llms-ollama = "^0.1.4"
 beautifulsoup4 = "^4.12.3"
 
+sentence-transformers = "^3.0.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 black = "^24.3.0"

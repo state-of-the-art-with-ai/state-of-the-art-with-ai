@@ -9,18 +9,6 @@ from state_of_the_art.config import config
 class PapersDataLoader:
     TITLE_MAX_LENGH = 80
 
-    def print(self, n=None):
-        """
-        Entrypoint to display papers. We add options to this function to change the display logic
-        Rather than introducing more functions.
-        """
-        papers = self.load_papers()
-        papers = self.sort_by_recently_published(papers)
-        if n:
-            papers = papers.head(n)
-
-        self.print_papers(papers)
-
     def get_latest_articles(
         self,
         from_date: Optional[str] = None,
@@ -120,7 +108,7 @@ class PapersDataLoader:
 
         return result
 
-    def load_papers_from_urls(self, urls) -> List[ArxivPaper]:
+    def load_papers_from_urls(self, urls: List[str]) -> List[ArxivPaper]:
         papers = self.load_from_urls(urls, as_dict=True)
         result = []
         for i in urls:
@@ -131,6 +119,9 @@ class PapersDataLoader:
             paper_dict = papers[i].to_dict(orient="records")[0]
             result.append(ArxivPaper.load_from_dict(paper_dict))
         return result
+
+    def load_paper_from_url(self, url: str) -> ArxivPaper:
+        return self.load_papers_from_urls([url])[0]
 
     def df_to_papers(self, papers_df) -> List[ArxivPaper]:
         papers_dict = papers_df.to_dict(orient="records")

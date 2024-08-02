@@ -42,7 +42,8 @@ class Recommender:
         papers_to_rank=None,
         query: Optional[str] = None,
         by_topic: Optional[str] = None,
-        description_from_clipboard=False,
+        problem_description: Optional[str] = None,
+        use_clipboard_for_problem_description: bool=False,
         number_of_recommendations=None,
     ):
         """
@@ -58,7 +59,8 @@ class Recommender:
             papers_to_rank=papers_to_rank,
             query=query,
             by_topic=by_topic,
-            description_from_clipboard=description_from_clipboard,
+            problem_description=problem_description,
+            use_clipboard_for_problem_description=use_clipboard_for_problem_description,
             number_of_papers_to_recommend=number_of_recommendations,
         )
 
@@ -132,7 +134,7 @@ class Recommender:
         if context.query:
             return self._get_topic_search().search_with_query(context.query)
 
-        if context.problem_description:
+        if context.use_clipboard_for_problem_description:
             import subprocess
 
             output = subprocess.getoutput("clipboard get_content")
@@ -143,6 +145,17 @@ class Recommender:
             return self._get_topic_search().search_with_query(
                 context.machine_generated_query
             )
+
+        if context.problem_description:
+            import subprocess
+
+            context.machine_generated_query = self._get_topic_search().extract_query(
+                context.problem_description
+            )
+            return self._get_topic_search().search_with_query(
+                context.machine_generated_query
+            )
+
 
         if not sys.stdin.isatty():
             print("Reading from stdin")

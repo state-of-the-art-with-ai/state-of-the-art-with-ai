@@ -1,3 +1,4 @@
+from typing import Union
 from state_of_the_art.config import config
 import pandas as pd
 
@@ -6,12 +7,13 @@ class InsightsTable:
     """
     Score semantics
 
-    5: Very Good insight
+    4: Very Good insight
     3: Good insight
-    1: Neutral (Not Evaluated)
-    0: Not useful insight
+    2: Neutral (Not Evaluated)
+    1: Bad insight
+    0: Very Bad insight
     """
-    SCORE_VALUES = [0, 1, 3, 5]
+    SCORE_VALUES = [0, 1, 2, 3, 5]
 
     TABLE_NAME = "sota_paper_insights_new"
 
@@ -33,7 +35,9 @@ class InsightsTable:
 
         return subprocess.getoutput("clipboard get_content")
     
-    def update_score(self, uuid: str, score: int):
+    def update_score(self, uuid: str, score: Union[int, str]):
+        if isinstance(score, str):
+            score = int(score)
         self.validate_score(score)
         df = self.read()
 

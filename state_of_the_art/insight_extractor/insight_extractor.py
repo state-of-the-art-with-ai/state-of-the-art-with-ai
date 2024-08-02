@@ -59,7 +59,8 @@ Abstract: {url}
         if not os.environ.get("SOTA_TEST"):
             insights_table = InsightsTable()
             for insight in structured_result["top_insights"]:
-                insights_table.add_insight(insight=insight, paper_id=url, score=1)
+                insights_table.add_insight(insight=insight, paper_id=url, score=None)
+            insights_table.add_insight(insight=structured_result['going_deep'], paper_id=url, score=None)
 
         if os.environ.get("SOTA_TEST") or email_skip:
             print("Skipping email")

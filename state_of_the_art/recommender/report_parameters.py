@@ -14,7 +14,8 @@ class ReportParameters(BaseModel):
     lookback_days: Optional[int] = None
     from_date: Optional[datetime.date] = None
     to_date: Optional[datetime.date] = None
-    problem_description: bool = False
+    problem_description: Optional[str] = None
+    use_clipboard_for_problem_description: bool = False
     skip_register: bool = False
     dry_run: bool = False
     batch: int = 1
