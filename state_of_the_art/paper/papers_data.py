@@ -121,7 +121,14 @@ class PapersDataLoader:
         return result
 
     def load_paper_from_url(self, url: str) -> ArxivPaper:
-        return self.load_papers_from_urls([url])[0]
+        if not url:
+            raise Exception("Url not defined to load any paper")
+
+        result = self.load_papers_from_urls([url])
+        if not result or len(result) == 0:
+            raise Exception(f'Could not find paper from url {url}')
+
+        return result[0]
 
     def df_to_papers(self, papers_df) -> List[ArxivPaper]:
         papers_dict = papers_df.to_dict(orient="records")

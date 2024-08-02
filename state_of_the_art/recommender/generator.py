@@ -43,7 +43,7 @@ class Recommender:
         query: Optional[str] = None,
         by_topic: Optional[str] = None,
         problem_description: Optional[str] = None,
-        use_clipboard_for_problem_description: bool=False,
+        use_clipboard_for_problem_description: bool = False,
         number_of_recommendations=None,
     ):
         """
@@ -155,7 +155,6 @@ class Recommender:
             return self._get_topic_search().search_with_query(
                 context.machine_generated_query
             )
-
 
         if not sys.stdin.isatty():
             print("Reading from stdin")

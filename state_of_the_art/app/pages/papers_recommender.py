@@ -15,11 +15,14 @@ with st.expander("Search Details"):
     c1.button("Save topic")
     c2.button("Delete topic")
 
-mine = st.checkbox('Mine new papers', True)
+mine = st.checkbox("Mine new papers", True)
 
 if st.button("Generate"):
     from state_of_the_art.recommender.generator import Recommender
-    Recommender().generate(skip_register=not mine, problem_description=problem_description)
+
+    Recommender().generate(
+        skip_register=not mine, problem_description=problem_description
+    )
 
 with st.sidebar:
     st.button("Logout")

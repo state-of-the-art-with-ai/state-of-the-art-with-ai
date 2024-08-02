@@ -3,7 +3,7 @@ import json
 from typing import Tuple
 
 from state_of_the_art.config import config
-from state_of_the_art.insight_extractor.insiths_table import InsightsTable
+from state_of_the_art.insight_extractor.insights_table import InsightsTable
 from state_of_the_art.utils.clipboard import get_clipboard_content
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
@@ -37,35 +37,62 @@ class InsightExtractor:
             return
 
         article_content, title, document_pdf_location = get_content_from_url(url)
-        result, structured_result = InsigthStructured().get_result(article_content)
+        result, structured_result = StructuredPaperInsights().get_result(
+            article_content
+        )
 
         result = f"""Title: {title}
 Abstract: {url}
 {result}
         """
 
+        if os.environ.get("SOTA_TEST"):
+            return
+
+        config.get_datawarehouse().write_event(
+            self.TABLE_NAME,
+            {"abstract_url": url, "insights": result},
+        )
+
+        insights = self._convert_sturctured_output_to_insights(structured_result, url)
+        self._write_insights_into_table(insights, url)
+
+        paper_path = self._create_pdf(title, result, document_pdf_location)
+
+        SotaMail().send("", f"Insights from {title}", paper_path)
+
+    def _convert_sturctured_output_to_insights(self, structured_result, url):
+        result = []
+        for key, value in structured_result.items():
+            if key == "top_insights":
+                for insight in value:
+                    result.append(('top_insights', insight))
+                continue
+
+            if key in ["institutions", "published_date", "published_where"]:
+                continue
+
+            if isinstance(value, str):
+                result.append((key, value))
+            else:
+                for insight_row in value:
+                    result.append((key, insight_row))
+        
+        return result
+
+    def _write_insights_into_table(self, insights, url):
+        insights_table = InsightsTable()
+        for (question, insight) in insights:
+            insights_table.add_insight(insight, question, url, None)
+
+    def _create_pdf(self, title, result, document_pdf_location):
         pdf.create_pdf(
             data=result, output_path="/tmp/current_paper.pdf", disable_open=True
         )
         paper_path = pdf.create_pdf_path("p " + title)
         print("Saving paper insights to ", paper_path)
         pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", document_pdf_location])
-
-        config.get_datawarehouse().write_event(
-            self.TABLE_NAME,
-            {"abstract_url": url, "insights": result, "pdf_path": paper_path},
-        )
-
-        if not os.environ.get("SOTA_TEST"):
-            insights_table = InsightsTable()
-            for insight in structured_result["top_insights"]:
-                insights_table.add_insight(insight=insight, paper_id=url, score=None)
-            insights_table.add_insight(insight=structured_result['going_deep'], paper_id=url, score=None)
-
-        if os.environ.get("SOTA_TEST") or email_skip:
-            print("Skipping email")
-        else:
-            SotaMail().send("", f"Insights from {title}", paper_path)
+        return paper_path
 
     def _open_insight_summary_if_exists(self, abstract_url) -> bool:
         df = config.get_datawarehouse().event(self.TABLE_NAME)
@@ -88,7 +115,8 @@ Abstract: {url}
         url = url.replace("file://", "")
         return url
 
-class InsigthStructured:
+
+class StructuredPaperInsights:
     def __init__(self):
         self.profile = config.get_current_audience()
         self.QUESTIONS: dict[str, str] = self.profile.paper_questions
@@ -96,7 +124,7 @@ class InsigthStructured:
 
     def get_result(self, text: str) -> Tuple[str, dict]:
         if os.environ.get("SOTA_TEST"):
-            return "Mocked result", None
+            return "Mocked result", {}
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
         result = client.chat.completions.create(
@@ -130,7 +158,7 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
                                 "items": {"type": "string"},
                                 "minItems": 3,
                                 "maxItems": 5,
-                                "description": """returns most valuable insights from the paper max 3 sentences per insight
+                                "description": """returns most valuable insights from the paper 
                                 The insights cover well which problem they are trying to solve.
                                 """,
                             },
@@ -175,6 +203,12 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
             ],
             function_call="auto",
         )
+
+        if not hasattr(result.choices[0].message, "function_call"):
+            raise Exception(
+                f"""Function call extraction operation failed returned {result.choices[0].message.content} instead """
+            )
+
         structured_results = result.choices[0].message.function_call.arguments
         structured_results = json.loads(str(structured_results))
         return json.dumps(structured_results, indent=3), structured_results

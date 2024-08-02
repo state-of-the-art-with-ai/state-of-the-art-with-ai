@@ -1,5 +1,5 @@
-
 from torch import nn
+
 
 # Define model
 class NeuralNetwork(nn.Module):
@@ -10,7 +10,7 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 64),
             nn.ReLU(),
-            nn.Linear(64, 5)
+            nn.Linear(64, 5),
         )
 
     def forward(self, x):

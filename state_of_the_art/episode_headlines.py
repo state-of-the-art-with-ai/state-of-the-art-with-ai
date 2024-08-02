@@ -1,10 +1,8 @@
-
 from state_of_the_art.utils.clipboard import get_clipboard_content
 from state_of_the_art.utils.llm.llm import LLM
 
 
 def generate_headline_from_clipboard():
-
     prompt = """You are a headline creator for a newlstter about ai for Jean Carlo machado.
 You will be given the content of the episode and you generate the highlights based on the paper title keywords that will drive most clicks.
 The maximum amount of chars is 196. If you need to pick specific papers, pick the most interesting ones while keeping the output diverse
