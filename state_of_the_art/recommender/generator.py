@@ -17,13 +17,23 @@ from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
 from state_of_the_art.utils.mail import SotaMail
 
+class RecommenderTable:
+    TABLE_NAME = "state_of_the_art_summary"
+
+    def read(self):
+        return config.get_datawarehouse().event(RecommenderTable.TABLE_NAME)
+
+    def get_latest(self)->dict:
+        df = self.read()
+        return df.iloc[-1]
+
+
 
 class Recommender:
     """
     Class responsible to the entire generation pipeline
     """
 
-    TABLE_NAME = "state_of_the_art_summary"
     _input_articles: Optional[List[ArxivPaper]] = None
     _topic_search: Optional[TopicSearch] = None
 
@@ -45,6 +55,8 @@ class Recommender:
         problem_description: Optional[str] = None,
         use_clipboard_for_problem_description: bool = False,
         number_of_recommendations=None,
+        skip_email=False,
+        disable_open_pdf=False,
     ):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
@@ -85,15 +97,17 @@ class Recommender:
         location = pdf.create_pdf(
             data=formatted_result,
             output_path_description=f"recommender summary {profile_name} {context.by_topic if context.by_topic else ""} ",
+            disable_open=disable_open_pdf,
         )
         context.generated_pdf_location = location
 
         self._write_event(context, formatted_result, result)
 
-        self._send_email(
-            formatted_result,
-            f"Sota summary batch {context.batch} for profile {profile_name}",
-        )
+        if not skip_email:
+            self._send_email(
+                formatted_result,
+                f"Sota summary batch {context.batch} for profile {profile_name}",
+            )
 
         return result
 
@@ -101,7 +115,8 @@ class Recommender:
         """
         Open the latest generated summary
         """
-        df = config.get_datawarehouse().event(self.TABLE_NAME)
+        df = RecommenderTable().read()
+
         dict = df.iloc[-1].to_dict()
 
         if dict["pdf_location"]:
@@ -232,7 +247,7 @@ Papers analysed: \n{articles_as_input}"""
             print("Mocking event, not writing to datawarehouse")
             return
 
-        config.get_datawarehouse().write_event(self.TABLE_NAME, ranking_data.to_dict())
+        config.get_datawarehouse().write_event(RecommenderTable.TABLE_NAME, ranking_data.to_dict())
 
     def _send_email(self, formatted_result, title):
         print("Sending email")

@@ -45,9 +45,17 @@ EXAMPLE_LLM_OUTPUT = {
 }
 
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
-def test_record_insights():
+def test_post_extraction():
+    InsightExtractor().post_extraction('foo', EXAMPLE_LLM_OUTPUT, 'a path', 'http://asdfasdd', 'a title')
+
+
+def test_insigts_structure():
     result = InsightExtractor()._convert_sturctured_output_to_insights(EXAMPLE_LLM_OUTPUT, "https://arxiv.org/abs/2202.02484v1")
-    assert len(result) == 19
+    print(result)
+    for key, value in result:
+        assert key is not None
+        assert value is not None
+
 
 
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})

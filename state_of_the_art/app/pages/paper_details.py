@@ -14,11 +14,20 @@ if url:
     url = url.strip()
     st.query_params.paper_url = url
 
-load = st.button("Load Paper")
+
+c1, c2, c3 = st.columns([1, 1, 3])
+with c1:
+    load = st.button("Load Paper")
+
+with c2:
+    send_to_email = st.checkbox("Send to email", value=False)
+
+with c3:
+    if st.button("Extract New Insights"):
+        InsightExtractor().extract_from_url(url, email_skip=not send_to_email, disable_pdf_open=True)
 
 
-if st.button("Extract New Insights"):
-    InsightExtractor().extract_from_url(url)
+
 
 if load or url:
     paper = PapersDataLoader().load_paper_from_url(url)
@@ -42,9 +51,12 @@ if load or url:
 
     for insight in insights_list:
         st.markdown(f"- ({insight['question']}) " + insight["insight"])
-        st.write("Predicted Score: ", insight['predicted_score'])
 
-        feedback_received = st.feedback(options="faces", key=insight["tdw_uuid"])
+        c1, c2  = st.columns([1, 3])
+        with c1:
+            st.write("Predicted Score: ", insight['predicted_score'])
+        with c2:
+            feedback_received = st.feedback(options="faces", key=insight["tdw_uuid"])
         if feedback_received:
             InsightsTable().update_score(insight["tdw_uuid"], feedback_received)
 

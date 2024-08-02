@@ -22,7 +22,13 @@ class InsightsTable:
         return config.get_datawarehouse().event(self.TABLE_NAME)
 
     def add_insight(self, insight: str, question: str, paper_id: str, score: int):
+        if not isinstance(insight, str):
+            raise ValueError(f"Insight should be a string found {type(insight)}")
+
+        if not isinstance(question, str):
+            raise ValueError(f"Question should be a string: found {type(question)}")
         self.validate_score(score)
+
         config.get_datawarehouse().write_event(
             self.TABLE_NAME,
             {"insight": insight, 'question': question, "paper_id": paper_id, "score": score},
@@ -38,5 +44,4 @@ class InsightsTable:
         df = self.read()
 
         df.loc[df["tdw_uuid"] == uuid, "score"] = score
-
         config.get_datawarehouse().replace_df(self.TABLE_NAME, df, dry_run=False)

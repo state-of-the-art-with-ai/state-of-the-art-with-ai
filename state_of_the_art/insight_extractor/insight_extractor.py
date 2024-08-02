@@ -25,7 +25,7 @@ class InsightExtractor:
         self.extract_from_url(get_clipboard_content())
 
     def extract_from_url(
-        self, url: str, open_existing: bool = False, email_skip: bool = False
+        self, url: str, open_existing: bool = False, email_skip: bool = False, disable_pdf_open=False
     ):
         """
         Generates insights for a given paper
@@ -45,7 +45,9 @@ class InsightExtractor:
 Abstract: {url}
 {result}
         """
+        self.post_extraction(result, structured_result, document_pdf_location, url, title, email_skip, disable_pdf_open)
 
+    def post_extraction(self, result, structured_result, document_pdf_location, url, title, email_skip=False, disable_pdf_open=False):
         if os.environ.get("SOTA_TEST"):
             return
 
@@ -57,9 +59,9 @@ Abstract: {url}
         insights = self._convert_sturctured_output_to_insights(structured_result, url)
         self._write_insights_into_table(insights, url)
 
-        paper_path = self._create_pdf(title, result, document_pdf_location)
-
-        SotaMail().send("", f"Insights from {title}", paper_path)
+        paper_path = self._create_pdf(title, result, document_pdf_location, disable_pdf_open=disable_pdf_open)
+        if not email_skip:
+            SotaMail().send("", f"Insights from {title}", paper_path)
 
     def _convert_sturctured_output_to_insights(self, structured_result, url):
         result = []
@@ -67,9 +69,6 @@ Abstract: {url}
             if key == "top_insights":
                 for insight in value:
                     result.append(('top_insights', insight))
-                continue
-
-            if key in ["institutions", "published_date", "published_where"]:
                 continue
 
             if isinstance(value, str):
@@ -81,17 +80,20 @@ Abstract: {url}
         return result
 
     def _write_insights_into_table(self, insights, url):
+        # reverse order of insights
+        insights.reverse()
+
         insights_table = InsightsTable()
         for (question, insight) in insights:
             insights_table.add_insight(insight, question, url, None)
 
-    def _create_pdf(self, title, result, document_pdf_location):
+    def _create_pdf(self, title, result, document_pdf_location, disable_pdf_open=False):
         pdf.create_pdf(
             data=result, output_path="/tmp/current_paper.pdf", disable_open=True
         )
         paper_path = pdf.create_pdf_path("p " + title)
         print("Saving paper insights to ", paper_path)
-        pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", document_pdf_location])
+        pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", document_pdf_location], disable_open=disable_pdf_open)
         return paper_path
 
     def _open_insight_summary_if_exists(self, abstract_url) -> bool:

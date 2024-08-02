@@ -77,7 +77,7 @@ def read_content(pdf_path):
     return PAPER_CONTENT
 
 
-def merge_pdfs(output_path: str, pdfs: List[str]):
+def merge_pdfs(output_path: str, pdfs: List[str], disable_open=False):
     from PyPDF2 import PdfMerger
 
     try:
@@ -92,7 +92,8 @@ def merge_pdfs(output_path: str, pdfs: List[str]):
             open_pdf(a_pdf)
         return
 
-    open_pdf(output_path)
+    if not disable_open:
+        open_pdf(output_path)
 
 
 if __name__ == "__main__":
