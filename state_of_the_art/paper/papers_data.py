@@ -52,7 +52,7 @@ class PapersDataLoader:
     def load_papers(self):
         df = config.get_datawarehouse().event("arxiv_papers")
         # @todo Fix duplicates
-        df.drop_duplicates(subset=["url"], keep="first", inplace=True)
+        df.drop_duplicates(subset=["abstract_url"], keep="first", inplace=True)
 
         return df
 
@@ -79,7 +79,7 @@ class PapersDataLoader:
 
     def load_from_url(self, url) -> Optional[pd.DataFrame]:
         papers = self.load_papers()
-        result = papers[papers["url"] == url]
+        result = papers[papers["abstract_url"] == url]
         return result
 
     def load_from_urls(
@@ -90,16 +90,16 @@ class PapersDataLoader:
         if as_dict:
             result = {}
             for url in urls:
-                result[url] = papers[papers["url"] == url]
+                result[url] = papers[papers["abstract_url"] == url]
             result_len = len(result.keys())
         else:
-            result = papers[papers["url"].isin(urls)]
+            result = papers[papers["abstract_url"].isin(urls)]
             result_len = len(result)
 
         if result_len != len(urls):
             message = f"""
                 Found {len(result)} papers but expected {len(urls)}
-                Missing urls: {[i for i in urls if i not in result['url'].to_list()]}
+                Missing urls: {[i for i in urls if i not in result['abstract_url'].to_list()]}
 """
             if fail_on_missing_ids:
                 raise ValueError(message)
@@ -137,7 +137,7 @@ class PapersDataLoader:
             paper = ArxivPaper(
                 title=i["title"],
                 abstract=i["abstract"],
-                pdf_url=i["url"],
+                abstract_url=i["abstract_url"],
                 published=i["published"],
             )
             result.append(paper)
@@ -154,7 +154,7 @@ class PapersDataLoader:
                 " ",
                 i["title"][0 : self.TITLE_MAX_LENGH],
                 " ",
-                i["url"],
+                i["abstract_url"],
                 abstract,
             )
 

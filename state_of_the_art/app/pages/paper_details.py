@@ -19,12 +19,6 @@ c1, c2, c3 = st.columns([1, 1, 3])
 with c1:
     load = st.button("Load Paper")
 
-with c2:
-    send_to_email = st.checkbox("Send to email", value=False)
-
-with c3:
-    if st.button("Extract New Insights"):
-        InsightExtractor().extract_from_url(url, email_skip=not send_to_email, disable_pdf_open=True)
 
 
 
@@ -32,8 +26,8 @@ with c3:
 if load or url:
     paper = PapersDataLoader().load_paper_from_url(url)
 
-    st.markdown(f"### Paper: {paper.title}")
-    st.markdown(f"Url: {url}")
+    st.markdown(f"### {paper.title}")
+    st.markdown(f"[{url}](url)     [PDF]({paper.pdf_url})")
     st.markdown("Published: " + paper.published_date_str())
     st.markdown(f"Abstract: {paper.abstract}")
     st.markdown("#### Insights")
@@ -61,3 +55,16 @@ if load or url:
             InsightsTable().update_score(insight["tdw_uuid"], feedback_received)
 
     already_rendered = True
+
+question = st.text_input("Your question")
+st.write("The queston is: ", question)
+
+c1, c2, = st.columns([1, 3])
+with c1:
+    send_to_email = st.checkbox("Send to email", value=False)
+with c2:
+    extract_insights = st.button("Extract Insights")
+
+if extract_insights:
+    InsightExtractor().extract_from_url(url, email_skip=not send_to_email, disable_pdf_open=True, question=question)
+

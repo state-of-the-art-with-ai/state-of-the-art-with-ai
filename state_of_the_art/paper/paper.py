@@ -37,34 +37,21 @@ class ArxivPaper(Paper):
     def __init__(
         self,
         *,
-        url: Optional[str] = None,
-        pdf_url: Optional[str] = None,
+        abstract_url: Optional[str] = None,
         published=None,
         title: Optional[str] = None,
         abstract: Optional[str] = None,
     ):
-        if url and not self.is_arxiv_url(url):
-            raise Exception(f'"{url}" is not a valid arxiv url')
+        """
+        the only acceptable url is the abstract url, the others need to be converted ahead of time
+        """
+        self.abstract_url = abstract_url.strip()
+        if not self.is_arxiv_url(self.abstract_url):
+            raise Exception(f'"{self.abstract_urls}" is not a valid arxiv url')
 
-        if pdf_url and not self.is_arxiv_url(pdf_url):
-            raise Exception(f'"{url}" is not a valid arxiv url')
+        self.abstract_url = ArxivPaper._remove_versions_from_url(self.abstract_url)
 
-        url = url.strip() if url else None
-        url = ArxivPaper._remove_versions_from_url(url)
-
-        if pdf_url:
-            pdf_url = (
-                ArxivPaper._remove_versions_from_url(pdf_url.split(".pdf")[0]) + ".pdf"
-            )
-
-        if pdf_url and not url:
-            self.abstract_url = self.convert_pdf_to_abstract(pdf_url)
-            self.pdf_url = pdf_url.replace("http://", "https://")
-
-        if url and not pdf_url:
-            self.pdf_url = self.convert_abstract_to_pdf(url)
-            self.abstract_url = self.convert_pdf_to_abstract(url)
-
+        self.pdf_url = self.convert_abstract_to_pdf(self.abstract_url)
         self.published = published
         self.title = title
         self.abstract = abstract
@@ -88,7 +75,7 @@ class ArxivPaper(Paper):
     @staticmethod
     def load_from_dict(data):
         return ArxivPaper(
-            pdf_url=data["url"],
+            abstract_url=data["abstract_url"],
             published=data["published"],
             title=data["title"],
             abstract=data["abstract"],
@@ -108,7 +95,7 @@ class ArxivPaper(Paper):
 
         result = result.iloc[0].to_dict()
         return ArxivPaper(
-            url=result["url"],
+            url=result["abstract_url"],
             published=result["published"],
             title=result["title"],
             abstract=result["abstract"],
@@ -122,7 +109,6 @@ class ArxivPaper(Paper):
 
     def to_dict(self):
         return {
-            "url": self.abstract_url,
             "pdf_url": self.pdf_url,
             "abstract_url": self.abstract_url,
             "published": self.published,

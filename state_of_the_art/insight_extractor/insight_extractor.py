@@ -25,7 +25,12 @@ class InsightExtractor:
         self.extract_from_url(get_clipboard_content())
 
     def extract_from_url(
-        self, url: str, open_existing: bool = False, email_skip: bool = False, disable_pdf_open=False
+        self,
+        url: str,
+        open_existing: bool = False,
+        email_skip: bool = False,
+        disable_pdf_open=False,
+        question = None
     ):
         """
         Generates insights for a given paper
@@ -38,7 +43,8 @@ class InsightExtractor:
 
         article_content, title, document_pdf_location = get_content_from_url(url)
         result, structured_result = StructuredPaperInsights().get_result(
-            article_content
+            article_content,
+            question=question
         )
 
         result = f"""Title: {title}
@@ -124,9 +130,88 @@ class StructuredPaperInsights:
         self.QUESTIONS: dict[str, str] = self.profile.paper_questions
         self.profile = config.get_current_audience()
 
-    def get_result(self, text: str) -> Tuple[str, dict]:
+    def get_result(self, text: str, question=None) -> Tuple[str, dict]:
         if os.environ.get("SOTA_TEST"):
             return "Mocked result", {}
+
+
+        if question:
+            print(f"Using question to extract insights ({question})")
+            parameters = {
+                question: {
+                    'type': 'string',
+                    'description': question
+                }
+            }
+        else:
+            parameters = {
+                "institutions": {
+                    "type": "string",
+                    "description": "the insitutions that published the paper",
+                },
+                "published_date": {
+                    "type": "string",
+                    "description": "when the paper was published?",
+                },
+                "published_where": {
+                    "type": "string",
+                    "description": "where paper was published?",
+                },
+                "top_insights": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 3,
+                    "maxItems": 5,
+                    "description": """returns most valuable insights from the paper 
+                    The insights cover well which problem they are trying to solve.
+                    """,
+                },
+                "going_deep": {
+                    "type": "string",
+                    "description": "return a summary on explaining in an clear way the core of the paper",
+                },
+                "unique_part": {
+                    "type": "string",
+                    "description": "what is the most interesting and unique part of the paper",
+                },
+                "core_terms_defintion": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 4,
+                    "description": "define core terms in the paper use analogies if needed when they are very complex",
+                },
+                "strenghs_from_paper": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 3,
+                    "description": "what are particular strenghts of this paper that make them stand out in relation to others in similar field?",
+                },
+                "weakeness_from_paper": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 2,
+                    "description": "what are particular weakenessess of this paper that make it less useful?",
+                },
+                "top_recommended_actions": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 3,
+                    "description": "what are actionable recommendations from this paper?",
+                },
+                "external_resoruces_recommendations": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 3,
+                    "description": """returns further resources recommendations from the board of experts if somebody whants to go deep into it.
+                    Books, articles, papers or people to follow related to the topic that helps to get a deeper understanding of it.""",
+                },
+
+            }
+
+
+
+
+        
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
         result = client.chat.completions.create(
@@ -142,65 +227,8 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
 """,
                     "parameters": {
                         "type": "object",
-                        "properties": {
-                            "institutions": {
-                                "type": "string",
-                                "description": "the insitutions that published the paper",
-                            },
-                            "published_date": {
-                                "type": "string",
-                                "description": "when the paper was published?",
-                            },
-                            "published_where": {
-                                "type": "string",
-                                "description": "where paper was published?",
-                            },
-                            "top_insights": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 3,
-                                "maxItems": 5,
-                                "description": """returns most valuable insights from the paper 
-                                The insights cover well which problem they are trying to solve.
-                                """,
-                            },
-                            "going_deep": {
-                                "type": "string",
-                                "description": "return a summary on explaining in an clear way the core of the paper",
-                            },
-                            "core_terms_defintion": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 4,
-                                "description": "define core terms in the paper use analogies if needed when they are very complex",
-                            },
-                            "strenghs_from_paper": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 3,
-                                "description": "what are particular strenghts of this paper that make them stand out in relation to others in similar field?",
-                            },
-                            "weakeness_from_paper": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 2,
-                                "description": "what are particular weakenessess of this paper that make it less useful?",
-                            },
-                            "top_recommended_actions": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 3,
-                                "description": "what are actionable recommendations from this paper?",
-                            },
-                            "external_resoruces_recommendations": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 3,
-                                "description": """returns further resources recommendations from the board of experts if somebody whants to go deep into it.
-                                Books, articles, papers or people to follow related to the topic that helps to get a deeper understanding of it.""",
-                            },
+                        "properties": parameters
                         },
-                    },
                 }
             ],
             function_call="auto",
