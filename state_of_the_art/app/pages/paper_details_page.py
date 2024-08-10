@@ -26,44 +26,32 @@ if load or url:
     paper = PapersDataLoader().load_paper_from_url(url)
 
     st.markdown(f"### {paper.title}")
-    c1, c2 = st.columns([1, 1])
+    c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
         st.markdown(f"[{url}](url)")
     with c2:
         st.markdown(f"[PDF]({paper.pdf_url})")
 
-    if st.button("Open paper locally"):
-        open_paper_locally(paper.abstract_url)
+    with c3:
+        if st.button("Open paper locally"):
+            open_paper_locally(paper.abstract_url)
+
 
     st.markdown("Published: " + paper.published_date_str())
     st.markdown(f"Abstract: {paper.abstract}")
 
-
-    question = st.text_input("Your question")
-    st.write("The queston is: ", question)
-
-    (
-        c1,
-        c2,
-    ) = st.columns([1, 3])
-    with c1:
-        send_to_email = st.checkbox("Send to email", value=False)
-    with c2:
-        extract_insights = st.button("Extract Insights")
-
-    if extract_insights:
-        InsightExtractor().extract_from_url(
-            url, email_skip=not send_to_email, disable_pdf_open=True, question=question
-        )
 
     st.markdown("#### Comments")
 
     comments = Comments()
     df_comments = comments.load_with_value(column='paper_url', value=paper.abstract_url, recent_first=True)
 
-    message = st.text_input('Add your new comment')
-    if st.button("Add comment"):
-        comments.add(message=message, paper_url=paper.abstract_url)
+    c1, c2 = st.columns([2, 1])
+    with c1:
+        message = st.text_input('Add your new comment')
+    with c2:
+        if st.button("Add"):
+            comments.add(message=message, paper_url=paper.abstract_url)
 
 
     for index, comment in df_comments.iterrows():
@@ -72,6 +60,20 @@ if load or url:
     st.divider()
 
     st.markdown("#### Insights")
+
+    c1, c2, = st.columns([3, 1])
+    with c1:
+        question = st.text_input("Your question")
+    with c2:
+        extract_insights = st.button("Extract Insights")
+
+    if extract_insights:
+        InsightExtractor().extract_from_url(
+            url, email_skip=True, disable_pdf_open=True, question=question
+        )
+    st.divider()
+
+
 
     insights = InsightsTable().read()
     insights = insights[insights["paper_id"] == url]
@@ -87,7 +89,11 @@ if load or url:
     )
 
     for insight in insights_list:
-        st.markdown(f"- ({insight['question']}) " + insight["insight"][0:200] + " ...")
+        c1, c2 = st.columns([1, 3])
+        with c1:
+            st.markdown("##### " + insight["question"])
+        with c2:
+            st.info(insight["insight"][0:200] + " ...")
 
         if len(insight["insight"]) > 300:
             st.expander("Read more").markdown(insight["insight"])
