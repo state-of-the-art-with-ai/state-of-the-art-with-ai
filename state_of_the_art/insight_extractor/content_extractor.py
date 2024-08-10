@@ -21,9 +21,9 @@ def get_content_from_url(url):
 
 def get_pdf_content(url):
     if ArxivPaper.is_arxiv_url(url):
-        paper = ArxivPaper(url=url)
+        paper = ArxivPaper(abstract_url=url)
         ArxivMiner().register_paper_if_not_registered(paper)
-        paper = ArxivPaper.load_paper_from_url(url=paper.abstract_url)
+        paper = ArxivPaper.load_paper_from_url(paper.abstract_url)
         paper_title = paper.title
     else:
         paper = Paper(pdf_url=url)

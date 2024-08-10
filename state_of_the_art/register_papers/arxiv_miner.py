@@ -205,9 +205,9 @@ class ArxivMiner:
         order_counter = 1
         for r in search.results():
             paper = ArxivPaper(
+                abstract_url=r.entry_id,
                 title=r.title,
                 abstract=r.summary,
-                pdf_url=r.entry_id,
                 published=r.published,
             )
             result.append(paper)

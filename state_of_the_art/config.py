@@ -52,7 +52,7 @@ class Config:
             return self.dwh
 
         self.dwh = DataWarehouse(
-            events_config={"arxiv_papers": {"prevent_duplicates_col": "url"}}
+            events_config={"arxiv_papers": {"prevent_duplicates_col": "abstract_url"}}
         )
 
         return self.dwh

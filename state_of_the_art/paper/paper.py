@@ -46,6 +46,7 @@ class ArxivPaper(Paper):
         the only acceptable url is the abstract url, the others need to be converted ahead of time
         """
         self.abstract_url = abstract_url.strip()
+        self.abstract_url.replace("http://", "https://")
         if not self.is_arxiv_url(self.abstract_url):
             raise Exception(f'"{self.abstract_urls}" is not a valid arxiv url')
 
@@ -86,7 +87,7 @@ class ArxivPaper(Paper):
         return url.split("/")[-1].replace(".pdf", "")
 
     @staticmethod
-    def load_paper_from_url(url) -> "ArxivPaper":
+    def load_paper_from_url(url: str) -> "ArxivPaper":
         from state_of_the_art.paper.papers_data import PapersDataLoader
 
         result = PapersDataLoader().load_from_url(url)
@@ -95,7 +96,7 @@ class ArxivPaper(Paper):
 
         result = result.iloc[0].to_dict()
         return ArxivPaper(
-            url=result["abstract_url"],
+            abstract_url=result["abstract_url"],
             published=result["published"],
             title=result["title"],
             abstract=result["abstract"],

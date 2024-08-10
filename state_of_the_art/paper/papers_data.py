@@ -126,7 +126,7 @@ class PapersDataLoader:
 
         result = self.load_papers_from_urls([url])
         if not result or len(result) == 0:
-            raise Exception(f'Could not find paper from url {url}')
+            raise Exception(f"Could not find paper from url {url}")
 
         return result[0]
 

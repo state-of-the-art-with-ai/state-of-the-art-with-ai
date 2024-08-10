@@ -15,7 +15,9 @@ class PaperRanker:
         Ranks existing papers by relevance
         """
         if not articles:
-            raise Exception("Arrived at paper ranker with no articles to rank. Did you mine new papers?")
+            raise Exception(
+                "Arrived at paper ranker with no articles to rank. Did you mine new papers?"
+            )
 
         prompt = self.get_prompt()
 

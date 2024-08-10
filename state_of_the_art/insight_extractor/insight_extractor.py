@@ -30,7 +30,7 @@ class InsightExtractor:
         open_existing: bool = False,
         email_skip: bool = False,
         disable_pdf_open=False,
-        question = None
+        question=None,
     ):
         """
         Generates insights for a given paper
@@ -43,29 +43,47 @@ class InsightExtractor:
 
         article_content, title, document_pdf_location = get_content_from_url(url)
         result, structured_result = StructuredPaperInsights().get_result(
-            article_content,
-            question=question
+            article_content, question=question
         )
 
         result = f"""Title: {title}
 Abstract: {url}
 {result}
         """
-        self.post_extraction(result, structured_result, document_pdf_location, url, title, email_skip, disable_pdf_open)
+        self.post_extraction(
+            result,
+            structured_result,
+            document_pdf_location,
+            url,
+            title,
+            email_skip,
+            disable_pdf_open,
+        )
 
-    def post_extraction(self, result, structured_result, document_pdf_location, url, title, email_skip=False, disable_pdf_open=False):
+    def post_extraction(
+        self,
+        result,
+        structured_result,
+        document_pdf_location: str,
+        url,
+        title,
+        email_skip=False,
+        disable_pdf_open=False,
+    ):
         if os.environ.get("SOTA_TEST"):
             return
 
         config.get_datawarehouse().write_event(
             self.TABLE_NAME,
-            {"abstract_url": url, "insights": result},
+            {"abstract_url": url, "insights": result, 'pdf_path': document_pdf_location},
         )
 
         insights = self._convert_sturctured_output_to_insights(structured_result, url)
         self._write_insights_into_table(insights, url)
 
-        paper_path = self._create_pdf(title, result, document_pdf_location, disable_pdf_open=disable_pdf_open)
+        paper_path = self._create_pdf(
+            title, result, document_pdf_location, disable_pdf_open=disable_pdf_open
+        )
         if not email_skip:
             SotaMail().send("", f"Insights from {title}", paper_path)
 
@@ -74,7 +92,7 @@ Abstract: {url}
         for key, value in structured_result.items():
             if key == "top_insights":
                 for insight in value:
-                    result.append(('top_insights', insight))
+                    result.append(("top_insights", insight))
                 continue
 
             if isinstance(value, str):
@@ -82,7 +100,7 @@ Abstract: {url}
             else:
                 for insight_row in value:
                     result.append((key, insight_row))
-        
+
         return result
 
     def _write_insights_into_table(self, insights, url):
@@ -90,7 +108,7 @@ Abstract: {url}
         insights.reverse()
 
         insights_table = InsightsTable()
-        for (question, insight) in insights:
+        for question, insight in insights:
             insights_table.add_insight(insight, question, url, None)
 
     def _create_pdf(self, title, result, document_pdf_location, disable_pdf_open=False):
@@ -99,7 +117,11 @@ Abstract: {url}
         )
         paper_path = pdf.create_pdf_path("p " + title)
         print("Saving paper insights to ", paper_path)
-        pdf.merge_pdfs(paper_path, ["/tmp/current_paper.pdf", document_pdf_location], disable_open=disable_pdf_open)
+        pdf.merge_pdfs(
+            paper_path,
+            ["/tmp/current_paper.pdf", document_pdf_location],
+            disable_open=disable_pdf_open,
+        )
         return paper_path
 
     def _open_insight_summary_if_exists(self, abstract_url) -> bool:
@@ -134,15 +156,9 @@ class StructuredPaperInsights:
         if os.environ.get("SOTA_TEST"):
             return "Mocked result", {}
 
-
         if question:
             print(f"Using question to extract insights ({question})")
-            parameters = {
-                question: {
-                    'type': 'string',
-                    'description': question
-                }
-            }
+            parameters = {question: {"type": "string", "description": question}}
         else:
             parameters = {
                 "institutions": {
@@ -205,13 +221,7 @@ class StructuredPaperInsights:
                     "description": """returns further resources recommendations from the board of experts if somebody whants to go deep into it.
                     Books, articles, papers or people to follow related to the topic that helps to get a deeper understanding of it.""",
                 },
-
             }
-
-
-
-
-        
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
         result = client.chat.completions.create(
@@ -225,10 +235,7 @@ It returns the most insightful and actionable information from the given paper c
 The written style is in richard feyman style of explanations
 It optimized the answers for the following audience: {self.profile.get_preferences()[0:300]}
 """,
-                    "parameters": {
-                        "type": "object",
-                        "properties": parameters
-                        },
+                    "parameters": {"type": "object", "properties": parameters},
                 }
             ],
             function_call="auto",

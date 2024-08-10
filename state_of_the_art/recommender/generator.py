@@ -17,16 +17,16 @@ from state_of_the_art.recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
 from state_of_the_art.utils.mail import SotaMail
 
+
 class RecommenderTable:
     TABLE_NAME = "state_of_the_art_summary"
 
     def read(self):
         return config.get_datawarehouse().event(RecommenderTable.TABLE_NAME)
 
-    def get_latest(self)->dict:
+    def get_latest(self) -> dict:
         df = self.read()
         return df.iloc[-1]
-
 
 
 class Recommender:
@@ -247,7 +247,9 @@ Papers analysed: \n{articles_as_input}"""
             print("Mocking event, not writing to datawarehouse")
             return
 
-        config.get_datawarehouse().write_event(RecommenderTable.TABLE_NAME, ranking_data.to_dict())
+        config.get_datawarehouse().write_event(
+            RecommenderTable.TABLE_NAME, ranking_data.to_dict()
+        )
 
     def _send_email(self, formatted_result, title):
         print("Sending email")

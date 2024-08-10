@@ -31,7 +31,12 @@ class InsightsTable:
 
         config.get_datawarehouse().write_event(
             self.TABLE_NAME,
-            {"insight": insight, 'question': question, "paper_id": paper_id, "score": score},
+            {
+                "insight": insight,
+                "question": question,
+                "paper_id": paper_id,
+                "score": score,
+            },
         )
 
     def validate_score(self, score: int):

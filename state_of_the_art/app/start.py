@@ -8,7 +8,6 @@ pages = {
     ],
     "Personalization": [
         st.Page("pages/profiles.py", title="Profiles"),
-        st.Page("pages/topics.py", title="Topics of Interest"),
     ],
 }
 
