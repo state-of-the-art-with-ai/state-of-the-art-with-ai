@@ -57,6 +57,7 @@ class Recommender:
         number_of_recommendations=None,
         skip_email=False,
         disable_open_pdf=False,
+        disable_pdf=False
     ):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
@@ -94,11 +95,15 @@ class Recommender:
         formatted_result = self._format_results(result, context)
         profile_name = config.get_current_audience().name.upper()
 
-        location = pdf.create_pdf(
-            data=formatted_result,
-            output_path_description=f"recommender summary {profile_name} {context.by_topic if context.by_topic else ""} ",
-            disable_open=disable_open_pdf,
-        )
+
+        if not disable_pdf:
+            location = pdf.create_pdf(
+                data=formatted_result,
+                output_path_description=f"recommender summary {profile_name} {context.by_topic if context.by_topic else ""} ",
+                disable_open=disable_open_pdf,
+            )
+        else:
+            location = None
         context.generated_pdf_location = location
 
         self._write_event(context, formatted_result, result)

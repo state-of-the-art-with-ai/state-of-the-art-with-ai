@@ -4,22 +4,37 @@ from state_of_the_art.insight_extractor.insights_table import InsightsTable
 from state_of_the_art.paper.comments import Comments
 from state_of_the_art.paper.local_paper_copy import open_paper_locally
 from state_of_the_art.paper.papers_data import PapersDataLoader
+from state_of_the_art.paper.tags_table import TagsTable
 import streamlit as st
+from streamlit_tags import st_tags
 from state_of_the_art.relevance_model.inference import Inference
+import pandas as pd
+
+@st.dialog("Questions to cover")
+def edit_equestions():
+    st.write(f"Questions")
+    data = [['tom'], ['nick'], ['juli']] 
+    df = pd.DataFrame(data, columns=['question'])
+
+    st.data_editor(df, width=500)
 
 
 default_url = st.query_params.get("paper_url", "")
 url = st.text_input(
-    "Paper URL", value=default_url, key="paper_url", help="Enter the URL of the paper"
+    "Paper URL", value=default_url, key="paper_url", help="Type the URL of the paper to be loaded"
 )
 if url:
     url = url.strip()
     st.query_params.paper_url = url
 
 
-c1, c2, c3 = st.columns([1, 1, 3])
+c1, c2 = st.columns([3, 1])
 with c1:
     load = st.button("Load Paper")
+
+with c2:
+    if st.button("Edit questions"):
+        edit_equestions()
 
 
 if load or url:
@@ -38,6 +53,18 @@ if load or url:
 
 
     st.markdown("Published: " + paper.published_date_str())
+
+    tags_table = TagsTable()
+    tags_table_df = tags_table.read()
+    existing_tags = []
+    existing_tags_df = tags_table_df[tags_table_df['paper_id'] == paper.abstract_url]
+    if not existing_tags_df.empty:
+        existing_tags = existing_tags_df.iloc[0]['tags'].split(',')
+    selected_tags = st_tags(label='', value=existing_tags, suggestions=TagsTable.DEFAULT_TAGS)
+    if selected_tags:
+        tags_table.update_or_create(by_key='paper_id', by_value=paper.abstract_url, new_values={'tags': ','.join(selected_tags)})
+
+
     st.markdown(f"Abstract: {paper.abstract}")
 
 
