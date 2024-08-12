@@ -29,6 +29,7 @@ class BaseTable():
 
         tdw.write_event(cls.table_name, data)
 
+
     @classmethod
     def read(cls, recent_first=False):
         try: 
@@ -61,6 +62,10 @@ class BaseTable():
         
         
         tdw.replace_df(cls.table_name, df, dry_run=True)
+
+    @classmethod
+    def replace(cls, df, dry_run=True):
+        tdw.replace_df(cls.table_name, df, dry_run=dry_run)
 
     @classmethod
     def update_or_create(cls, by_key: str, by_value: Any, new_values: dict):
