@@ -31,6 +31,7 @@ beautifulsoup4 = "^4.12.3"
 
 sentence-transformers = "^3.0.1"
 streamlit-tags = "^1.2.8"
+schedule = "^1.2.2"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 black = "^24.3.0"

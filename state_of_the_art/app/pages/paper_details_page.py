@@ -100,9 +100,11 @@ if load or url:
 
 
     if extract_insights:
-        InsightExtractor().extract_from_url(
+        InsightExtractor().extract_insights_from_paper_url(
             url, email_skip=True, disable_pdf_open=True, question=custom_question
         )
+        st.rerun()
+
 
     insights = InsightsTable().read()
     insights = insights[insights["paper_id"] == url]

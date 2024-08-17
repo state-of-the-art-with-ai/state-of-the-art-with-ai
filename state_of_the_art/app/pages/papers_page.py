@@ -13,8 +13,9 @@ topic_description = None
 
 @st.dialog("Edit profile")
 def edit_profile(name):
-    name = st.text_input(name)
-    description = st.text_area("description")
+    name = st.text_input("Name", name)
+    email = st.text_input("Email")
+    description = st.text_area("Description")
     st.button("Save")
     st.button("Delete")
 
@@ -44,11 +45,22 @@ def get_papers_from_summary():
 
 st.title("Papers")
 papers = None
+send_by_email = False
 
 
-selected_ui = st.selectbox('', ['Recommendations', 'By Interest', 'Insights history', 'By Tags'], index=0)
+from enum import Enum
+class RecommenationTypes(str, Enum):
+    recommendation = 'Recommendations'
+    by_interest = 'By Interest'
+    insights_history = 'Insights history'
+    by_tags = 'By Tags'
 
-if selected_ui == 'Recommendations' or selected_ui == 'By Interest':
+
+    
+
+selected_ui = st.selectbox('', [item.value for item in RecommenationTypes], index=0)
+
+if selected_ui == RecommenationTypes.recommendation or selected_ui == RecommenationTypes.by_interest:
 
     if selected_ui == 'By Interest':
         topics = Topics()
@@ -75,7 +87,7 @@ if selected_ui == 'Recommendations' or selected_ui == 'By Interest':
                 topics.delete_by(column='name', value=topic_name)
                 st.success("Interest deleted successfully")
 
-    if selected_ui == 'Recommendations':
+    if selected_ui == RecommenationTypes.recommendation:
         lookback_days = st.slider("Days to Look back", 2, 30, 2)
 
     c1, c2 = st.columns([3, 1])
@@ -93,14 +105,15 @@ if selected_ui == 'Recommendations' or selected_ui == 'By Interest':
         generate_clicked = st.button("Generate new recommendations")
 
     with c2:
-        mine_new_papers = st.checkbox("Mine new papers", False)
+        mine_new_papers = st.toggle("Mine new papers", False)
+        send_by_email = st.toggle("Send By email", False)
     if generate_clicked:
         from state_of_the_art.recommender.generator import Recommender
 
         Recommender().generate(
             skip_register=not mine_new_papers,
             problem_description=topic_description,
-            skip_email=True,
+            skip_email=not send_by_email,
             disable_open_pdf=True,
             disable_pdf=True,
             number_lookback_days=lookback_days,
@@ -109,11 +122,11 @@ if selected_ui == 'Recommendations' or selected_ui == 'By Interest':
     with c3:
         num_of_results = st.selectbox("Num of results", [15, 50, 100])
 
-if selected_ui == 'Insights history':
+if selected_ui == RecommenationTypes.insights_history:
     load_no = st.selectbox("Number of papers to load", [50, 100, 200])
     papers = load_papers_from_insights(load_no=load_no)
 
-if selected_ui == 'By Tags':
+if selected_ui == RecommenationTypes.by_tags:
     all_tags_df = TagsTable().read()
     all_tags = all_tags_df['tags'].to_list()
     all_tags = [tags.split(',') for tags in all_tags]

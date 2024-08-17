@@ -23,9 +23,9 @@ class InsightExtractor:
         """
         loads the url frrom clipboard then calls the extract function
         """
-        self.extract_from_url(get_clipboard_content())
+        self.extract_insights_from_paper_url(get_clipboard_content())
 
-    def extract_from_url(
+    def extract_insights_from_paper_url(
         self,
         url: str,
         open_existing: bool = False,

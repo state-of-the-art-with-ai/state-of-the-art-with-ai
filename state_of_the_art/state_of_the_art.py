@@ -12,6 +12,7 @@ from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.review import ReportReview
 from state_of_the_art.insight_extractor.summarize_and_sharpen import Sharpen
 from state_of_the_art import episode_headlines
+from state_of_the_art.scheduler import run_scheduler
 
 
 class Sota:
@@ -34,6 +35,7 @@ class Sota:
         self.ReportReview = ReportReview
         self.Sharpen = Sharpen
         self.episode_headlines = episode_headlines
+        self.run_scheduler = run_scheduler
 
 
 def main():

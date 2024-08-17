@@ -8,8 +8,6 @@ class BaseTable():
     schema = None
 
     def __init__(self):
-        if not self.schema:
-            raise Exception("Schema is required")
         if not self.table_name:
             raise Exception("Table name is required")
 

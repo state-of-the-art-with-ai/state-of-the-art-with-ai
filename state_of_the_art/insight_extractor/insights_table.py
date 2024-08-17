@@ -5,7 +5,7 @@ import pandas as pd
 
 class InsightsTable:
     """
-    Score semantics
+    Representt a single insigth for row.
 
     4: Very Good insight
     3: Good insight

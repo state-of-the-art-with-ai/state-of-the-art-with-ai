@@ -72,6 +72,6 @@ def test_structured_output():
 
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_extract():
-    InsightExtractor().extract_from_url(
+    InsightExtractor().extract_insights_from_paper_url(
         "https://arxiv.org/abs/2202.02484v1", open_existing=False
     )
