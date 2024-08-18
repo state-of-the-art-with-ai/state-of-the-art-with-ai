@@ -23,6 +23,30 @@ if url:
 
 load = st.button("Load Paper")
 
+@st.dialog("Questions")
+def questions():
+    tab1, tab2 = st.tabs(["Custom question", "Default questions"])
+
+    with tab1:
+        custom_question = st.text_input("Type the quesiton here")
+
+    with tab2:
+        question_table = QuestionsTable()
+        df = question_table.read()
+        df_updated = st.data_editor(df, width=800, num_rows='dynamic')
+        if st.button("Save"):
+            question_table.replace(df_updated, dry_run=False)
+
+    extract_insights = st.button("Generate Insights", key='generate_insights_dialog')
+    if extract_insights:
+        InsightExtractor().extract_insights_from_paper_url(
+            url, email_skip=True, disable_pdf_open=True, question=custom_question
+        )
+        st.rerun()
+
+
+
+
 if load or url:
 
     paper = PapersDataLoader().load_paper_from_url(url)
@@ -59,49 +83,17 @@ if load or url:
 
 
 
-    st.markdown("**Comments**: ")
-    with st.expander("Add Comments"):
-        comments = Comments()
-        df_comments = comments.load_with_value(column='paper_url', value=paper.abstract_url, recent_first=True)
-
-        c1, c2 = st.columns([2, 1])
-        with c1:
-            message = st.text_input('New comment')
-        with c2:
-            if st.button("Add"):
-                comments.add(message=message, paper_url=paper.abstract_url)
-
-    for index, comment in df_comments.iterrows():
-        st.markdown(f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment['message'])
-
     st.divider()
 
-
-    c1, c2 = st.columns([3, 1])
-    with c1:
-        st.markdown("#### Generated Insights")
-    with c2:
-        extract_insights = st.button("Generate Insights")
-
-    with st.expander("Questions"):
-        tab1, tab2 = st.tabs(["Custom question", "Default questions"])
+    st.markdown("### Insights")
+    if st.button("Edit questions"):
+        questions()
 
 
-        with tab1:
-            custom_question = st.text_input("Type the quesiton here")
-
-        with tab2:
-            question_table = QuestionsTable()
-            df = question_table.read()
-            df_updated = st.data_editor(df, width=800, num_rows='dynamic')
-            if st.button("Save"):
-                question_table.replace(df_updated, dry_run=False)
-
-
-
+    extract_insights = st.button("Generate Detault Insights")
     if extract_insights:
         InsightExtractor().extract_insights_from_paper_url(
-            url, email_skip=True, disable_pdf_open=True, question=custom_question
+            url, email_skip=True, disable_pdf_open=True
         )
         st.rerun()
 
@@ -136,3 +128,19 @@ if load or url:
                 st.write("PS: ", insight["predicted_score"])
 
     already_rendered = True
+
+    with st.expander("Comments", expanded=True):
+            comments = Comments()
+            df_comments = comments.load_with_value(column='paper_url', value=paper.abstract_url, recent_first=True)
+            for index, comment in df_comments.iterrows():
+                st.markdown(f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment['message'])
+
+            c1, c2 = st.columns([2, 1])
+            with c1:
+                message = st.text_input('New comment')
+            with c2:
+                if st.button("Save new comment"):
+                    comments.add(message=message, paper_url=paper.abstract_url)
+                    st.success("Comment added successfully")
+                    st.rerun()
+

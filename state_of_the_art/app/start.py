@@ -11,7 +11,6 @@ pages = {
 pg = st.navigation(pages)
 
 with st.sidebar:
-    st.button("Open by tags")
     st.button("Insights History")
 
 
