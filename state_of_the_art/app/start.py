@@ -11,7 +11,8 @@ pages = {
 pg = st.navigation(pages)
 
 with st.sidebar:
-    st.button("Insights History")
+    st.link_button("Find Papers By Interest", '/?search_type=By Interest')
+    st.link_button("Find Papers By Tags", '/?search_type=By Tags')
 
 
 pg.run()

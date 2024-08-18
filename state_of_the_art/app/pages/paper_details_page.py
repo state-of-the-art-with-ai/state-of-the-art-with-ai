@@ -45,8 +45,6 @@ def questions():
         st.rerun()
 
 
-
-
 if load or url:
 
     paper = PapersDataLoader().load_paper_from_url(url)
@@ -83,14 +81,33 @@ if load or url:
 
 
 
+    comments = Comments()
+    df_comments = comments.load_with_value(column='paper_url', value=paper.abstract_url, recent_first=True)
+    comments_list = list(df_comments.iterrows())
+    with st.expander("Comments", expanded=True if comments_list else False):
+            for index, comment in comments_list:
+                st.markdown(f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment['message'])
+
+            c1, c2 = st.columns([2, 1])
+            with c1:
+                message = st.text_input('New comment')
+            with c2:
+                if st.button("Save new comment"):
+                    comments.add(message=message, paper_url=paper.abstract_url)
+                    st.success("Comment added successfully")
+                    st.rerun()
+
+
     st.divider()
 
     st.markdown("### Insights")
-    if st.button("Edit questions"):
-        questions()
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        extract_insights = st.button("Generate Detault Insights")
+    with c2:
+        if st.button("Edit questions"):
+            questions()
 
-
-    extract_insights = st.button("Generate Detault Insights")
     if extract_insights:
         InsightExtractor().extract_insights_from_paper_url(
             url, email_skip=True, disable_pdf_open=True
@@ -128,19 +145,3 @@ if load or url:
                 st.write("PS: ", insight["predicted_score"])
 
     already_rendered = True
-
-    with st.expander("Comments", expanded=True):
-            comments = Comments()
-            df_comments = comments.load_with_value(column='paper_url', value=paper.abstract_url, recent_first=True)
-            for index, comment in df_comments.iterrows():
-                st.markdown(f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment['message'])
-
-            c1, c2 = st.columns([2, 1])
-            with c1:
-                message = st.text_input('New comment')
-            with c2:
-                if st.button("Save new comment"):
-                    comments.add(message=message, paper_url=paper.abstract_url)
-                    st.success("Comment added successfully")
-                    st.rerun()
-
