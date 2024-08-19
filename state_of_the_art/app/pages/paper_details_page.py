@@ -1,20 +1,22 @@
 from state_of_the_art.app.data import insights
+from state_of_the_art.app.pages.paper_details_utils import questions
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.insight_extractor.insights_table import InsightsTable
 from state_of_the_art.paper.comments import Comments
 from state_of_the_art.paper.local_paper_copy import open_paper_locally
 from state_of_the_art.paper.papers_data import PapersDataLoader
-from state_of_the_art.paper.questions_table import QuestionsTable
 from state_of_the_art.paper.tags_table import TagsTable
 import streamlit as st
 from streamlit_tags import st_tags
 from state_of_the_art.relevance_model.inference import Inference
-import pandas as pd
 
 
 default_url = st.query_params.get("paper_url", "")
 url = st.text_input(
-    "Paper URL", value=default_url, key="paper_url", help="Type the URL of the paper to be loaded"
+    "Paper URL",
+    value=default_url,
+    key="paper_url",
+    help="Type the URL of the paper to be loaded",
 )
 if url:
     url = url.strip()
@@ -23,30 +25,11 @@ if url:
 
 load = st.button("Load Paper")
 
-@st.dialog("Questions")
-def questions():
-    tab1, tab2 = st.tabs(["Custom question", "Default questions"])
-
-    with tab1:
-        custom_question = st.text_input("Type the quesiton here")
-
-    with tab2:
-        question_table = QuestionsTable()
-        df = question_table.read()
-        df_updated = st.data_editor(df, width=800, num_rows='dynamic')
-        if st.button("Save"):
-            question_table.replace(df_updated, dry_run=False)
-
-    extract_insights = st.button("Generate Insights", key='generate_insights_dialog')
-    if extract_insights:
-        InsightExtractor().extract_insights_from_paper_url(
-            url, email_skip=True, disable_pdf_open=True, question=custom_question
-        )
-        st.rerun()
-
-
 if load or url:
-
+    if not PapersDataLoader().is_paper_url_registered(url):
+        st.error("Paper not found")
+        st.stop()
+        
     paper = PapersDataLoader().load_paper_from_url(url)
 
     st.markdown(f"### {paper.title}")
@@ -60,45 +43,46 @@ if load or url:
         if st.button("Open paper locally"):
             open_paper_locally(paper.abstract_url)
 
-
-
     tags_table = TagsTable()
     tags_table_df = tags_table.read()
     existing_tags = []
-    existing_tags_df = tags_table_df[tags_table_df['paper_id'] == paper.abstract_url]
+    existing_tags_df = tags_table_df[tags_table_df["paper_id"] == paper.abstract_url]
     if not existing_tags_df.empty:
-        existing_tags = existing_tags_df.iloc[0]['tags'].split(',')
-    selected_tags = st_tags(label='', value=existing_tags, suggestions=TagsTable.DEFAULT_TAGS)
+        existing_tags = existing_tags_df.iloc[0]["tags"].split(",")
+    selected_tags = st_tags(
+        label="", value=existing_tags, suggestions=TagsTable.DEFAULT_TAGS
+    )
     if selected_tags:
-        tags_table.update_or_create(by_key='paper_id', by_value=paper.abstract_url, new_values={'tags': ','.join(selected_tags)})
-
+        tags_table.update_or_create(
+            by_key="paper_id",
+            by_value=paper.abstract_url,
+            new_values={"tags": ",".join(selected_tags)},
+        )
+        st.success("Tags updated successfully")
 
     st.markdown("Published: " + paper.published_date_str())
-    st.markdown(f"Abstract: {paper.abstract[0:280]} ...")
-    if len(paper.abstract) > 280:  
-        with st.expander("Full abstract"):
-            st.markdown(paper.abstract)
-
-
+    with st.expander("Abstract"):
+        st.markdown(paper.abstract)
 
     comments = Comments()
-    df_comments = comments.load_with_value(column='paper_url', value=paper.abstract_url, recent_first=True)
+    df_comments = comments.load_with_value(
+        column="paper_url", value=paper.abstract_url, recent_first=True
+    )
     comments_list = list(df_comments.iterrows())
     with st.expander("Comments", expanded=True if comments_list else False):
-            for index, comment in comments_list:
-                st.markdown(f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment['message'])
+        for index, comment in comments_list:
+            st.markdown(
+                f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment["message"]
+            )
 
-            c1, c2 = st.columns([2, 1])
-            with c1:
-                message = st.text_input('New comment')
-            with c2:
-                if st.button("Save new comment"):
-                    comments.add(message=message, paper_url=paper.abstract_url)
-                    st.success("Comment added successfully")
-                    st.rerun()
-
-
-    st.divider()
+        c1, c2 = st.columns([2, 1])
+        with c1:
+            message = st.text_input("New comment")
+        with c2:
+            if st.button("Save new comment"):
+                comments.add(message=message, paper_url=paper.abstract_url)
+                st.success("Comment added successfully")
+                st.rerun()
 
     st.markdown("### Insights")
     c1, c2 = st.columns([1, 1])
@@ -106,14 +90,13 @@ if load or url:
         extract_insights = st.button("Generate Detault Insights")
     with c2:
         if st.button("Edit questions"):
-            questions()
+            questions(url)
 
     if extract_insights:
         InsightExtractor().extract_insights_from_paper_url(
             url, email_skip=True, disable_pdf_open=True
         )
         st.rerun()
-
 
     insights = InsightsTable().read()
     insights = insights[insights["paper_id"] == url]
@@ -132,13 +115,17 @@ if load or url:
             if insight_len > 200:
                 appendix = "..."
 
-            st.markdown(f"**{insight["question"]}**: {insight["insight"][0:200]} {appendix}")
+            st.markdown(
+                f"**{insight["question"]}**: {insight["insight"][0:200]} {appendix}"
+            )
             if len(insight["insight"]) > 200:
                 st.expander("Read more").markdown(insight["insight"])
         with c2:
             c1, c2 = st.columns(2)
             with c1:
-                feedback_received = st.feedback(options="faces", key=insight["tdw_uuid"])
+                feedback_received = st.feedback(
+                    options="faces", key=insight["tdw_uuid"]
+                )
                 if feedback_received:
                     InsightsTable().update_score(insight["tdw_uuid"], feedback_received)
             with c2:

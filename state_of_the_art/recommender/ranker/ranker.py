@@ -2,7 +2,7 @@ import os
 from typing import List
 
 from state_of_the_art.config import config
-from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.utils.llm.llm import LLM
 
 

@@ -7,8 +7,9 @@ def test_get_pdf():
     result = get_paper_copy_path(url)
     assert result is not None
 
+
 def test_get_missing_pdf():
     url = "asdasdfas1"
 
-    with pytest.raises(Exception, match='Local copy not found'):
+    with pytest.raises(Exception, match="Local copy not found"):
         get_paper_copy_path(url)

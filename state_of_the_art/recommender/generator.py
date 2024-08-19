@@ -4,7 +4,7 @@ from typing import Optional, List
 
 import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.papers_data import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
@@ -57,7 +57,7 @@ class Recommender:
         number_of_recommendations=None,
         skip_email=False,
         disable_open_pdf=False,
-        disable_pdf=False
+        disable_pdf=False,
     ):
         """
         The main entrypoint of the application does the entire cycle from registering papers to ranking them
@@ -94,7 +94,6 @@ class Recommender:
         result = self._rank(context)
         formatted_result = self._format_results(result, context)
         profile_name = config.get_current_audience().name.upper()
-
 
         if not disable_pdf:
             location = pdf.create_pdf(

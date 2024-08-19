@@ -3,7 +3,7 @@ from typing import List
 import nltk
 from rank_bm25 import BM25Okapi as BM25
 
-from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 
 
 class Bm25Search:

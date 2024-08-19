@@ -4,7 +4,7 @@ import datetime
 
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.utils.mail import SotaMail
-from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.utils import pdf
 import pandas as pd
 

@@ -10,6 +10,8 @@ def test_generate_fast():
     """
     recommender = Recommender()
 
-    result = recommender.generate(skip_register=True, disable_pdf=True, query="test jean")
+    result = recommender.generate(
+        skip_register=True, disable_pdf=True, query="test jean"
+    )
     assert result is not None
     assert len(result) > 0

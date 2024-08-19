@@ -1,16 +1,17 @@
 from typing import Any
 import pandas as pd
 from tiny_data_warehouse import DataWarehouse
+
 tdw = DataWarehouse()
 
-class BaseTable():
+
+class BaseTable:
     table_name = None
     schema = None
 
     def __init__(self):
         if not self.table_name:
             raise Exception("Table name is required")
-
 
     @classmethod
     def add(cls, **kwargs):
@@ -27,20 +28,18 @@ class BaseTable():
 
         tdw.write_event(cls.table_name, data)
 
-
     @classmethod
     def read(cls, recent_first=False):
-        try: 
+        try:
             df = tdw.event(cls.table_name)
-        except ValueError: 
+        except ValueError:
             return pd.DataFrame(columns=cls.schema.keys())
 
         if recent_first:
-            df = df.sort_values(by='tdw_timestamp', ascending=False)
-
+            df = df.sort_values(by="tdw_timestamp", ascending=False)
 
         return df
-    
+
     @classmethod
     def len(cls) -> int:
         return len(cls.read().index)
@@ -49,16 +48,16 @@ class BaseTable():
     def load_with_value(cls, column: str, value: Any, recent_first=False):
         df = cls.read(recent_first=recent_first)
         return df[df[column] == value]
-    
+
     def reset(cls, dry_run=False):
         if dry_run:
             print("Dry run enabled exitting")
             return
-        
+
         import pandas as pd
+
         df = pd.DataFrame()
-        
-        
+
         tdw.replace_df(cls.table_name, df, dry_run=True)
 
     @classmethod
@@ -68,7 +67,7 @@ class BaseTable():
     @classmethod
     def update_or_create(cls, by_key: str, by_value: Any, new_values: dict):
         df = cls.read()
-        if not by_key in new_values:
+        if by_key not in new_values:
             new_values[by_key] = by_value
 
         filtered_df = df[df[by_key] == by_value]
@@ -78,13 +77,12 @@ class BaseTable():
             # udpate the pandas rows that match the key with the new column values
 
             for column, new_value in new_values.items():
-                df[column] = df.apply(lambda row: new_value if row[by_key] == by_value else row[column], axis=1)
+                df[column] = df.apply(
+                    lambda row: new_value if row[by_key] == by_value else row[column],
+                    axis=1,
+                )
 
             tdw.replace_df(cls.table_name, df, dry_run=False)
-
-
-
-
 
     @classmethod
     def delete_by(cls, column: str, value: Any):

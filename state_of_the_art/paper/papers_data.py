@@ -1,10 +1,9 @@
 from typing import List, Optional, Union
 
-from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 import pandas as pd
 import datetime
 from state_of_the_art.config import config
-
 
 class PapersDataLoader:
     TITLE_MAX_LENGH = 80
@@ -119,6 +118,15 @@ class PapersDataLoader:
             paper_dict = papers[i].to_dict(orient="records")[0]
             result.append(ArxivPaper.load_from_dict(paper_dict))
         return result
+
+    def is_paper_url_registered(self, url: str) -> bool:
+        try:
+            self.load_paper_from_url(url)
+            return True
+        except BaseException as e:
+            return False
+
+
 
     def load_paper_from_url(self, url: str) -> ArxivPaper:
         if not url:

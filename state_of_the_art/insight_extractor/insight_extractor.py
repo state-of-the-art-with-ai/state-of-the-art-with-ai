@@ -1,6 +1,7 @@
+from enum import Enum
 import os
 import json
-from typing import Tuple
+from typing import Optional, Tuple
 
 from state_of_the_art.config import config
 from state_of_the_art.insight_extractor.insights_table import InsightsTable
@@ -10,6 +11,12 @@ from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf
 from state_of_the_art.insight_extractor.content_extractor import get_content_from_url
 from openai import OpenAI
+
+
+class SupportedModels(Enum):
+    gpt_4o_mini = "gpt-4o-mini"
+    gpt_4o = "gpt-4o"
+
 
 
 class InsightExtractor:
@@ -32,6 +39,7 @@ class InsightExtractor:
         email_skip: bool = False,
         disable_pdf_open=False,
         question=None,
+        model_to_use=SupportedModels.gpt_4o.value,
     ):
         """
         Generates insights for a given paper
@@ -43,7 +51,7 @@ class InsightExtractor:
             return
 
         article_content, title, document_pdf_location = get_content_from_url(url)
-        result, structured_result = StructuredPaperInsights().get_result(
+        result, structured_result = StructuredPaperInsights(model_to_use=model_to_use).get_result(
             article_content, question=question
         )
 
@@ -76,7 +84,11 @@ Abstract: {url}
 
         config.get_datawarehouse().write_event(
             self.TABLE_NAME,
-            {"abstract_url": url, "insights": result, 'pdf_path': document_pdf_location},
+            {
+                "abstract_url": url,
+                "insights": result,
+                "pdf_path": document_pdf_location,
+            },
         )
 
         insights = self._convert_sturctured_output_to_insights(structured_result, url)
@@ -148,10 +160,11 @@ Abstract: {url}
 
 
 class StructuredPaperInsights:
-    def __init__(self):
+    def __init__(self, model_to_use: Optional[str] = None):
         self.profile = config.get_current_audience()
         self.QUESTIONS: dict[str, str] = self.profile.paper_questions
         self.profile = config.get_current_audience()
+        self.model_to_use = model_to_use
 
     def get_result(self, text: str, question=None) -> Tuple[str, dict]:
         if os.environ.get("SOTA_TEST"):
@@ -165,8 +178,10 @@ class StructuredPaperInsights:
             parameters = convert_questions_to_openai_call(questions)
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
+        used_model = self.model_to_use if self.model_to_use else SupportedModels.gpt_4o.value
+        print("Using model: ", used_model)
         result = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=used_model,
             messages=[{"role": "user", "content": text}],
             functions=[
                 {
@@ -193,26 +208,21 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
 
 
 def convert_questions_to_openai_call(data):
-
     result = {}
     for i, row in data.iterrows():
-        data = {
-            'type': 'string',
-            'description': row['question']
-
-        }
-        if row['min_items'] or row['max_items']:
+        data = {"type": "string", "description": row["question"]}
+        if row["min_items"] or row["max_items"]:
             data = {
-                'type': 'array',
+                "type": "array",
                 "items": {"type": "string"},
-                'description': row['question']
+                "description": row["question"],
             }
 
-            if row['min_items']:
-                data["minItems"] =  int(row['min_items'])
+            if row["min_items"]:
+                data["minItems"] = int(row["min_items"])
 
-            if row['max_items']: 
-                data["maxItems"] =  int(row['max_items'])
+            if row["max_items"]:
+                data["maxItems"] = int(row["max_items"])
 
-        result[row['short_version']] = data
+        result[row["short_version"]] = data
     return result

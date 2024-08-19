@@ -1,4 +1,4 @@
-from state_of_the_art.paper.paper import ArxivPaper
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 
 
 def test_paper_url():

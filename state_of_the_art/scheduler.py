@@ -1,12 +1,10 @@
-
 import time
-
-
 
 
 def job():
     print("Running recommender")
     from state_of_the_art.recommender.generator import Recommender
+
     try:
         Recommender().generate(
             skip_register=False,
@@ -18,9 +16,9 @@ def job():
         print("Error in scheduler job", e)
 
 
-
 def run_scheduler():
     import schedule
+
     schedule.every().day.at("09:00").do(job)
     print("Scheduler infinite loop started")
     while True:
