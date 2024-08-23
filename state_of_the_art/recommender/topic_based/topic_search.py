@@ -1,7 +1,7 @@
 from typing import Optional
 
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.papers_data import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.preferences.audience import Audience
 from state_of_the_art.recommender.topic_based.searches import Bm25Search
 from state_of_the_art.recommender.topic_based.semantic_search import SemanticSearch

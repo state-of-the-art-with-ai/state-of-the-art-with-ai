@@ -3,7 +3,7 @@ import sys
 
 import tqdm
 
-from state_of_the_art.paper.papers_data import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 
 
 class SemanticSearch:

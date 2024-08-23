@@ -4,7 +4,8 @@ from state_of_the_art.insight_extractor.insight_extractor import InsightExtracto
 from state_of_the_art.insight_extractor.insights_table import InsightsTable
 from state_of_the_art.paper.comments import Comments
 from state_of_the_art.paper.local_paper_copy import open_paper_locally
-from state_of_the_art.paper.papers_data import PapersDataLoader
+from state_of_the_art.paper.paper_table import PaperTable
+from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.tags_table import TagsTable
 import streamlit as st
 from streamlit_tags import st_tags
@@ -23,7 +24,29 @@ if url:
     st.query_params.paper_url = url
 
 
-load = st.button("Load Paper")
+@st.dialog("Questions")
+def new_paper(paper_url):
+    st.write("New paper")
+    title = st.text_input("Title")
+    paper_url = st.text_input("Url", paper_url)
+    if st.button("Save"):
+        st.success("Paper saved successfully")
+        paper_table = PaperTable()
+        paper_table.add(
+            abstract_url=paper_url,
+            title=title,
+            published=None
+        )
+        st.rerun()
+
+c1, c2 = st.columns([1, 1])
+with c1:
+    load = st.button("Load Paper")
+with c2:
+    add = st.button("Add new Paper")
+    if add:
+        new_paper(url)
+
 
 if load or url:
     if not PapersDataLoader().is_paper_url_registered(url):

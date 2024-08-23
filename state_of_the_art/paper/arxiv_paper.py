@@ -27,7 +27,7 @@ class ArxivPaper(Paper):
         self.abstract_url = abstract_url.strip()
         self.abstract_url.replace("http://", "https://")
         if not self.is_arxiv_url(self.abstract_url):
-            raise Exception(f'"{self.abstract_urls}" is not a valid arxiv url')
+            raise Exception(f'"{self.abstract_url}" is not a valid arxiv url')
 
         self.abstract_url = ArxivPaper._remove_versions_from_url(self.abstract_url)
 
@@ -67,7 +67,7 @@ class ArxivPaper(Paper):
 
     @staticmethod
     def load_paper_from_url(url: str) -> "ArxivPaper":
-        from state_of_the_art.paper.papers_data import PapersDataLoader
+        from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 
         result = PapersDataLoader().load_from_url(url)
         if result.empty:

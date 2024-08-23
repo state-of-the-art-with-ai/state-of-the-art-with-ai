@@ -4,6 +4,7 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 import pandas as pd
 import datetime
 from state_of_the_art.config import config
+from state_of_the_art.paper.paper import Paper
 
 class PapersDataLoader:
     TITLE_MAX_LENGH = 80
@@ -116,7 +117,13 @@ class PapersDataLoader:
                 continue
 
             paper_dict = papers[i].to_dict(orient="records")[0]
-            result.append(ArxivPaper.load_from_dict(paper_dict))
+            if ArxivPaper.is_arxiv_url(paper_dict['abstract_url']):
+                entity = ArxivPaper.load_from_dict(paper_dict)
+            else:
+                entity = Paper(pdf_url=paper_dict['abstract_url'], title=paper_dict['title'])
+
+
+            result.append(entity)
         return result
 
     def is_paper_url_registered(self, url: str) -> bool:
@@ -124,6 +131,7 @@ class PapersDataLoader:
             self.load_paper_from_url(url)
             return True
         except BaseException as e:
+            print("Could not find paper from url ", url, e)
             return False
 
 
@@ -139,16 +147,23 @@ class PapersDataLoader:
         return result[0]
 
     def df_to_papers(self, papers_df) -> List[ArxivPaper]:
+        """
+        Converts a dataframe to papers
+        """
         papers_dict = papers_df.to_dict(orient="records")
         result = []
         for i in papers_dict:
-            paper = ArxivPaper(
-                title=i["title"],
-                abstract=i["abstract"],
-                abstract_url=i["abstract_url"],
-                published=i["published"],
-            )
-            result.append(paper)
+            try:
+                paper = ArxivPaper(
+                    title=i["title"],
+                    abstract=i["abstract"],
+                    abstract_url=i["abstract_url"],
+                    published=i["published"],
+                )
+                result.append(paper)
+            except Exception as e:
+                print("Error converting to paper ", i, e)
+
         return result
 
     def print_papers(self, papers_df, show_abstract=False):

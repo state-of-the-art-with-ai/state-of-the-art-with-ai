@@ -5,7 +5,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
     get_papers_from_summary,
     load_papers_from_insights,
 )
-from state_of_the_art.paper.papers_data import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.tags_table import TagsTable
 from state_of_the_art.preferences.topic_table import Topics
 import streamlit as st

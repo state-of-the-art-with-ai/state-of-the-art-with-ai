@@ -5,7 +5,7 @@ from typing import Optional, List
 import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
-from state_of_the_art.paper.papers_data import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
