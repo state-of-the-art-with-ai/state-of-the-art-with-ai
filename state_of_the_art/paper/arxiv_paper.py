@@ -1,4 +1,4 @@
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper_entity import Paper
 
 
 from typing import List, Optional
@@ -33,8 +33,8 @@ class ArxivPaper(Paper):
 
         self.pdf_url = self.convert_abstract_to_pdf(self.abstract_url)
         self.published = published
-        self.title = title
-        self.abstract = abstract
+        self.title = title if title else ""
+        self.abstract = abstract if abstract else ""
 
     @staticmethod
     def _remove_versions_from_url(url: Optional[str]):

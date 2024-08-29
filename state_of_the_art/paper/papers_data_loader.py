@@ -4,7 +4,8 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 import pandas as pd
 import datetime
 from state_of_the_art.config import config
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper_entity import Paper
+
 
 class PapersDataLoader:
     TITLE_MAX_LENGH = 80
@@ -57,13 +58,17 @@ class PapersDataLoader:
         return df
 
     def get_all_papers(self) -> List[ArxivPaper]:
-        df = self.load_papers()
+        df = self.load_papers().sort_values(by="published", ascending=False)
         return self.to_papers(df)
 
     def to_papers(self, df) -> Union[List[ArxivPaper], dict[str, ArxivPaper]]:
         papers = []
         for i in df.iterrows():
-            papers.append(ArxivPaper.load_from_dict(i[1].to_dict()))
+            try:
+                papers.append(ArxivPaper.load_from_dict(i[1].to_dict()))
+            except Exception as e:
+                pass
+
         return papers
 
     def load_between_dates(self, start: str, end: str):
@@ -117,11 +122,12 @@ class PapersDataLoader:
                 continue
 
             paper_dict = papers[i].to_dict(orient="records")[0]
-            if ArxivPaper.is_arxiv_url(paper_dict['abstract_url']):
+            if ArxivPaper.is_arxiv_url(paper_dict["abstract_url"]):
                 entity = ArxivPaper.load_from_dict(paper_dict)
             else:
-                entity = Paper(pdf_url=paper_dict['abstract_url'], title=paper_dict['title'])
-
+                entity = Paper(
+                    pdf_url=paper_dict["abstract_url"], title=paper_dict["title"]
+                )
 
             result.append(entity)
         return result
@@ -133,8 +139,6 @@ class PapersDataLoader:
         except BaseException as e:
             print("Could not find paper from url ", url, e)
             return False
-
-
 
     def load_paper_from_url(self, url: str) -> ArxivPaper:
         if not url:

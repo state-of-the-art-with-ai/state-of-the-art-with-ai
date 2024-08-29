@@ -3,6 +3,10 @@ from state_of_the_art.config import config
 
 
 class Paper:
+    """
+    Base paper abstration
+    """
+
     def __init__(self, *, pdf_url: str, title: Optional[str] = None):
         self.pdf_url = pdf_url
         self.abstract_url = pdf_url
@@ -27,8 +31,5 @@ class Paper:
     def get_filename(self):
         return self.pdf_url.split("/")[-1]
 
-
     def published_date_str(self):
         return ""
-
-

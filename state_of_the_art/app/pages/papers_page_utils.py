@@ -1,4 +1,3 @@
-from enum import Enum
 from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.generator import RecommenderTable
@@ -37,10 +36,3 @@ def get_papers_from_summary(num_of_results):
     papers = PapersDataLoader().load_papers_from_urls(latest_urls)[0:num_of_results]
 
     return papers, latest_summary["tdw_timestamp"]
-
-
-class RecommenationTypes(str, Enum):
-    recommendation = "Recommendations"
-    by_interest = "Interests"
-    insights_history = "Insights history"
-    by_tags = "By Tags"

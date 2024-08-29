@@ -27,9 +27,9 @@ class ArxivMiner:
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
-    def register_latest(self, dry_run=False, max_papers_per_query=None, topic=None):
+    def register_all_new_papers(self, dry_run=False, max_papers_per_query=None, topic=None):
         """
-        Register papers by looking in arxiv api with the keyworkds of the audience configuration
+        Register all papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
         :param disable_relevance_miner:
         :return:

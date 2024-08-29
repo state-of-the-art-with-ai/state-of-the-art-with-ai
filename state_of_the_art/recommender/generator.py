@@ -89,7 +89,7 @@ class Recommender:
                     str(context.from_date),
                 )
 
-            self._miner.register_latest(max_papers_per_query=max_papers_per_query)
+            self._miner.register_all_new_papers(max_papers_per_query=max_papers_per_query)
 
         result = self._rank(context)
         formatted_result = self._format_results(result, context)

@@ -18,7 +18,6 @@ class SupportedModels(Enum):
     gpt_4o = "gpt-4o"
 
 
-
 class InsightExtractor:
     """
     Looks into a single paper and extracts insights
@@ -51,9 +50,9 @@ class InsightExtractor:
             return
 
         article_content, title, document_pdf_location = get_content_from_url(url)
-        result, structured_result = StructuredPaperInsights(model_to_use=model_to_use).get_result(
-            article_content, question=question
-        )
+        result, structured_result = StructuredPaperInsights(
+            model_to_use=model_to_use
+        ).get_result(article_content, question=question)
 
         result = f"""Title: {title}
 Abstract: {url}
@@ -178,7 +177,9 @@ class StructuredPaperInsights:
             parameters = convert_questions_to_openai_call(questions)
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
-        used_model = self.model_to_use if self.model_to_use else SupportedModels.gpt_4o.value
+        used_model = (
+            self.model_to_use if self.model_to_use else SupportedModels.gpt_4o.value
+        )
         print("Using model: ", used_model)
         result = client.chat.completions.create(
             model=used_model,

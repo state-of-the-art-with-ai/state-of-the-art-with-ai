@@ -5,6 +5,7 @@ from state_of_the_art.insight_extractor.insight_extractor import (
 )
 from state_of_the_art.paper.questions_table import QuestionsTable
 
+
 @st.dialog("Questions")
 def questions(paper_url):
     tab1, tab2 = st.tabs(["Custom question", "Default questions"])
@@ -21,7 +22,11 @@ def questions(paper_url):
             st.success("Successfully saved")
 
     supported_models = [model.value for model in SupportedModels]
-    selected_model = st.selectbox("Select a model", supported_models, index=supported_models.index(SupportedModels.gpt_4o.value))
+    selected_model = st.selectbox(
+        "Select a model",
+        supported_models,
+        index=supported_models.index(SupportedModels.gpt_4o.value),
+    )
     extract_insights = st.button("Generate Insights", key="generate_insights_dialog")
     if extract_insights:
         InsightExtractor().extract_insights_from_paper_url(
@@ -29,6 +34,6 @@ def questions(paper_url):
             email_skip=True,
             disable_pdf_open=True,
             question=custom_question,
-            selected_model=selected_model
+            selected_model=selected_model,
         )
         st.rerun()

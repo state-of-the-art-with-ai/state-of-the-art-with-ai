@@ -1,16 +1,22 @@
+from enum import Enum
 from state_of_the_art.app.data import papers, topics
 from state_of_the_art.app.pages.papers_page_utils import (
-    RecommenationTypes,
     edit_profile,
     get_papers_from_summary,
-    load_papers_from_insights,
 )
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
-from state_of_the_art.paper.tags_table import TagsTable
+from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.preferences.topic_table import Topics
 import streamlit as st
 
+
+class DiscoveryPageTypes(str, Enum):
+    recommendation = "Recommendations from Latest Papers"
+    by_interest = "Best matches to your Interests"
+    all_latest = "All latest papers"
+
+
 num_of_results = 15
+generated_date = None
 lookback_days = None
 topic_description = None
 num_of_results = 15
@@ -20,7 +26,7 @@ papers = None
 send_by_email = False
 
 
-search_types = [item.value for item in RecommenationTypes]
+search_types = [item.value for item in DiscoveryPageTypes]
 default_search_index = 0
 if "search_type" in st.query_params:
     default_ui = st.query_params["search_type"]
@@ -31,10 +37,10 @@ selected_ui = st.selectbox("Search Types", search_types, index=default_search_in
 st.query_params["search_type"] = selected_ui
 with st.expander("Search options", expanded=True):
     if (
-        selected_ui == RecommenationTypes.recommendation
-        or selected_ui == RecommenationTypes.by_interest
+        selected_ui == DiscoveryPageTypes.recommendation
+        or selected_ui == DiscoveryPageTypes.by_interest
     ):
-        if selected_ui == RecommenationTypes.by_interest:
+        if selected_ui == DiscoveryPageTypes.by_interest:
             topics = Topics()
             topics_df = topics.read()
             topics_names = [""] + topics_df["name"].tolist()
@@ -79,7 +85,7 @@ with st.expander("Search options", expanded=True):
                     topics.delete_by(column="name", value=interest_name)
                     st.success("Interest deleted successfully")
 
-        if selected_ui == RecommenationTypes.recommendation:
+        if selected_ui == DiscoveryPageTypes.recommendation:
             lookback_days = st.slider("Days to Look back", 2, 30, 2)
 
         c1, c2 = st.columns([3, 1])
@@ -113,53 +119,20 @@ with st.expander("Search options", expanded=True):
         with c3:
             num_of_results = st.selectbox("Num of results", [15, 50, 100])
 
-    if selected_ui == RecommenationTypes.insights_history:
-        load_no = st.selectbox("Number of papers to load", [50, 100, 200])
-        papers = load_papers_from_insights(load_no=load_no)
-
-    if selected_ui == RecommenationTypes.by_tags:
-        all_tags_df = TagsTable().read()
-        all_tags = all_tags_df["tags"].to_list()
-        all_tags = [tags.split(",") for tags in all_tags]
-        import itertools
-
-        merged = list(itertools.chain(*all_tags))
-        unique = list(set(merged))
-
-        default_tags = []
-        if "tags" in st.query_params:
-            default_tags = st.query_params["tags"]
-
-        selected_tags = st.multiselect("Tags", unique, default_tags)
-        if selected_tags:
-            st.query_params["tags"] = selected_tags
-
-        all_papers_selected = all_tags_df[
-            all_tags_df["tags"].str.contains("|".join(selected_tags))
-        ]
-        all_papers_selected = all_papers_selected["paper_id"].to_list()
-
-        unique_papers = list(set(all_papers_selected))
-
-        papers = PapersDataLoader().load_papers_from_urls(unique_papers)[
-            0:num_of_results
-        ]
-
-    generated_date = None
     if not papers:
         papers, generated_date = get_papers_from_summary(num_of_results=num_of_results)
+    
+    if selected_ui == DiscoveryPageTypes.all_latest:
+        from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+
+        papers = PapersDataLoader().get_all_papers()
+
+        num_of_results = st.number_input(
+            "Number of papers to display", 1, 1000, 15
+        )
 
 
 st.divider()
 
-if generated_date:
-    st.markdown(f"###### Generated at {str(generated_date).split('.')[0]}")
-with st.container():
-    for k, paper in enumerate(papers):
-        st.markdown(
-            f"##### {k+1}. [{paper.title}](/paper_details_page?paper_url={paper.abstract_url})"
-        )
-
-        st.markdown(f"Published: {paper.published_date_str()}")
-        with st.expander("Full abstract"):
-            st.markdown(paper.abstract)
+# render all papeers
+render_papers(papers, generated_date=generated_date, num_of_results=num_of_results)

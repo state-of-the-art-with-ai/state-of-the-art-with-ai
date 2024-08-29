@@ -1,4 +1,4 @@
-from state_of_the_art.paper.paper import Paper
+from state_of_the_art.paper.paper_entity import Paper
 import os
 from state_of_the_art.utils import pdf
 

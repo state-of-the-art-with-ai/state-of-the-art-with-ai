@@ -4,6 +4,7 @@ from state_of_the_art.insight_extractor.insight_extractor import InsightExtracto
 from state_of_the_art.insight_extractor.insights_table import InsightsTable
 from state_of_the_art.paper.comments import Comments
 from state_of_the_art.paper.local_paper_copy import open_paper_locally
+from state_of_the_art.paper.paper_metadata_from_user_table import PaperMetadataFromUser
 from state_of_the_art.paper.paper_table import PaperTable
 from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.tags_table import TagsTable
@@ -32,12 +33,9 @@ def new_paper(paper_url):
     if st.button("Save"):
         st.success("Paper saved successfully")
         paper_table = PaperTable()
-        paper_table.add(
-            abstract_url=paper_url,
-            title=title,
-            published=None
-        )
+        paper_table.add(abstract_url=paper_url, title=title, published=None)
         st.rerun()
+
 
 c1, c2 = st.columns([1, 1])
 with c1:
@@ -52,7 +50,7 @@ if load or url:
     if not PapersDataLoader().is_paper_url_registered(url):
         st.error("Paper not found")
         st.stop()
-        
+
     paper = PapersDataLoader().load_paper_from_url(url)
 
     st.markdown(f"### {paper.title}")
@@ -82,6 +80,25 @@ if load or url:
             new_values={"tags": ",".join(selected_tags)},
         )
         st.success("Tags updated successfully")
+
+    query_progress = PaperMetadataFromUser().load_with_value(
+        "abstract_url", paper.abstract_url
+    )
+    if not query_progress.empty:
+        current_progress = int(query_progress.iloc[0]["progress"])
+    else:
+        current_progress = 0
+
+    progress = st.select_slider(
+        "Reading progress", options=tuple(range(0, 105, 5)), value=current_progress
+    )
+    if progress:
+        PaperMetadataFromUser().update_or_create(
+            by_key="abstract_url",
+            by_value=paper.abstract_url,
+            new_values={"progress": progress},
+        )
+        st.success("Progress updated successfully")
 
     st.markdown("Published: " + paper.published_date_str())
     with st.expander("Abstract"):
