@@ -13,7 +13,6 @@ import streamlit as st
 
 class DiscoveryPageTypes(str, Enum):
     all_latest = "All latest papers"
-    recommendation = "Recommendations from Latest Papers"
     by_interest = "Following your Interests"
 
 
@@ -37,8 +36,7 @@ selected_ui = st.selectbox("Search Types", search_types, index=default_search_in
 st.query_params["search_type"] = selected_ui
 with st.expander("Search options", expanded=True):
     if (
-        selected_ui == DiscoveryPageTypes.recommendation
-        or selected_ui == DiscoveryPageTypes.by_interest
+        selected_ui == DiscoveryPageTypes.by_interest
     ):
         if selected_ui == DiscoveryPageTypes.by_interest:
             topics = Topics()
@@ -85,9 +83,6 @@ with st.expander("Search options", expanded=True):
                     topics.delete_by(column="name", value=interest_name)
                     st.success("Interest deleted successfully")
 
-        if selected_ui == DiscoveryPageTypes.recommendation:
-            lookback_days = st.slider("Days to Look back", 2, 30, 2)
-
         c1, c2 = st.columns([3, 1])
         with c1:
             current_profile = st.selectbox("Profile", ["jean", "gdp", "mlp", "mlops"])
@@ -119,12 +114,6 @@ with st.expander("Search options", expanded=True):
                 papers, generated_date = load_papers_from_last_report()
 
 
-    if selected_ui == DiscoveryPageTypes.recommendation:
-        report_uuid = None
-        if 'report_uuid' in st.query_params:
-            report_uuid = st.query_params["report_uuid"]
-        papers, generated_date = load_papers_from_last_report(report_id=report_uuid)
-    
     if selected_ui == DiscoveryPageTypes.all_latest:
         from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 
@@ -141,9 +130,8 @@ with st.expander("Search options", expanded=True):
         papers = papers[papers["published"].dt.date == date_filter]
         papers = PapersDataLoader().to_papers(papers)
 
-metadata = {"Papers found": len(papers)}
 
 st.divider()
 
 # render all papeers
-render_papers(papers, generated_date=generated_date, metadata=metadata)
+render_papers(papers, generated_date=generated_date)
