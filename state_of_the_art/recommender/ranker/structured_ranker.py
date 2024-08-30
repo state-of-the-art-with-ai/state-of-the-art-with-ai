@@ -19,7 +19,7 @@ class StructuredPaperRanker:
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
         used_model = (
-            self.model_to_use if self.model_to_use else SupportedModels.gpt_4o.value
+            self.model_to_use if self.model_to_use else SupportedModels.gpt_4o_mini.value
         )
         print("Using model: ", used_model)
         result = client.chat.completions.create(
