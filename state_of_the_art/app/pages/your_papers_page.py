@@ -2,7 +2,7 @@ from enum import Enum
 import streamlit as st
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.pages.papers_page_utils import (
-    get_papers_from_summary,
+    load_papers_from_last_report,
     load_papers_from_insights,
 )
 from state_of_the_art.app.pages.render_papers import render_papers
@@ -72,7 +72,7 @@ with st.expander("Search options", expanded=True):
 
     generated_date = None
     if not papers:
-        papers, generated_date = get_papers_from_summary(num_of_results=num_of_results)
+        papers, generated_date = load_papers_from_last_report(max_num_of_results=num_of_results)
 
 
 st.divider()

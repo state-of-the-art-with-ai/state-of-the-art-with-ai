@@ -20,7 +20,6 @@ with st.sidebar:
         "Find Papers By Interest",
         f"/?search_type={DiscoveryPageTypes.by_interest.value}",
     )
-    st.link_button("Find Papers By Tags", "/?search_type=By Tags")
 
 
 pg.run()

@@ -2,7 +2,7 @@ from enum import Enum
 from state_of_the_art.app.data import papers, topics
 from state_of_the_art.app.pages.papers_page_utils import (
     edit_profile,
-    get_papers_from_summary,
+    load_papers_from_last_report,
 )
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.preferences.topic_table import Topics
@@ -13,15 +13,13 @@ import streamlit as st
 
 class DiscoveryPageTypes(str, Enum):
     all_latest = "All latest papers"
-    by_interest = "Following your Interests"
     recommendation = "Recommendations from Latest Papers"
+    by_interest = "Following your Interests"
 
 
-num_of_results = 15
 generated_date = None
 lookback_days = None
 topic_description = None
-num_of_results = 15
 
 st.title("Discover Papers")
 papers = None
@@ -97,7 +95,7 @@ with st.expander("Search options", expanded=True):
             if st.button("Manage Profile"):
                 edit_profile(current_profile)
 
-        c1, c2, c3 = st.columns([2, 3, 2])
+        c1, c2 = st.columns([2, 3])
 
         with c1:
             generate_clicked = st.button("Generate new recommendations")
@@ -118,11 +116,11 @@ with st.expander("Search options", expanded=True):
                     number_lookback_days=lookback_days,
                 )
 
-        with c3:
-            num_of_results = st.selectbox("Num of results", [15, 50, 100])
+                papers, generated_date = load_papers_from_last_report()
 
-    if not papers:
-        papers, generated_date = get_papers_from_summary(num_of_results=num_of_results)
+
+    if selected_ui == DiscoveryPageTypes.recommendation:
+        papers, generated_date = load_papers_from_last_report()
     
     if selected_ui == DiscoveryPageTypes.all_latest:
         from state_of_the_art.paper.papers_data_loader import PapersDataLoader
@@ -138,8 +136,6 @@ with st.expander("Search options", expanded=True):
         st.query_params["date"] = date_filter
         papers = PapersDataLoader().load_papers()
         papers = papers[papers["published"].dt.date == date_filter]
-        num_of_results  = len(papers.index)
-
         papers = PapersDataLoader().to_papers(papers)
 
 metadata = {"Papers found": len(papers)}
@@ -147,4 +143,4 @@ metadata = {"Papers found": len(papers)}
 st.divider()
 
 # render all papeers
-render_papers(papers, generated_date=generated_date, metadata=metadata, max_num_of_renderable_results=num_of_results)
+render_papers(papers, generated_date=generated_date, metadata=metadata)

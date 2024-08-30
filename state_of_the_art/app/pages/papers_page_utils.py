@@ -30,9 +30,11 @@ def load_papers_from_insights(load_no):
     return papers
 
 
-def get_papers_from_summary(num_of_results):
+def load_papers_from_last_report(max_num_of_results = None):
     latest_summary = RecommenderTable().get_latest().to_dict()
     latest_urls = PapersUrlsExtractor().extract_urls(latest_summary["summary"])
-    papers = PapersDataLoader().load_papers_from_urls(latest_urls)[0:num_of_results]
+    papers = PapersDataLoader().load_papers_from_urls(latest_urls)
+    if max_num_of_results:
+        papers = papers[0:max_num_of_results]
 
     return papers, latest_summary["tdw_timestamp"]
