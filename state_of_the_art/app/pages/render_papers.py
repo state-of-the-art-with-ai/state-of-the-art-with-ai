@@ -1,12 +1,14 @@
 from typing import Optional
+from state_of_the_art.paper.tags_table import TagsTable
 import streamlit as st
 
 
 @st.dialog("More details")
 def preview(paper):
     st.markdown(paper.abstract)
-    st.markdown("Published at: " + paper.date_published_str())
+    st.markdown("Published at: " + paper.published_date_str())
 
+tags_table = TagsTable()
 
 def render_papers(papers, generated_date=None, metadata: Optional[dict] = None, max_num_of_renderable_results=15):
     if generated_date:
@@ -26,4 +28,7 @@ def render_papers(papers, generated_date=None, metadata: Optional[dict] = None, 
                     "More", key=f"p{k}", on_click=preview, args=(paper,)
                 )
             with c3:
-                st.button("Save", key=f"save{k}",)
+                if st.button("Save", key=f"save{k}"):
+                    tags_table.add_tag_to_paper(paper.abstract_url, "save For Later")
+
+

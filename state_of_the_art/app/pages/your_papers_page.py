@@ -51,7 +51,7 @@ with st.expander("Search options", expanded=True):
         if "tags" in st.query_params:
             default_tags = st.query_params["tags"]
 
-        if st.checkbox("Select all", key="all_tags", value=True):
+        elif st.checkbox("Select all", key="all_tags", value=True):
             default_tags = unique
 
         selected_tags = st.multiselect("Tags", unique, default_tags)

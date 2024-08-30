@@ -127,8 +127,15 @@ with st.expander("Search options", expanded=True):
     if selected_ui == DiscoveryPageTypes.all_latest:
         from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 
-        date_with_papers=  ArxivMiner().latest_date_with_papers()
-        date_filter = st.date_input("Date", value=date_with_papers)
+
+        if "date" in st.query_params:
+            default_date_filter = st.query_params["date"]
+            default_date_filter = datetime.datetime.strptime(default_date_filter, "%Y-%m-%d").date()
+        else:
+            default_date_filter=  ArxivMiner().latest_date_with_papers()
+
+        date_filter = st.date_input("Date", value=default_date_filter)
+        st.query_params["date"] = date_filter
         papers = PapersDataLoader().load_papers()
         papers = papers[papers["published"].dt.date == date_filter]
         num_of_results  = len(papers.index)
