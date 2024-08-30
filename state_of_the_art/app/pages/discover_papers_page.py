@@ -6,13 +6,15 @@ from state_of_the_art.app.pages.papers_page_utils import (
 )
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.preferences.topic_table import Topics
+from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
+import datetime
 import streamlit as st
 
 
 class DiscoveryPageTypes(str, Enum):
-    recommendation = "Recommendations from Latest Papers"
-    by_interest = "Best matches to your Interests"
     all_latest = "All latest papers"
+    by_interest = "Following your Interests"
+    recommendation = "Recommendations from Latest Papers"
 
 
 num_of_results = 15
@@ -125,14 +127,17 @@ with st.expander("Search options", expanded=True):
     if selected_ui == DiscoveryPageTypes.all_latest:
         from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 
-        papers = PapersDataLoader().get_all_papers()
+        date_with_papers=  ArxivMiner().latest_date_with_papers()
+        date_filter = st.date_input("Date", value=date_with_papers)
+        papers = PapersDataLoader().load_papers()
+        papers = papers[papers["published"].dt.date == date_filter]
+        num_of_results  = len(papers.index)
 
-        num_of_results = st.number_input(
-            "Number of papers to display", 1, 1000, 15
-        )
+        papers = PapersDataLoader().to_papers(papers)
 
+metadata = {"Papers found": len(papers)}
 
 st.divider()
 
 # render all papeers
-render_papers(papers, generated_date=generated_date, num_of_results=num_of_results)
+render_papers(papers, generated_date=generated_date, metadata=metadata, max_num_of_renderable_results=num_of_results)
