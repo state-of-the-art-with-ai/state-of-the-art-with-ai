@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
@@ -8,8 +8,8 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.recommender.ranker.rank_data import RankGeneratedData
+from state_of_the_art.recommender.ranker.structured_ranker import StructuredPaperRanker
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
-from state_of_the_art.recommender.ranker.ranker import PaperRanker
 from state_of_the_art.recommender.report_parameters import ReportParameters
 from state_of_the_art.config import config
 
@@ -122,7 +122,7 @@ class Recommender:
 
         return self._topic_search
 
-    def _rank(self, context: ReportParameters) -> str:
+    def _rank(self, context: ReportParameters) -> Tuple[str, dict]:
         if context.by_topic:
             self._miner.register_by_relevance(
                 max_papers_per_query=None, topic_name=context.by_topic
@@ -183,7 +183,7 @@ class Recommender:
             )
         )
 
-        result = PaperRanker().rank(articles=self._input_articles)
+        result, structured_result = StructuredPaperRanker().rank(articles=self._input_articles)
 
         return result
 

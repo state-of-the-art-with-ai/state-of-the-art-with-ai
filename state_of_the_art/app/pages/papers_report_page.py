@@ -10,12 +10,15 @@ st.divider()
 df = PastRecommendationsTable().read().sort_values(by="tdw_timestamp", ascending=False)
 
 
-@st.dialog("Summary")
+@st.dialog("More info")
 def preview(row):
-    urls = PapersUrlsExtractor().extract_urls(row["summary"])
-    st.write("Papers recommended len ", len(urls))
-    st.write(row["summary"])
+    with st.expander("Prompt"):
+        st.write(row["prompt"])
 
+    st.write("Papers recommended")
+    urls = PapersUrlsExtractor().extract_urls(row["summary"])
+    st.write(len(urls))
+    st.write(row["summary"])
 
 for index, row in enumerate(df.to_dict(orient="records")):
     papers_analysed = len(row["papers_analysed"].split("\n"))
