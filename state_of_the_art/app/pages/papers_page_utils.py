@@ -1,6 +1,6 @@
 from state_of_the_art.paper.papers_data_loader import PapersDataLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
-from state_of_the_art.recommender.generator import RecommenderTable
+from state_of_the_art.llm_recommender.generator import RecommenderTable
 import streamlit as st
 
 

@@ -99,7 +99,7 @@ with st.expander("Search options", expanded=True):
             mine_new_papers = st.toggle("Mine new papers", False)
             send_by_email = st.toggle("Send By email", False)
         if generate_clicked:
-            from state_of_the_art.recommender.generator import Recommender
+            from state_of_the_art.llm_recommender.generator import Recommender
 
             with st.spinner("Generating recommendations"):
                 Recommender().generate(

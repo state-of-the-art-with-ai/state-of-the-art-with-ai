@@ -3,7 +3,7 @@ import time
 
 def job():
     print("Running recommender")
-    from state_of_the_art.recommender.generator import Recommender
+    from state_of_the_art.llm_recommender.generator import Recommender
 
     try:
         Recommender().generate(
