@@ -6,7 +6,7 @@ pages = {
         st.Page("pages/discover_papers_page.py", title="Discover Papers"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         st.Page("pages/paper_details_page.py", title="Dive into a Paper"),
-        st.Page("pages/reports_page.py", title="Past Recomendations"),
+        st.Page("pages/papers_report_page.py", title="Past Recomendations"),
     ],
 }
 
