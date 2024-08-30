@@ -1,5 +1,5 @@
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
-from state_of_the_art.llm_recommender.past_recommendations_table import (
+from state_of_the_art.deprecated_recommender.past_recommendations_table import (
     PastRecommendationsTable,
 )
 import streamlit as st

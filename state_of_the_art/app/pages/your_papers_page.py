@@ -6,7 +6,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
     load_papers_from_insights,
 )
 from state_of_the_art.app.pages.render_papers import render_papers
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.paper.tags_table import TagsTable
 
 num_of_results = 15
@@ -66,7 +66,7 @@ with st.expander("Search options", expanded=True):
 
         unique_papers = list(set(all_papers_selected))
 
-        papers = PapersDataLoader().load_papers_from_urls(unique_papers)[
+        papers = PapersLoader().load_papers_from_urls(unique_papers)[
             0:num_of_results
         ]
 

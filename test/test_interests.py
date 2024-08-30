@@ -1,8 +1,8 @@
-from state_of_the_art.preferences.topic_table import Topics
+from state_of_the_art.preferences.interest_table import Interests
 
 
 def test_topic_crud():
-    topics = Topics()
+    topics = Interests()
     original_size = topics.len()
     topics.add(name="foo", description="bar")
     topics.add(name="baz", description="bar")
@@ -13,3 +13,5 @@ def test_topic_crud():
     new_size = topics.len()
 
     assert new_size == (original_size + 1)
+
+    Interests().delete_by(column="name", value="baz")

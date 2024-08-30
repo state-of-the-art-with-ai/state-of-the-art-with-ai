@@ -3,7 +3,7 @@ import sys
 
 import tqdm
 
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 
 
 class SemanticSearch:
@@ -31,7 +31,7 @@ class SemanticSearch:
         print("Setting up documents")
 
         existing_ids = self.client.get_or_create_collection("papers").get()["ids"]
-        papers = PapersDataLoader().get_all_papers()
+        papers = PapersLoader().get_all_papers()
         missing_papers = [
             paper for paper in papers if paper.abstract_url not in existing_ids
         ]

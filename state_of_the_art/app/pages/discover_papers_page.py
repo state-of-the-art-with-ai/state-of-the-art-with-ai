@@ -5,7 +5,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
     load_papers_from_last_report,
 )
 from state_of_the_art.app.pages.render_papers import render_papers
-from state_of_the_art.preferences.topic_table import Topics
+from state_of_the_art.preferences.interest_table import Interests
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
 import streamlit as st
@@ -39,7 +39,7 @@ with st.expander("Search options", expanded=True):
         selected_ui == DiscoveryPageTypes.by_interest
     ):
         if selected_ui == DiscoveryPageTypes.by_interest:
-            topics = Topics()
+            topics = Interests()
             topics_df = topics.read()
             topics_names = [""] + topics_df["name"].tolist()
 
@@ -99,7 +99,7 @@ with st.expander("Search options", expanded=True):
             mine_new_papers = st.toggle("Mine new papers", False)
             send_by_email = st.toggle("Send By email", False)
         if generate_clicked:
-            from state_of_the_art.llm_recommender.generator import Recommender
+            from state_of_the_art.deprecated_recommender.generator import Recommender
 
             with st.spinner("Generating recommendations"):
                 Recommender().generate(
@@ -115,7 +115,7 @@ with st.expander("Search options", expanded=True):
 
 
     if selected_ui == DiscoveryPageTypes.all_latest:
-        from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+        from state_of_the_art.paper.papers_data_loader import PapersLoader
 
 
         if "date" in st.query_params:
@@ -126,9 +126,9 @@ with st.expander("Search options", expanded=True):
 
         date_filter = st.date_input("Date", value=default_date_filter)
         st.query_params["date"] = date_filter
-        papers = PapersDataLoader().load_papers()
+        papers = PapersLoader().load_papers()
         papers = papers[papers["published"].dt.date == date_filter]
-        papers = PapersDataLoader().to_papers(papers)
+        papers = PapersLoader().to_papers(papers)
 
 
 st.divider()

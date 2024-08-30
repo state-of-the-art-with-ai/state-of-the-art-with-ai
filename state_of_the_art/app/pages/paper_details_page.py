@@ -6,7 +6,7 @@ from state_of_the_art.paper.comments import Comments
 from state_of_the_art.paper.local_paper_copy import open_paper_locally
 from state_of_the_art.paper.paper_metadata_from_user_table import PaperMetadataFromUser
 from state_of_the_art.paper.paper_table import PaperTable
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.paper.tags_table import TagsTable
 import streamlit as st
 from streamlit_tags import st_tags
@@ -47,11 +47,11 @@ with c2:
 
 
 if load or url:
-    if not PapersDataLoader().is_paper_url_registered(url):
+    if not PapersLoader().is_paper_url_registered(url):
         st.error("Paper not found")
         st.stop()
 
-    paper = PapersDataLoader().load_paper_from_url(url)
+    paper = PapersLoader().load_paper_from_url(url)
 
     st.markdown(f"### {paper.title}")
     c1, c2, c3 = st.columns([1, 1, 1])

@@ -1,6 +1,6 @@
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
-from state_of_the_art.llm_recommender.generator import RecommenderTable
+from state_of_the_art.deprecated_recommender.generator import RecommenderTable
 import streamlit as st
 
 
@@ -25,7 +25,7 @@ def load_papers_from_insights(load_no):
     df = df.drop_duplicates(subset=["abstract_url"])
     papers = df.to_dict(orient="records")[0:load_no]
     papers_urls = [paper["abstract_url"] for paper in papers]
-    papers = PapersDataLoader().load_papers_from_urls(papers_urls)
+    papers = PapersLoader().load_papers_from_urls(papers_urls)
 
     return papers
 
@@ -42,7 +42,7 @@ def load_papers_from_last_report(report_id=None, max_num_of_results = None):
 
 
     latest_urls = PapersUrlsExtractor().extract_urls(latest_summary["summary"])
-    papers = PapersDataLoader().load_papers_from_urls(latest_urls)
+    papers = PapersLoader().load_papers_from_urls(latest_urls)
     if max_num_of_results:
         papers = papers[0:max_num_of_results]
 

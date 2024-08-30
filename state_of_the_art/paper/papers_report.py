@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.utils import pdf
 
 
 class PapersReport:
     def generate(self, from_date):
-        papers = PapersDataLoader().load_papers_between_published_dates(
+        papers = PapersLoader().load_papers_between_published_dates(
             from_date, datetime.now().strftime("%Y-%m-%d")
         )
         urls = papers["url"].tolist()

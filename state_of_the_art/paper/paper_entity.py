@@ -17,9 +17,9 @@ class Paper:
 
     def exists_in_db(self, url):
         print(f"Checking if paper {url} exists in db")
-        from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+        from state_of_the_art.paper.papers_data_loader import PapersLoader
 
-        result = PapersDataLoader().load_from_url(url)
+        result = PapersLoader().load_from_url(url)
         if result.empty:
             return False
         return True

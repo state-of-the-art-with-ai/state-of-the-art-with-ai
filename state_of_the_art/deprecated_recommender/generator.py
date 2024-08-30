@@ -5,15 +5,15 @@ from typing import Optional, List, Tuple
 import datetime
 from state_of_the_art.paper.format_papers import PapersFormatter
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
-from state_of_the_art.llm_recommender.ranker.rank_data import RankGeneratedData
-from state_of_the_art.llm_recommender.ranker.structured_ranker import StructuredPaperRanker
+from state_of_the_art.deprecated_recommender.ranker.rank_data import RankGeneratedData
+from state_of_the_art.deprecated_recommender.ranker.structured_ranker import StructuredPaperRanker
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
-from state_of_the_art.llm_recommender.report_parameters import ReportParameters
+from state_of_the_art.deprecated_recommender.report_parameters import ReportParameters
 from state_of_the_art.config import config
 
-from state_of_the_art.llm_recommender.topic_based.topic_search import TopicSearch
+from state_of_the_art.deprecated_recommender.topic_based.topic_search import TopicSearch
 from state_of_the_art.utils import pdf
 from state_of_the_art.utils.mail import SotaMail
 
@@ -174,8 +174,8 @@ class Recommender:
         # if we arrrive here we want to rank the latest articles
         context.type = "latest"
 
-        self._input_articles = PapersDataLoader().to_papers(
-            PapersDataLoader().get_latest_articles(
+        self._input_articles = PapersLoader().to_papers(
+            PapersLoader().get_latest_articles(
                 lookback_days=context.lookback_days,
                 from_date=context.from_date,
                 batch=context.batch,
@@ -224,7 +224,7 @@ Papers analysed: \n{articles_as_input}"""
         return formatted_ranked_result
 
     def _write_event(self, parameters, formatted_result, result):
-        papers_str = PapersDataLoader().papers_to_urls_str(self._input_articles)
+        papers_str = PapersLoader().papers_to_urls_str(self._input_articles)
         ranking_data = RankGeneratedData(
             from_date=parameters.from_date.isoformat(),
             to_date=parameters.to_date if parameters.to_date else None,
@@ -255,4 +255,4 @@ Papers analysed: \n{articles_as_input}"""
 
     def _load_papers_from_str(self, papers_str: str):
         urls = PapersUrlsExtractor().extract_urls(papers_str)
-        return PapersDataLoader().load_from_urls(urls, fail_on_missing_ids=False)
+        return PapersLoader().load_from_urls(urls, fail_on_missing_ids=False)

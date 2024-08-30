@@ -7,7 +7,7 @@ from state_of_the_art.config import config
 from state_of_the_art.paper.paper_entity import Paper
 
 
-class PapersDataLoader:
+class PapersLoader:
     TITLE_MAX_LENGH = 80
 
     def get_latest_articles(
@@ -34,7 +34,7 @@ class PapersDataLoader:
         ).isoformat()
         to_date = to_date if to_date else datetime.date.today().isoformat()
 
-        articles = self.load_between_dates(from_date, to_date)
+        articles = self.load_between_dates_str(from_date, to_date)
         amount_of_articles = len(articles)
         print(
             "Found  ",
@@ -71,7 +71,7 @@ class PapersDataLoader:
 
         return papers
 
-    def load_between_dates(self, start: str, end: str):
+    def load_between_dates_str(self, start: str, end: str):
         df = self.load_papers()
         print("Date filters of publication (from, to): ", start, end)
         return df[
@@ -79,8 +79,12 @@ class PapersDataLoader:
             & (df["published"].dt.strftime("%Y-%m-%d") <= end)
         ].sort_values(by="published", ascending=False)
 
-    def papers_schema(self):
-        return list(self.load_papers().columns)
+    def load_between_dates(self, start: datetime.date, end: datetime.date):
+        df = self.load_papers()
+        return df[
+            (df["published"].dt.date >= start)
+            & (df["published"].dt.date <= end)
+        ].sort_values(by="published", ascending=False)
 
     def load_from_url(self, url) -> Optional[pd.DataFrame]:
         papers = self.load_papers()
@@ -170,23 +174,6 @@ class PapersDataLoader:
 
         return result
 
-    def print_papers(self, papers_df, show_abstract=False):
-        papers_dict = papers_df.to_dict(orient="records")
-        for i in papers_dict:
-            abstract = ""
-            if show_abstract:
-                abstract = i["abstract"]
-            print(
-                str(i["published"])[0:10],
-                " ",
-                i["title"][0 : self.TITLE_MAX_LENGH],
-                " ",
-                i["abstract_url"],
-                abstract,
-            )
-
-        print("Total papers: ", len(papers_dict))
-
     def sort_by_recently_published(self, df):
         return df.sort_values(by="published", ascending=False)
 
@@ -198,14 +185,6 @@ class PapersDataLoader:
                 & (df["published"].dt.strftime("%Y-%m-%d") <= end)
             ]
         )
-
-    def load_latest_n_days(self, look_back_days=10):
-        from_date = (
-            datetime.date.today() - datetime.timedelta(days=look_back_days)
-        ).isoformat()
-        to_date = datetime.date.today().isoformat()
-
-        return self.load_papers_between_published_dates(from_date, to_date)
 
     def papers_to_urls_str(self, papers: List[ArxivPaper]) -> str:
         urls = ""

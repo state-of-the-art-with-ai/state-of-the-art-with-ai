@@ -1,17 +1,17 @@
 from typing import Optional
 
 from state_of_the_art.paper.format_papers import PapersFormatter
-from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.preferences.audience import Audience
-from state_of_the_art.llm_recommender.topic_based.searches import Bm25Search
-from state_of_the_art.llm_recommender.topic_based.semantic_search import SemanticSearch
-from state_of_the_art.llm_recommender.topic_based.topic import Topic
-from state_of_the_art.llm_recommender.topic_based.topic_extraction import TopicExtractor
+from state_of_the_art.deprecated_recommender.topic_based.searches import Bm25Search
+from state_of_the_art.deprecated_recommender.topic_based.semantic_search import SemanticSearch
+from state_of_the_art.deprecated_recommender.topic_based.topic import Topic
+from state_of_the_art.deprecated_recommender.topic_based.topic_extraction import TopicExtractor
 
 
 class TopicSearch:
     def __init__(self):
-        papers_data = PapersDataLoader()
+        papers_data = PapersLoader()
         papers = papers_data.load_papers()
         self._papers_list = papers_data.df_to_papers(papers)
         self.bm25_search = Bm25Search(self._papers_list)

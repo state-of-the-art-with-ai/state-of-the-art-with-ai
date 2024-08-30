@@ -67,9 +67,9 @@ class ArxivPaper(Paper):
 
     @staticmethod
     def load_paper_from_url(url: str) -> "ArxivPaper":
-        from state_of_the_art.paper.papers_data_loader import PapersDataLoader
+        from state_of_the_art.paper.papers_data_loader import PapersLoader
 
-        result = PapersDataLoader().load_from_url(url)
+        result = PapersLoader().load_from_url(url)
         if result.empty:
             raise Exception(f'Paper not found for url "{url}"')
 
