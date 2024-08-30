@@ -115,19 +115,6 @@ class Recommender:
 
         return result
 
-    def open_latest(self):
-        """
-        Open the latest generated summary
-        """
-        df = RecommenderTable().read()
-
-        dict = df.iloc[-1].to_dict()
-
-        if dict["pdf_location"]:
-            pdf.open_pdf(dict["pdf_location"])
-        else:
-            print("No pdf path found")
-
     def _get_topic_search(self) -> TopicSearch:
         if not self._topic_search:
             self._topic_search = TopicSearch()

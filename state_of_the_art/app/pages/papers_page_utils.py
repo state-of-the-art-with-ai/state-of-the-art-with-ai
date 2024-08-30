@@ -30,8 +30,17 @@ def load_papers_from_insights(load_no):
     return papers
 
 
-def load_papers_from_last_report(max_num_of_results = None):
-    latest_summary = RecommenderTable().get_latest().to_dict()
+def load_papers_from_last_report(report_id=None, max_num_of_results = None):
+    
+    report_df = RecommenderTable().read()
+    if report_id:
+        report_df = report_df[report_df["tdw_uuid"] == report_id].iloc[-1]
+    else:
+        report_df = report_df.iloc[-1]
+    
+    latest_summary = report_df.to_dict()
+
+
     latest_urls = PapersUrlsExtractor().extract_urls(latest_summary["summary"])
     papers = PapersDataLoader().load_papers_from_urls(latest_urls)
     if max_num_of_results:

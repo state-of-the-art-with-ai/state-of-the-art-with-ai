@@ -120,7 +120,10 @@ with st.expander("Search options", expanded=True):
 
 
     if selected_ui == DiscoveryPageTypes.recommendation:
-        papers, generated_date = load_papers_from_last_report()
+        report_uuid = None
+        if 'report_uuid' in st.query_params:
+            report_uuid = st.query_params["report_uuid"]
+        papers, generated_date = load_papers_from_last_report(report_id=report_uuid)
     
     if selected_ui == DiscoveryPageTypes.all_latest:
         from state_of_the_art.paper.papers_data_loader import PapersDataLoader
