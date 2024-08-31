@@ -1,7 +1,7 @@
 from state_of_the_art.insight_extractor.insight_extractor import (
     convert_questions_to_openai_call,
 )
-from state_of_the_art.paper.questions_table import QuestionsTable
+from state_of_the_art.tables.questions_table import QuestionsTable
 
 
 def test_convert():

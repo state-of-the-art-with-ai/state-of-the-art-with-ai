@@ -1,9 +1,9 @@
 
 import datetime
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.preferences.interest_table import Interests
+from state_of_the_art.user_preferences.interest_table import Interests
 from sentence_transformers import SentenceTransformer
-from state_of_the_art.utils.base_table import BaseTable
+from state_of_the_art.tables.base_table import BaseTable
 
 class InterestRecommender:
     def __init__(self) -> None:

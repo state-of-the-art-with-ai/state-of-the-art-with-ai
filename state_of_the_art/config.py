@@ -1,5 +1,5 @@
 import os
-from state_of_the_art.preferences.audience import Audience
+from state_of_the_art.user_preferences.audience import Audience
 from tiny_data_warehouse import DataWarehouse
 
 

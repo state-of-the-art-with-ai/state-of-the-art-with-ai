@@ -1,4 +1,4 @@
-from state_of_the_art.utils.base_table import BaseTable
+from state_of_the_art.tables.base_table import BaseTable
 
 
 class PaperMetadataFromUser(BaseTable):

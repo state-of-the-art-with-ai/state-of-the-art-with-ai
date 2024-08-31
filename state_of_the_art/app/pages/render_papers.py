@@ -1,5 +1,5 @@
 from typing import Optional
-from state_of_the_art.paper.tags_table import TagsTable
+from state_of_the_art.tables.tags_table import TagsTable
 import streamlit as st
 
 

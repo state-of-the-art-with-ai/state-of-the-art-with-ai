@@ -1,4 +1,4 @@
-from state_of_the_art.insight_extractor.insights_table import InsightsTable
+from state_of_the_art.tables.insights_table import InsightsTable
 import streamlit as st
 
 

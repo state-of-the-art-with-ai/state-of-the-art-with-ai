@@ -4,8 +4,8 @@ import json
 from typing import Optional, Tuple
 
 from state_of_the_art.config import config
-from state_of_the_art.insight_extractor.insights_table import InsightsTable
-from state_of_the_art.paper.questions_table import QuestionsTable
+from state_of_the_art.tables.insights_table import InsightsTable
+from state_of_the_art.tables.questions_table import QuestionsTable
 from state_of_the_art.utils.clipboard import get_clipboard_content
 from state_of_the_art.utils.mail import SotaMail
 from state_of_the_art.utils import pdf

@@ -7,7 +7,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
 )
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.paper.tags_table import TagsTable
+from state_of_the_art.tables.tags_table import TagsTable
 
 num_of_results = 15
 lookback_days = None

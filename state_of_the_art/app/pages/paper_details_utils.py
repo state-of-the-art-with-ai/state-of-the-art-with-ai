@@ -3,7 +3,7 @@ from state_of_the_art.insight_extractor.insight_extractor import (
     InsightExtractor,
     SupportedModels,
 )
-from state_of_the_art.paper.questions_table import QuestionsTable
+from state_of_the_art.tables.questions_table import QuestionsTable
 
 
 @st.dialog("Questions")

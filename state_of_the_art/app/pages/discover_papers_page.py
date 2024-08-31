@@ -5,7 +5,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
     load_papers_from_last_report,
 )
 from state_of_the_art.app.pages.render_papers import render_papers
-from state_of_the_art.preferences.interest_table import Interests
+from state_of_the_art.user_preferences.interest_table import Interests
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
 import streamlit as st

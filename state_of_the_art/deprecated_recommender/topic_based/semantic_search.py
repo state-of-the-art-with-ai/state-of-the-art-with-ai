@@ -1,8 +1,6 @@
 import os
 import sys
-
 import tqdm
-
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
 

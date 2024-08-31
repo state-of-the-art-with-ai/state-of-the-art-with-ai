@@ -1,4 +1,4 @@
-from state_of_the_art.paper.comments import Comments
+from state_of_the_art.tables.comments_table import Comments
 
 
 def test_comment():

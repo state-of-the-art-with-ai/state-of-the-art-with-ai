@@ -1,13 +1,13 @@
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
-from state_of_the_art.deprecated_recommender.past_recommendations_table import (
-    PastRecommendationsTable,
+from state_of_the_art.tables.recommendations_history_table import (
+    RecommendationsHistoryTable,
 )
 import streamlit as st
 
 st.title("Past recommendations")
 st.divider()
 
-df = PastRecommendationsTable().read().sort_values(by="tdw_timestamp", ascending=False)
+df = RecommendationsHistoryTable().read().sort_values(by="tdw_timestamp", ascending=False)
 
 
 @st.dialog("More info")

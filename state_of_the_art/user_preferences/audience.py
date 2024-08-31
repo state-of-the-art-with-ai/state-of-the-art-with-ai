@@ -1,4 +1,4 @@
-from state_of_the_art.preferences.default_questions import DEFAULT_PAPER_QUESTIONS
+from state_of_the_art.user_preferences.default_questions import DEFAULT_PAPER_QUESTIONS
 
 
 class Audience:
