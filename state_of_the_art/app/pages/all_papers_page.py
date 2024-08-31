@@ -20,7 +20,7 @@ if "date" in st.query_params:
 else:
     default_date_filter=  ArxivMiner().latest_date_with_papers()
 
-date_filter = st.date_input("Date", value=default_date_filter)
+date_filter = st.date_input("By Day", value=default_date_filter)
 st.query_params["date"] = date_filter
 
 papers = PapersLoader().load_papers()

@@ -4,6 +4,7 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.interest_table import Interests
 from sentence_transformers import SentenceTransformer
 from state_of_the_art.tables.base_table import BaseTable
+from state_of_the_art.tables.recommendations_history_table import RecommendationsHistoryTable
 
 class InterestRecommender:
     def __init__(self) -> None:
@@ -12,6 +13,7 @@ class InterestRecommender:
         self.date_to =  datetime.date(2024, 8, 30)
     def generate(self):
 
+        result = {}
         # get all interests
         interests_df = Interests().read()
         interests_to_str = [interest["description"] for interest in interests_df.to_dict(orient="records")]
@@ -26,8 +28,16 @@ class InterestRecommender:
             # get the top 5 most similar papers indexes positions
             top_papers_indices = similarity_matrix[idx].argsort(descending=True)[0:5]
             print(f"Top papers for {interest['name']}, indices: {top_papers_indices}")
-            papers = papers_embeddings_df.loc[top_papers_indices]
-            print(papers)
+            selected_papers = papers_embeddings_df.loc[top_papers_indices]
+            result[interest["name"]] = {}
+            result[interest["name"]]['papers'] = selected_papers['paper_id'].to_list()
+        
+        RecommendationsHistoryTable().add(from_date=self.date_from.isoformat(), to_date=self.date_to.isoformat(), recommended_papers=str(result), papers_analysed="")
+
+        return result
+
+
+
 
 
     def encode_papers(self):

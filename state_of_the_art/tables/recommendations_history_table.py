@@ -8,5 +8,5 @@ class RecommendationsHistoryTable(BaseTable):
         "from_date": {"type": Any},
         "to_date": {"type": Any},
         "papers_analysed": {"type": str},
-        "recommended_papers_str": {"type": str},
+        "recommended_papers": {"type": str},
     }

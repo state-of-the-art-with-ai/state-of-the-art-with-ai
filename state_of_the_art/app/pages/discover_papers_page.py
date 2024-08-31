@@ -13,7 +13,7 @@ generated_date = None
 lookback_days = None
 topic_description = None
 
-st.title("Discover Papers")
+st.title("Discover Papers by Interest")
 papers = None
 send_by_email = False
 

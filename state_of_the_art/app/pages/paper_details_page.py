@@ -64,6 +64,20 @@ if load or url:
         if st.button("Open paper locally"):
             open_paper_locally(paper.abstract_url)
 
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        extract_insights = st.button("Generate New Insights")
+    with c2:
+        if st.button("Edit questions"):
+            questions(url)
+
+    if extract_insights:
+        InsightExtractor().extract_insights_from_paper_url(
+            url, email_skip=True, disable_pdf_open=True
+        )
+        st.rerun()
+
     tags_table = TagsTable()
     tags_table_df = tags_table.read()
     existing_tags = []
@@ -124,19 +138,7 @@ if load or url:
                 st.success("Comment added successfully")
                 st.rerun()
 
-    st.markdown("### Insights")
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        extract_insights = st.button("Generate Detault Insights")
-    with c2:
-        if st.button("Edit questions"):
-            questions(url)
-
-    if extract_insights:
-        InsightExtractor().extract_insights_from_paper_url(
-            url, email_skip=True, disable_pdf_open=True
-        )
-        st.rerun()
+    st.markdown("### Existing Insights")
 
     insights = InsightsTable().read()
     insights = insights[insights["paper_id"] == url]
