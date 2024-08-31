@@ -1,7 +1,7 @@
 
 import datetime
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.user_preferences.interest_table import Interests
+from state_of_the_art.tables.interest_table import Interests
 from sentence_transformers import SentenceTransformer
 from state_of_the_art.tables.base_table import BaseTable
 
