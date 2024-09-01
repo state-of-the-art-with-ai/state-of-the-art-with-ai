@@ -62,6 +62,16 @@ class ArxivMiner:
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 
+    def register_by_id(self, id: str):
+        """
+        Register new paper by id
+        """
+        print("Registering paper in db by id: ", id)
+        papers = self._find_papers(id_list=[str(id)])
+        print("Found papers: ", str(papers))
+        return self._register_given_papers(papers)
+
+
     def register_by_relevance(
         self, dry_run=False, max_papers_per_query=None, topic_name=None
     ):
@@ -142,12 +152,6 @@ class ArxivMiner:
             self.register_by_id(ArxivPaper.id_from_url(paper.pdf_url))
         else:
             print("Paper already registered")
-
-    def register_by_id(self, id: str):
-        print("Registering paper in db by id: ", id)
-        papers = self._find_papers(id_list=[str(id)])
-        print("Found papers: ", str(papers))
-        return self._register_given_papers(papers)
 
     def query_papers(self, query):
         self._find_papers(

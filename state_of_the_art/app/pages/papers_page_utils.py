@@ -1,6 +1,6 @@
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
-from state_of_the_art.deprecated_recommender.generator import RecommenderTable
+from state_of_the_art.tables.recommendations_history_table import RecommendationsHistoryTable
 import streamlit as st
 
 
@@ -32,7 +32,7 @@ def load_papers_from_insights(load_no):
 
 def load_papers_from_last_report(report_id=None, max_num_of_results = None):
     
-    report_df = RecommenderTable().read()
+    report_df = RecommendationsHistoryTable().read()
     if report_id:
         report_df = report_df[report_df["tdw_uuid"] == report_id].iloc[-1]
     else:

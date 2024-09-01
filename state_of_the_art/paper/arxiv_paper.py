@@ -62,7 +62,7 @@ class ArxivPaper(Paper):
         )
 
     @staticmethod
-    def id_from_url(url):
+    def id_from_url(url) -> str:
         return url.split("/")[-1].replace(".pdf", "")
 
     @staticmethod

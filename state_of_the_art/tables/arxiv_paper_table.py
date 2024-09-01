@@ -7,4 +7,5 @@ class PaperTable(BaseTable):
         "abstract_url": {"type": str},
         "title": {"type": str},
         "published": {"type": int},
+        "institution": {"type": str},
     }

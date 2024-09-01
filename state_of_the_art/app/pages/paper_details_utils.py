@@ -1,3 +1,4 @@
+from state_of_the_art.tables.arxiv_paper_table import PaperTable
 import streamlit as st
 from state_of_the_art.insight_extractor.insight_extractor import (
     InsightExtractor,
@@ -36,4 +37,16 @@ def questions(paper_url):
             question=custom_question,
             selected_model=selected_model,
         )
+        st.rerun()
+
+
+@st.dialog("Questions")
+def new_paper(paper_url):
+    st.write("New paper")
+    title = st.text_input("Title")
+    paper_url = st.text_input("Url", paper_url)
+    if st.button("Save"):
+        st.success("Paper saved successfully")
+        paper_table = PaperTable()
+        paper_table.add(abstract_url=paper_url, title=title, published=None)
         st.rerun()
