@@ -27,6 +27,20 @@ class Config:
     OPEN_API_KEY = os.environ["SOTA_OPENAI_KEY"]
     dwh = None
 
+    KEYWORDS_TO_MINE = [
+        "data science",
+        'mlops',
+        'cs',
+        'computer science',
+        'ai',
+        'artificial intelligence',
+        'machine learning',
+        'statistics',
+        'deep learning',
+        'ethics',
+        'data',
+    ]
+
     def get_max_articles_to_return_rank(self) -> int:
         if os.environ.get("MAX_ARTICLES_TO_RETURN_RANK"):
             return int(os.environ.get("MAX_ARTICLES_TO_RETURN_RANK"))

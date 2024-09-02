@@ -3,7 +3,7 @@ from state_of_the_art.config import config
 import datetime
 
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
-from state_of_the_art.utils.mail import SotaMail
+from state_of_the_art.utils.mail import EmailService
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.utils import pdf
 import pandas as pd
@@ -145,7 +145,7 @@ Bookmarked: {str(dict[i]['bookmarked_date']).split(' ')[0]}
         return df
 
     def send_to_email(self):
-        SotaMail().send(
+        EmailService().send(
             content="",
             subject="Bookmarks as of "
             + datetime.datetime.now().isoformat().split(".")[0],

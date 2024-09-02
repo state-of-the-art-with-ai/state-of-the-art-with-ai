@@ -8,11 +8,17 @@ def preview(paper):
     st.markdown("Published at: " + paper.published_date_str())
     st.markdown(paper.abstract)
 
+
 tags_table = TagsTable()
 
-def render_papers(papers, papers_metadata: Optional[dict] = None, generated_date=None, metadata: Optional[dict] = None, max_num_of_renderable_results=None):
 
-
+def render_papers(
+    papers,
+    papers_metadata: Optional[dict] = None,
+    generated_date=None,
+    metadata: Optional[dict] = None,
+    max_num_of_renderable_results=None,
+):
     if generated_date:
         st.markdown(f"###### Generated at {str(generated_date).split('.')[0]}")
     if metadata:
@@ -30,25 +36,25 @@ def render_papers(papers, papers_metadata: Optional[dict] = None, generated_date
             with c1:
                 st.markdown(
                     f"""##### {k+1}. [{paper.title}](/paper_details_page?paper_url={paper.abstract_url})
-                """)
+                """
+                )
                 ci1, ci2 = st.columns([1, 5])
                 with ci1:
                     st.markdown(f"""
-    ###### ({paper.published_date_str()}) """ 
-                    )
+    ###### ({paper.published_date_str()}) """)
                 with ci2:
-                    if papers_metadata and paper.abstract_url in papers_metadata and 'labels' in papers_metadata[paper.abstract_url]:
-                        for label in papers_metadata[paper.abstract_url]['labels']:
+                    if (
+                        papers_metadata
+                        and paper.abstract_url in papers_metadata
+                        and "labels" in papers_metadata[paper.abstract_url]
+                    ):
+                        for label in papers_metadata[paper.abstract_url]["labels"]:
                             st.markdown(f"###### {label}")
             with c2:
-                if st.button(
-                    "More", key=f"preview{k}"
-                ):
+                if st.button("More", key=f"preview{k}"):
                     preview(paper)
-                    
+
             with c3:
                 if st.button("Save", key=f"save{k}"):
                     tags_table.add_tag_to_paper(paper.abstract_url, "save For Later")
                     st.success("Saved")
-
-

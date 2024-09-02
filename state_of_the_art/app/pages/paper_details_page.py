@@ -48,11 +48,15 @@ st.markdown(f"### {paper.title}")
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     st.markdown(f"[{url}](url)")
-    st.markdown(f"###### Institution ({insights_table.get_lastest_answer('Institution', url)})")
+    st.markdown(
+        f"###### Institution ({insights_table.get_lastest_answer('Institution', url)})"
+    )
     st.markdown("Published: " + paper.published_date_str())
 with c2:
     st.markdown(f"[PDF]({paper.pdf_url})")
-    st.markdown(f"###### Conference ({insights_table.get_lastest_answer('Conference', url)})")
+    st.markdown(
+        f"###### Conference ({insights_table.get_lastest_answer('Conference', url)})"
+    )
 
 with c3:
     if st.button("Open paper locally"):
@@ -168,14 +172,17 @@ with st.spinner("Loading insights..."):
     for insight in insights_list:
         insight["predicted_score"] = inference.predict(insight["tdw_uuid"])
 
-insights_list = sorted(insights_list, key=lambda el: el["predicted_score"],reverse=True)
+insights_list = sorted(
+    insights_list, key=lambda el: el["predicted_score"], reverse=True
+)
 IGNORED_INSIGHTS = [
     "DeepSummaryOfStructure",
-    "Institution", 
-    'Conference',
-    'Definitions',
-    'Resources', 
-    'Outcomes']
+    "Institution",
+    "Conference",
+    "Definitions",
+    "Resources",
+    "Outcomes",
+]
 
 insights_list = filter(lambda x: x["question"] not in IGNORED_INSIGHTS, insights_list)
 
@@ -196,9 +203,7 @@ for insight in insights_list:
     with c2:
         c1, c2 = st.columns(2)
         with c1:
-            feedback_received = st.feedback(
-                options="faces", key=insight["tdw_uuid"]
-            )
+            feedback_received = st.feedback(options="faces", key=insight["tdw_uuid"])
             if feedback_received:
                 InsightsTable().update_score(insight["tdw_uuid"], feedback_received)
         with c2:

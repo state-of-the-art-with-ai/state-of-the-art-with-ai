@@ -7,6 +7,7 @@ from state_of_the_art.insight_extractor.insight_extractor import SupportedModels
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from openai import OpenAI
 
+
 class StructuredPaperRanker:
     def __init__(self):
         self.model_to_use = None
@@ -19,13 +20,17 @@ class StructuredPaperRanker:
 
         client = OpenAI(api_key=config.OPEN_API_KEY)
         used_model = (
-            self.model_to_use if self.model_to_use else SupportedModels.gpt_4o_mini.value
+            self.model_to_use
+            if self.model_to_use
+            else SupportedModels.gpt_4o_mini.value
         )
         print("Using model: ", used_model)
         result = client.chat.completions.create(
             model=used_model,
-            messages=[{"role": "user", "content": self._format_input_articles(articles)}],
-            #temperature=1.5,
+            messages=[
+                {"role": "user", "content": self._format_input_articles(articles)}
+            ],
+            # temperature=1.5,
             functions=[
                 {
                     "name": "get_insights_from_paper",
@@ -40,23 +45,22 @@ Sort the papers from most relevant to less. You cannot return all papers so pick
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            'ranked_articles': {
+                            "ranked_articles": {
                                 "type": "array",
                                 "max_items": config.get_max_articles_to_return_rank(),
                                 "min_items": config.get_max_articles_to_return_rank(),
-                                "items": 
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "paper_title": {"type": "string"},
-                                            "url": {"type": "string"},
-                                            "published_date": {"type": "string"},
-                                            "why_relevant": {"type": "string"},
-                                            "insitution": {"type": "string"},
-                                        }
-                                    }
-                                }
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "paper_title": {"type": "string"},
+                                        "url": {"type": "string"},
+                                        "published_date": {"type": "string"},
+                                        "why_relevant": {"type": "string"},
+                                        "insitution": {"type": "string"},
+                                    },
+                                },
                             }
+                        },
                     },
                 }
             ],
@@ -72,8 +76,6 @@ Sort the papers from most relevant to less. You cannot return all papers so pick
         structured_results = json.loads(str(structured_results))
         print(json.dumps(structured_results, indent=3))
         return str(structured_results), structured_results
-
-
 
     def _format_input_articles(self, papers: List[ArxivPaper]) -> str:
         papers_str = " "

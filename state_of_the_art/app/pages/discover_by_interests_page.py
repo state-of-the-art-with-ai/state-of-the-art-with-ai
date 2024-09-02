@@ -5,8 +5,6 @@ from state_of_the_art.app.pages.papers_page_utils import (
 )
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.tables.interest_table import Interests
-from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
-import datetime
 import streamlit as st
 
 generated_date = None
@@ -38,16 +36,14 @@ with st.expander("Search options", expanded=True):
     interest_name = ""
     topic_description = ""
     if selected_interest:
-        interest_name = topics_df[topics_df["name"] == selected_interest].iloc[
-            0
-        ]["name"]
-        topic_description = topics_df[
-            topics_df["name"] == selected_interest
-        ].iloc[0]["description"]
+        interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0][
+            "name"
+        ]
+        topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
+            "description"
+        ]
 
-    topic_description = st.text_area(
-        "Query / Description", value=topic_description
-    )
+    topic_description = st.text_area("Query / Description", value=topic_description)
     interest_name = st.text_input("Interest name", value=interest_name)
 
     c1, c2 = st.columns(2)
@@ -91,8 +87,6 @@ with st.expander("Search options", expanded=True):
             )
 
             papers, generated_date = load_papers_from_last_report()
-
-
 
 
 st.divider()

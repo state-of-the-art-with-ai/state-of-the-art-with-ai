@@ -7,7 +7,7 @@ from state_of_the_art.config import config
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.tables.questions_table import QuestionsTable
 from state_of_the_art.utils.clipboard import get_clipboard_content
-from state_of_the_art.utils.mail import SotaMail
+from state_of_the_art.utils.mail import EmailService
 from state_of_the_art.utils import pdf
 from state_of_the_art.insight_extractor.content_extractor import get_content_from_url
 from openai import OpenAI
@@ -97,7 +97,7 @@ Abstract: {url}
             title, result, document_pdf_location, disable_pdf_open=disable_pdf_open
         )
         if not email_skip:
-            SotaMail().send("", f"Insights from {title}", paper_path)
+            EmailService().send("", f"Insights from {title}", paper_path)
 
     def _convert_sturctured_output_to_insights(self, structured_result, url):
         result = []

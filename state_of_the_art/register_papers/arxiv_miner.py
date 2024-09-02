@@ -27,7 +27,9 @@ class ArxivMiner:
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
 
-    def register_all_new_papers(self, dry_run=False, max_papers_per_query=None, topic=None):
+    def register_all_new_papers(
+        self, dry_run=False, max_papers_per_query=None, topic=None
+    ):
         """
         Register all papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
@@ -37,19 +39,15 @@ class ArxivMiner:
         self.max_papers_per_query = max_papers_per_query
         if dry_run:
             print("Dry run, just printing, not registering them")
-
-        if topic:
-            topics_to_mine = self._get_topic_keywords(topic)
-        else:
-            topics_to_mine = self._get_topics_to_mine()
+        keywords_to_mine = self.config.KEYWORDS_TO_MINE
 
         print(
-            f"Registering papers for the following ({len(topics_to_mine)}) keywords: ",
-            topics_to_mine,
+            f"Registering papers for the following ({len(keywords_to_mine)}) keywords: ",
+            keywords_to_mine,
         )
 
         papers = []
-        for topic in tqdm(topics_to_mine):
+        for topic in tqdm(keywords_to_mine):
             papers = papers + self._find_papers(query=topic, sort_by="submitted")
 
         papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
@@ -70,7 +68,6 @@ class ArxivMiner:
         papers = self._find_papers(id_list=[str(id)])
         print("Found papers: ", str(papers))
         return self._register_given_papers(papers)
-
 
     def register_by_relevance(
         self, dry_run=False, max_papers_per_query=None, topic_name=None
@@ -132,12 +129,6 @@ class ArxivMiner:
         total_registered, total_skipped = self._register_given_papers(papers)
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
-
-    def _get_topic_keywords(self, filter_topic_name: str) -> List[str]:
-        audience_topics = config.get_current_audience().get_topics()
-        if filter_topic_name in audience_topics:
-            return audience_topics[filter_topic_name].get_arxiv_search_keywords()
-        return []
 
     def _get_topics_to_mine(self) -> List[str]:
         audience_keywords = config.get_current_audience().keywords

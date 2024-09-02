@@ -66,7 +66,7 @@ class PapersLoader:
         for i in df.iterrows():
             try:
                 papers.append(ArxivPaper.load_from_dict(i[1].to_dict()))
-            except Exception as e:
+            except Exception:
                 pass
 
         return papers
@@ -82,8 +82,7 @@ class PapersLoader:
     def load_between_dates(self, start: datetime.date, end: datetime.date):
         df = self.load_papers()
         return df[
-            (df["published"].dt.date >= start)
-            & (df["published"].dt.date <= end)
+            (df["published"].dt.date >= start) & (df["published"].dt.date <= end)
         ].sort_values(by="published", ascending=False)
 
     def load_from_url(self, url) -> Optional[pd.DataFrame]:

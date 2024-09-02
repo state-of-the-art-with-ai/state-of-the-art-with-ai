@@ -1,10 +1,5 @@
-from enum import Enum
 import streamlit as st
 from state_of_the_art.app.data import papers
-from state_of_the_art.app.pages.papers_page_utils import (
-    load_papers_from_last_report,
-    load_papers_from_insights,
-)
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.tags_table import TagsTable

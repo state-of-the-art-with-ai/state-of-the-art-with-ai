@@ -6,5 +6,5 @@ class PapersFromUserTable(BaseTable):
     schema = {
         "url": {"type": str},
         "title": {"type": str},
-        "user_uuid": {"type": 'str'},
+        "user_uuid": {"type": "str"},
     }

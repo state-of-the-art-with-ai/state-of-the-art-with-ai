@@ -1,11 +1,9 @@
-
-
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 
 
-class PaperRegister():
+class PaperRegister:
     def __init__(self):
         self.papers = []
 
@@ -15,8 +13,8 @@ class PaperRegister():
     def register_if_not_found(self, url: str):
         if self.is_paper_registered(url):
             return
-        
+
         self.register_by_url(url)
-        
+
     def register_by_url(self, url: str):
         ArxivMiner().register_by_id(ArxivPaper.id_from_url(url))

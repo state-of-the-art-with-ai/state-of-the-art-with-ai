@@ -51,15 +51,17 @@ class InsightsTable:
         df.loc[df["tdw_uuid"] == uuid, "score"] = score
         config.get_datawarehouse().replace_df(self.TABLE_NAME, df, dry_run=False)
 
-    def get_lastest_answer(self, question: str, paper)->str:
-        df = self.read().sort_values(by='tdw_timestamp', ascending=False)
+    def get_lastest_answer(self, question: str, paper) -> str:
+        df = self.read().sort_values(by="tdw_timestamp", ascending=False)
         result = df[(df["question"] == question) & (df["paper_id"] == paper)]
 
         if result.empty:
             return ""
-        
-        return result['insight'].iloc[0]
 
-    def get_all_answers(self, question: str, paper)->List[str]:
-        df = self.read().sort_values(by='tdw_timestamp', ascending=False)
-        return df[(df["question"] == question) & (df["paper_id"] == paper)]['insight'].to_list()
+        return result["insight"].iloc[0]
+
+    def get_all_answers(self, question: str, paper) -> List[str]:
+        df = self.read().sort_values(by="tdw_timestamp", ascending=False)
+        return df[(df["question"] == question) & (df["paper_id"] == paper)][
+            "insight"
+        ].to_list()

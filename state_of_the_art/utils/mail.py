@@ -1,7 +1,7 @@
 import os
 
 
-class SotaMail:
+class EmailService:
     default_destination = "j34nc4rl0@gmail.com"
 
     def send(self, content=None, subject=None, attachment=None):
@@ -11,7 +11,7 @@ class SotaMail:
 
         if attachment:
             os.system(
-                f"mail.py send_email --to '{SotaMail.default_destination}' --subject '{subject}'  --attachement  {attachment} "
+                f"mail.py send_email --to '{EmailService.default_destination}' --subject '{subject}'  --attachement  {attachment} "
             )
         else:
             os.system(

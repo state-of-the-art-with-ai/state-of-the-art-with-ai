@@ -16,7 +16,6 @@ class Audience:
         "geology",
         "electrical engineering",
     ]
-    DEFAULT_KEYWORDS_OF_INTEREST = None
     DEAFULT_DESCRIPTION = """Data Science and AI experts and enthusiasts"""
 
     def __init__(
@@ -33,7 +32,6 @@ class Audience:
             if audience_description
             else Audience.DEAFULT_DESCRIPTION
         )
-        self.keywords = keywords if keywords else Audience.DEFAULT_KEYWORDS_OF_INTEREST
         self.keywords_to_exclude = (
             keywords_to_exclude
             if keywords_to_exclude
@@ -56,12 +54,6 @@ class Audience:
         Returns all the preferences of the profile encoded in a string
         """
 
-        if self.keywords:
-            keywords_str = f"""Topics keywords your audience is interested on: \n - {'\n - '.join(self.keywords)}
-           """
-        else:
-            keywords_str = ""
-
         keywords_to_exclude_str = (
             f"""Non relevant topics (make sure they are not mentioned in the results): \n - {'\n - '.join(self.keywords_to_exclude)}"""
             if include_keywords_to_exclude
@@ -69,6 +61,5 @@ class Audience:
         )
 
         return f"""{self.audience_description}
-{keywords_str}
 {keywords_to_exclude_str}
         """
