@@ -92,3 +92,6 @@ class BaseTable:
         df_dropped = df.drop(df[df[column] == value].index)
         tdw.replace_df(cls.table_name, df_dropped, dry_run=False)
         return True
+
+    def last(cls):
+        return cls.read().sort_values(by='tdw_timestamp', ascending=True).iloc[-1]

@@ -21,6 +21,7 @@ url = st.text_input(
 )
 if url:
     url = url.strip()
+    url = url.replace("https", "http")
     st.query_params.paper_url = url
 
 

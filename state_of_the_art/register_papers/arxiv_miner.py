@@ -123,6 +123,7 @@ class ArxivMiner:
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
     def register_latest_by_query(self, query):
+
         papers = self._find_papers(query=query, number_of_papers=10)
         print("Found ", len(papers), " new papers")
 
