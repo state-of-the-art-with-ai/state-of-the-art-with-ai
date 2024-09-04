@@ -18,6 +18,7 @@ class ArxivPaper(Paper):
         *,
         abstract_url: Optional[str] = None,
         published=None,
+        updated=None,
         title: Optional[str] = None,
         abstract: Optional[str] = None,
     ):
@@ -33,6 +34,7 @@ class ArxivPaper(Paper):
 
         self.pdf_url = self.convert_abstract_to_pdf(self.abstract_url)
         self.published = published
+        self.updated = updated
         self.title = title if title else ""
         self.abstract = abstract if abstract else ""
 

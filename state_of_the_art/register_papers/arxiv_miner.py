@@ -14,7 +14,7 @@ class ArxivMiner:
     Looks at arxiv api for papers
     """
 
-    DEFAULT_QUERY = "cs.AI"
+    SORT_COLUMN = "submitted"
 
     def __init__(self):
         self.config = config
@@ -28,7 +28,7 @@ class ArxivMiner:
         self.arxiv_gateway = ArxivGateway()
 
     def register_all_new_papers(
-        self, dry_run=False, max_papers_per_query=None, topic=None
+        self, dry_run=False, topic=None
     ):
         """
         Register all papers by looking in arxiv api with the keyworkds of the audience configuration
@@ -47,9 +47,13 @@ class ArxivMiner:
 
         papers = []
         for topic in tqdm(keywords_to_mine):
-            papers = papers + self.arxiv_gateway.find_by_query(query=topic, sort_by="submitted")
+            print("Mining papers for topic: ", topic)
+            candidate_papers = self.arxiv_gateway.find_by_query(query=topic, sort_by=self.SORT_COLUMN)
+            real_new_papers = [p for p in candidate_papers if p.abstract_url not in self.existing_papers_urls]
+            print("Found ", len(real_new_papers), " new papers for topic: ", topic)
+            papers = papers + real_new_papers
 
-        papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
+
         logging.info("Found ", len(papers), " new papers")
 
         if dry_run:
@@ -68,42 +72,6 @@ class ArxivMiner:
         print("Found papers: ", str(papers))
         return self._register_given_papers(papers)
 
-    def register_by_relevance(
-        self, dry_run=False, topic_name=None
-    ):
-        """
-        Register papers by looking in arxiv api with the keyworkds of the audience configuration
-        :param dry_run:
-        :param disable_relevance_miner:
-        :return:
-        """
-        if dry_run:
-            print("Dry run, just printing, not registering them")
-
-        if topic_name:
-            topics_to_mine = self._get_topic_keywords(topic_name)
-        else:
-            topics_to_mine = self._get_topics_to_mine()
-
-        print(
-            f"Registering papers for the following ({len(topics_to_mine)}) keywords: ",
-            topics_to_mine,
-        )
-
-        papers = []
-        for topic_name in topics_to_mine:
-            papers = papers + self._find_papers(query=topic_name, sort_by="relevance")
-
-        papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
-        print("Found ", len(papers), " new papers")
-
-        if dry_run:
-            return len(papers), 0
-
-        total_registered, total_skipped = self._register_given_papers(papers)
-        print("New papers ", total_registered, " papers")
-        print("Skipped ", total_skipped, " papers")
-
     def latest_date_with_papers(self) -> datetime.date:
         """
         Return the latest date with papers in arxiv with the Query AI
@@ -112,32 +80,15 @@ class ArxivMiner:
         if not has_internet():
             raise Exception("No internet connection found")
 
-        query = ""
+        query = "cat:Artificial Intelligence"
 
-        result = self._find_papers(
-            query=query, number_of_papers=100, sort_by="submitted"
+        result = self.arxiv_gateway.find_by_query(
+            query=query, number_of_papers=10, sort_by=self.SORT_COLUMN
         )
         if not result:
             raise Exception(f"Did not find any paper with Query {query}")
-        date_str = result[0].published_date_str()
+        date_str = result[0].updated.date().isoformat()
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-
-    def register_latest_by_query(self, query):
-
-        papers = self._find_papers(query=query, number_of_papers=10)
-        print("Found ", len(papers), " new papers")
-
-        total_registered, total_skipped = self._register_given_papers(papers)
-        print("New papers ", total_registered, " papers")
-        print("Skipped ", total_skipped, " papers")
-
-    def _get_topics_to_mine(self) -> List[str]:
-        audience_keywords = config.get_current_audience().keywords
-        topics_to_mine = audience_keywords
-        audience_topics = config.get_current_audience().get_topics().values()
-        for topic in audience_topics:
-            topics_to_mine = topics_to_mine + topic.get_arxiv_search_keywords()
-        return topics_to_mine
 
     def register_paper_if_not_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
@@ -149,7 +100,6 @@ class ArxivMiner:
         self._find_papers(
             query=query, number_of_papers=15, sort_by="relevance", only_print=True
         )
-
 
     def load_existing_papers_urls(self):
         arxiv_papers = self.tdw.event("arxiv_papers")
@@ -184,7 +134,7 @@ class ArxivMiner:
 
 
 class ArxivGateway():
-    def find_by_id(ids):
+    def find_by_id(ids) -> List[ArxivPaper]:
         print("Searching by id list: ", id_list)
         search = arxiv.Search(
             id_list=id_list, max_results=number_of_papers, sort_by=sort
@@ -196,24 +146,24 @@ class ArxivGateway():
         self,
         query=None,
         number_of_papers=None,
-        sort_by: Literal["submitted", "relevance"] = "submitted",
+        sort_by: Literal["submitted", "relevance", 'updated'] = "submitted",
     ) -> List[ArxivPaper]:
 
         if not number_of_papers:
-            number_of_papers = (
-                self.max_papers_per_query
-                if self.max_papers_per_query
-                else self.config.papers_to_mine_per_query()
-            )
+            number_of_papers = config.papers_to_mine_per_query()
 
-        sort = (
-            arxiv.SortCriterion.SubmittedDate
-            if sort_by == "submitted"
-            else arxiv.SortCriterion.Relevance
-        )
+        if sort_by == "submitted":
+            sort = arxiv.SortCriterion.SubmittedDate
+        elif sort_by == "relevance":
+            sort = arxiv.SortCriterion.Relevance
+        elif sort_by == "updated":
+            sort = arxiv.SortCriterion.LastUpdatedDate
+
+        print("Searching by query: ", query)
+        print("Sorting by: ", sort_by)
 
         search = arxiv.Search(
-            query=query, max_results=number_of_papers, sort_by=sort
+            query=query, max_results=number_of_papers, sort_by=sort, sort_order=arxiv.SortOrder.Descending
         )
         return self._build_papers_from_results(search.results())
 
@@ -226,6 +176,7 @@ class ArxivGateway():
                 title=r.title,
                 abstract=r.summary,
                 published=r.published,
+                updated=r.updated,
             )
             papers.append(paper)
         return papers
