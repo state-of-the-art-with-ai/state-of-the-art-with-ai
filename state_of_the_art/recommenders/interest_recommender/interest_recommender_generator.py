@@ -14,6 +14,7 @@ from state_of_the_art.tables.recommendations_history_table import (
 from state_of_the_art.utils.mail import EmailService
 
 class InterestsRecommender:
+    NUMBER_OF_PAPERS_PER_TOPIC = 3
     def __init__(self) -> None:
         self._sentence_transformer = SentenceTransformer("all-mpnet-base-v2")
 
@@ -106,7 +107,6 @@ Period from: {data['from_date']}
 Period to: {data['to_date']}
 Papers analysed: {data['papers_analysed_total']}\n\n"""
         topic_counter = 1
-        NUMBER_OF_PAPERS_PER_TOPIC = 3
 
         # add total score to interest
         content_structured = {k: v for k, v in sorted(content_structured.items(), key=lambda item: sum([paper['score'] for paper in item[1]['papers'].values()]), reverse=True)}
@@ -116,10 +116,10 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
             papers = PapersLoader().load_papers_from_urls(interest_data['papers'].keys())
             content_str += f"{topic_counter}. {interest}\n"
 
-            for paper in papers[0:NUMBER_OF_PAPERS_PER_TOPIC]:
+            for paper in papers[0:self.NUMBER_OF_PAPERS_PER_TOPIC]:
                 paper_score = interest_data['papers'][paper.abstract_url]['score']
                 # add paper and url
-            content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
+                content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
 
             content_str += "\n"
             content_str += "\n"
