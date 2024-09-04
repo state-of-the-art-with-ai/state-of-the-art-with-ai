@@ -14,14 +14,17 @@ papers = None
 
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
+latest_date_with_papers = ArxivMiner().latest_date_with_papers()
+
+st.metric(f"Latest date with papers in arxiv", str(latest_date_with_papers))
+
 if "date" in st.query_params:
     default_date_filter = st.query_params["date"]
     default_date_filter = datetime.datetime.strptime(
         default_date_filter, "%Y-%m-%d"
     ).date()
 else:
-    default_date_filter = ArxivMiner().latest_date_with_papers()
-
+    default_date_filter = latest_date_with_papers
 date_filter = st.date_input("By Day", value=default_date_filter)
 st.query_params["date"] = date_filter
 

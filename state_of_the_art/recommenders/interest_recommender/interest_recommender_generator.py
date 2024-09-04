@@ -119,7 +119,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
             for paper in papers[0:NUMBER_OF_PAPERS_PER_TOPIC]:
                 paper_score = interest_data['papers'][paper.abstract_url]['score']
                 # add paper and url
-                content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
+            content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
 
             content_str += "\n"
             content_str += "\n"
