@@ -15,7 +15,6 @@ class ArxivMiner:
     """
 
     DEFAULT_QUERY = "cs.AI"
-    max_papers_per_query = None
 
     def __init__(self):
         self.config = config
@@ -26,6 +25,7 @@ class ArxivMiner:
         )
         self.tdw = config.get_datawarehouse()
         self.existing_papers_urls = self.load_existing_papers_urls()
+        self.arxiv_gateway = ArxivGateway()
 
     def register_all_new_papers(
         self, dry_run=False, max_papers_per_query=None, topic=None
@@ -36,7 +36,6 @@ class ArxivMiner:
         :param disable_relevance_miner:
         :return:
         """
-        self.max_papers_per_query = max_papers_per_query
         if dry_run:
             print("Dry run, just printing, not registering them")
         keywords_to_mine = self.config.KEYWORDS_TO_MINE
@@ -48,7 +47,7 @@ class ArxivMiner:
 
         papers = []
         for topic in tqdm(keywords_to_mine):
-            papers = papers + self._find_papers(query=topic, sort_by="submitted")
+            papers = papers + self.arxiv_gateway.find_by_query(query=topic, sort_by="submitted")
 
         papers = [p for p in papers if p.abstract_url not in self.existing_papers_urls]
         logging.info("Found ", len(papers), " new papers")
@@ -70,7 +69,7 @@ class ArxivMiner:
         return self._register_given_papers(papers)
 
     def register_by_relevance(
-        self, dry_run=False, max_papers_per_query=None, topic_name=None
+        self, dry_run=False, topic_name=None
     ):
         """
         Register papers by looking in arxiv api with the keyworkds of the audience configuration
@@ -78,7 +77,6 @@ class ArxivMiner:
         :param disable_relevance_miner:
         :return:
         """
-        self.max_papers_per_query = max_papers_per_query
         if dry_run:
             print("Dry run, just printing, not registering them")
 
@@ -114,11 +112,13 @@ class ArxivMiner:
         if not has_internet():
             raise Exception("No internet connection found")
 
+        query = ""
+
         result = self._find_papers(
-            query="machine learning", number_of_papers=1, sort_by="submitted"
+            query=query, number_of_papers=100, sort_by="submitted"
         )
         if not result:
-            raise Exception("Did not find any paper with Query AI")
+            raise Exception(f"Did not find any paper with Query {query}")
         date_str = result[0].published_date_str()
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
 
@@ -150,70 +150,6 @@ class ArxivMiner:
             query=query, number_of_papers=15, sort_by="relevance", only_print=True
         )
 
-    def _find_papers(
-        self,
-        id_list=None,
-        query=None,
-        number_of_papers=None,
-        sort_by: Literal["submitted", "relevance"] = "submitted",
-    ) -> List[ArxivPaper]:
-        if not query and not id_list:
-            print("No query provided, using default query")
-            query = self.DEFAULT_QUERY
-
-        if not number_of_papers:
-            number_of_papers = (
-                self.max_papers_per_query
-                if self.max_papers_per_query
-                else self.config.papers_to_mine_per_query()
-            )
-
-        sort = (
-            arxiv.SortCriterion.SubmittedDate
-            if sort_by == "submitted"
-            else arxiv.SortCriterion.Relevance
-        )
-
-        print(
-            "Arxiv query parameters:",
-            str(
-                {
-                    "query": query,
-                    "sort_by": sort_by,
-                    "id_list": id_list,
-                    "number_of_papers": number_of_papers,
-                }
-            ),
-        )
-
-        if id_list:
-            print("Searching by id list: ", id_list)
-            search = arxiv.Search(
-                id_list=id_list, max_results=number_of_papers, sort_by=sort
-            )
-        else:
-            print("Searching by query: ", query)
-            search = arxiv.Search(
-                query=query, max_results=number_of_papers, sort_by=sort
-            )
-
-        result = []
-        order_counter = 1
-        for r in search.results():
-            paper = ArxivPaper(
-                abstract_url=r.entry_id,
-                title=r.title,
-                abstract=r.summary,
-                published=r.published,
-            )
-            result.append(paper)
-            logging.info(
-                order_counter, paper.published, paper.title, paper.abstract_url
-            )
-            order_counter += 1
-        print("Found ", len(result), " papers")
-
-        return result
 
     def load_existing_papers_urls(self):
         arxiv_papers = self.tdw.event("arxiv_papers")
@@ -245,6 +181,54 @@ class ArxivMiner:
         print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
         return registered, skipped
 
+
+
+class ArxivGateway():
+    def find_by_id(ids):
+        print("Searching by id list: ", id_list)
+        search = arxiv.Search(
+            id_list=id_list, max_results=number_of_papers, sort_by=sort
+        )
+
+        return self._build_papers_from_results(search.results())
+
+    def find_by_query(
+        self,
+        query=None,
+        number_of_papers=None,
+        sort_by: Literal["submitted", "relevance"] = "submitted",
+    ) -> List[ArxivPaper]:
+
+        if not number_of_papers:
+            number_of_papers = (
+                self.max_papers_per_query
+                if self.max_papers_per_query
+                else self.config.papers_to_mine_per_query()
+            )
+
+        sort = (
+            arxiv.SortCriterion.SubmittedDate
+            if sort_by == "submitted"
+            else arxiv.SortCriterion.Relevance
+        )
+
+        search = arxiv.Search(
+            query=query, max_results=number_of_papers, sort_by=sort
+        )
+        return self._build_papers_from_results(search.results())
+
+
+    def _build_papers_from_results(self, results):
+        papers = []
+        for r in results:
+            paper = ArxivPaper(
+                abstract_url=r.entry_id,
+                title=r.title,
+                abstract=r.summary,
+                published=r.published,
+            )
+            papers.append(paper)
+        return papers
 
 if __name__ == "__main__":
     import fire
