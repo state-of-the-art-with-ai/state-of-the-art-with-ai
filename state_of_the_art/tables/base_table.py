@@ -94,4 +94,4 @@ class BaseTable:
         return True
 
     def last(cls):
-        return cls.read().sort_values(by='tdw_timestamp', ascending=True).iloc[-1]
+        return cls.read().sort_values(by='tdw_timestamp', ascending=False).iloc[0]

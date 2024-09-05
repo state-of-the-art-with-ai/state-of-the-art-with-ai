@@ -1,7 +1,7 @@
 import datetime
 import json
 from tqdm import tqdm
-from typing import List
+from typing import List, Tuple
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
@@ -14,72 +14,49 @@ from state_of_the_art.tables.recommendations_history_table import (
 from state_of_the_art.utils.mail import EmailService
 
 class InterestsRecommender:
-    NUMBER_OF_PAPERS_PER_TOPIC = 3
+    PAPER_PER_TOPIC_TO_RENDER = 5
+    TOP_PAPERS_TO_SELECT = 10
     def __init__(self) -> None:
         self._sentence_transformer = SentenceTransformer("all-mpnet-base-v2")
 
-    def generate(self, skip_register_new_papers=False, encode=True, ignore_last_recommendation=False):
+    def generate(self, number_of_days_to_look_back = 1, repeat_check_disable=False, skip_register_new_papers=False, encode=True, ignore_last_recommendation=False):
+        """
+        to disable encode set encode=False
+        """
         latest_date_with_papers = ArxivMiner().latest_date_with_papers()
         print(f"Latest date with papers submitted in arxiv: {latest_date_with_papers}")
 
         last_recommendation = RecommendationsHistoryTable().last().to_dict()
-        if last_recommendation['to_date'] == latest_date_with_papers.isoformat() and not ignore_last_recommendation:
+        if last_recommendation['to_date'] == latest_date_with_papers.isoformat() and not repeat_check_disable:
             raise Exception(f"No new papers since last recommendations on {last_recommendation['to_date']}")
 
         self.date_to = latest_date_with_papers
-        self.date_from = (datetime.datetime.fromisoformat(self.date_to.isoformat()) - datetime.timedelta(days=1)).date()
+        self.date_from = (datetime.datetime.fromisoformat(self.date_to.isoformat()) - datetime.timedelta(days=number_of_days_to_look_back)).date()
 
         
-        if  latest_date_with_papers < self.date_from:
+        if  latest_date_with_papers < self.date_from and not repeat_check_disable:
             print("No new papers since {self.date_from} so skipping mining ")
         elif not skip_register_new_papers:
             print("Will now mine new papers")
             ArxivMiner().register_all_new_papers()
 
-        papers_df = PapersLoader().load_between_dates(self.date_from, self.date_to)
-        if papers_df.empty:
-            raise Exception(f"No papers found between {self.date_from} and {self.date_to} so cannot generate recommendations")
-        
-        print(f"Found {len(papers_df.index)} papers between {self.date_from} and {self.date_to}")
-        arxiv_papers = PapersLoader().to_papers(papers_df)
 
-        if encode:
-            self.encode_papers(arxiv_papers)
+        self.load_papers_and_embeddings(self.date_from, self.date_to)
 
         # get all interests
         interests_df = Interests().read()
-        interests_to_str = [
-            interest["description"]
-            for interest in interests_df.to_dict(orient="records")
-        ]
-
-        print("Encoding interests")
-        interests_embeddings = self._sentence_transformer.encode(interests_to_str, show_progress_bar=True)
-
-        # get top similar papers for each interest
-        papers_embeddings_df = self.load_paper_embeddigs_table(paper_ids=papers_df['abstract_url'].to_list()).reset_index()
-        papers_embeddings = papers_embeddings_df["embedding"].to_list()
-
-
-        print("Calculating similarities")
-        similarity_matrix = self._sentence_transformer.similarity(
-            interests_embeddings, papers_embeddings
-        )
-        TOP_PAPERS_TO_SELECT = 10
 
         result = {}
         result['interest_papers'] = {}
-        for interest_index, interest in enumerate(interests_df.to_dict(orient="records")):
+        for interest in interests_df.to_dict(orient="records"):
             # get the top most similar papers indexes positions
-            top_papers_indices = similarity_matrix[interest_index].argsort(descending=True)[0:TOP_PAPERS_TO_SELECT]
+            top_papers, scores = self.get_papers_for_interest(interest["name"] + " " + interest["description"])
             # get teh top scores for the papers
 
-            print(f"Top papers for {interest['name']}, indices: {top_papers_indices}")
             result['interest_papers'][interest["name"]] = {}
             result['interest_papers'][interest["name"]]["papers"] = {}
-            for index in top_papers_indices:
-                score = similarity_matrix[interest_index][index].detach().item()
-                paper = arxiv_papers[index]
+            for paper_indice, paper in enumerate(top_papers):
+                score = scores[paper_indice]
                 result['interest_papers'][interest["name"]]["papers"][paper.abstract_url] = {"score": score}
 
         RecommendationsHistoryTable().add(
@@ -87,17 +64,54 @@ class InterestsRecommender:
             to_date=self.date_to.isoformat(),
             recommended_papers=str(result),
             papers_analysed="",
-            papers_analysed_total=len(papers_df.index),
+            papers_analysed_total=len(self.papers),
         )
 
 
         self.format_and_send_email()
 
         return result
+    
+    def get_papers_for_interest(self, interest_str: str) -> Tuple[List[ArxivPaper], List[float]]:
+        interests_embedding = self._sentence_transformer.encode(interest_str, show_progress_bar=True)
+
+        print("Calculating similarities")
+        similarity_matrix = self._sentence_transformer.similarity(
+            [interests_embedding], self.papers_embeddings
+        )
+        # return the closest match papapers
+        top_indices =similarity_matrix[0].argsort(descending=True)[0:self.TOP_PAPERS_TO_SELECT]
+        scores = [similarity_matrix[0][index].detach().item() for index in top_indices]
+        papers = [self.papers[index] for index in top_indices]
+            # get teh top scores for the papers
+        print('Top papers for interest: ', interest_str, ' are: ', [paper.title for paper in papers]) 
+
+        # print top papers matching
+        return papers, scores
+        
+
+
+    def load_papers_and_embeddings(self, date_from, date_to):
+        papers_df = PapersLoader().load_between_dates(date_from, date_to)
+        if papers_df.empty:
+            raise Exception(f"No papers found between {date_from} and {date_to} so cannot generate recommendations")
+        
+        print(f"Found {len(papers_df.index)} papers between {date_from} and {date_to}")
+        self.papers = arxiv_papers = PapersLoader().to_papers(papers_df)
+
+        self.encode_missing_papers(arxiv_papers)
+
+        papers_embeddings_df = self.load_papers_embeddings(paper_ids=papers_df['abstract_url'].to_list()).reset_index()
+        self.papers_embeddings = papers_embeddings_df["embedding"].to_list()
+
+
+        return self.papers, self.papers_embeddings
+        
 
     def format_and_send_email(self):
         df = RecommendationsHistoryTable().last()
         data = df.to_dict()
+        
         json_encoded = data['recommended_papers'].replace("'", '"')
         print("Json encoded: ", json_encoded)
         content_structured = json.loads(json_encoded)['interest_papers']
@@ -105,18 +119,22 @@ class InterestsRecommender:
         content_str = f"""
 Period from: {data['from_date']}
 Period to: {data['to_date']}
+Generated at: {data['tdw_timestamp']}
 Papers analysed: {data['papers_analysed_total']}\n\n"""
+
+        print(content_str)
+
         topic_counter = 1
 
         # add total score to interest
-        content_structured = {k: v for k, v in sorted(content_structured.items(), key=lambda item: sum([paper['score'] for paper in item[1]['papers'].values()]), reverse=True)}
+        #content_structured = {k: v for k, v in sorted(content_structured.items(), key=lambda item: sum([paper['score'] for paper in item[1]['papers'].values()]), reverse=True)}
         
 
         for interest, interest_data in content_structured.items():
             papers = PapersLoader().load_papers_from_urls(interest_data['papers'].keys())
             content_str += f"{topic_counter}. {interest}\n"
 
-            for paper in papers[0:self.NUMBER_OF_PAPERS_PER_TOPIC]:
+            for paper in papers[0:self.PAPER_PER_TOPIC_TO_RENDER]:
                 paper_score = interest_data['papers'][paper.abstract_url]['score']
                 # add paper and url
                 content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
@@ -130,25 +148,37 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         title = "Latest recommendations, generated at " + str(datetime.datetime.now()).split(".")[0]
         EmailService().send(content=content_str, subject=title)
 
-    def encode_papers(self, arxiv_papers: List[ArxivPaper]):
+    def encode_missing_papers(self, arxiv_papers: List[ArxivPaper]):
         """
         Encode all papers between the date_from and date_to into embeddings
         """
 
         print("Encoding papers to embeddings")
-        papers = [paper.title + " " + paper.abstract for paper in arxiv_papers]
-        result = self._sentence_transformer.encode(papers, show_progress_bar=True)
+        papers_candidates_ids = [paper.abstract_url for paper in arxiv_papers]
+        papers_dict = {paper.abstract_url: paper for paper in arxiv_papers}
+
 
         table = PaperEmbeddingsTable()
+        existing_papers = table.read()['paper_id'].to_list()
 
-        print("Writing embeddings to table")
-        for index, paper in tqdm(enumerate(arxiv_papers)):
+        papers_to_add = list(set(papers_candidates_ids) - set(existing_papers))
+
+        if not papers_to_add:
+            print("No new papers to add to table skipping encoding")
+            return
+
+        papers_str_list = [papers_dict[paper_id].title + " " + papers_dict[paper_id].abstract for paper_id in papers_to_add]
+        result = self._sentence_transformer.encode(papers_str_list, show_progress_bar=True)
+
+
+        print("Writing embeddings to table in progress bellow...")
+        for index, paper_id in tqdm(enumerate(papers_to_add), total=len(papers_to_add)):
             table.update_or_create(
                 by_key="paper_id",
-                by_value=paper.abstract_url,
+                by_value=paper_id,
                 new_values={
-                    "paper_id": paper.abstract_url,
-                    "content": paper.title + " " + paper.abstract,
+                    "paper_id": paper_id,
+                    "content": papers_dict['paper_id'].title + " " + papers_dict['paper_id'].abstract,
                     "embedding": result[index],
                 }
             )
@@ -157,7 +187,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
 
         return df
 
-    def load_paper_embeddigs_table(self, paper_ids: List[str]):
+    def load_papers_embeddings(self, paper_ids: List[str]):
         result = PaperEmbeddingsTable().read()
         result = result[result['paper_id'].isin(paper_ids)]
         return result

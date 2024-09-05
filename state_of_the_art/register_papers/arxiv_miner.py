@@ -50,7 +50,7 @@ class ArxivMiner:
             print("Mining papers for topic: ", topic)
             candidate_papers = self.arxiv_gateway.find_by_query(query=topic, sort_by=self.SORT_COLUMN)
             real_new_papers = [p for p in candidate_papers if p.abstract_url not in self.existing_papers_urls]
-            print("Found ", len(real_new_papers), " new papers for topic: ", topic)
+            print("Unique new papers found: ", len(real_new_papers), " for topic: ", topic)
             papers = papers + real_new_papers
 
 
@@ -68,7 +68,7 @@ class ArxivMiner:
         Register new paper by id
         """
         print("Registering paper in db by id: ", id)
-        papers = self._find_papers(id_list=[str(id)])
+        papers = self.arxiv_gateway.find_by_id([id])
         print("Found papers: ", str(papers))
         return self._register_given_papers(papers)
 
@@ -134,10 +134,9 @@ class ArxivMiner:
 
 
 class ArxivGateway():
-    def find_by_id(ids) -> List[ArxivPaper]:
-        print("Searching by id list: ", id_list)
+    def find_by_id(self, ids) -> List[ArxivPaper]:
         search = arxiv.Search(
-            id_list=id_list, max_results=number_of_papers, sort_by=sort
+            id_list=ids, max_results=len(ids)
         )
 
         return self._build_papers_from_results(search.results())
