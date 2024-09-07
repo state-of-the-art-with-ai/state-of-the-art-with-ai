@@ -3,7 +3,7 @@ import streamlit as st
 pages = {
     "Discover new Papers": [
         st.Page("pages/all_papers_page.py", title="All Latest Papers"),
-        st.Page("pages/papers_recommended_page.py", title="Papers Recommended"),
+        st.Page("pages/papers_recommended_page.py", title="Papers Recommendations"),
         st.Page("pages/discover_by_interests_page.py", title="Discovery by Interest"),
     ],
     "Your Papers": [

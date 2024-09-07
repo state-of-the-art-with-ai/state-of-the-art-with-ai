@@ -60,7 +60,6 @@ class ArxivMiner:
         if dry_run:
             return len(total_new_papers_found), 0
 
-
         total_registered, total_skipped = self._register_given_papers(total_new_papers_found)
         ArxivMiningHistory().add(
             keywords = ",".join(keywords_to_mine),

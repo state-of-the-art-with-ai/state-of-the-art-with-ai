@@ -38,7 +38,7 @@ class InterestsRecommender:
             print("No new papers since {self.date_from} so skipping mining ")
         elif not skip_register_new_papers:
             print("Will now mine new papers")
-            ArxivMiner().mine_all_topics()
+            ArxivMiner().mine_all_keywords()
 
 
         self.load_papers_and_embeddings(self.date_from, self.date_to)
@@ -99,7 +99,7 @@ class InterestsRecommender:
         print(f"Found {len(papers_df.index)} papers between {date_from} and {date_to}")
         self.papers = arxiv_papers = PapersLoader().to_papers(papers_df)
 
-        self.encode_missing_papers(arxiv_papers)
+        self._encode_missing_papers(arxiv_papers)
 
         papers_embeddings_df = self.load_papers_embeddings(paper_ids=papers_df['abstract_url'].to_list()).reset_index()
         self.papers_embeddings = papers_embeddings_df["embedding"].to_list()
@@ -148,7 +148,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         title = "Latest recommendations, generated at " + str(datetime.datetime.now()).split(".")[0]
         EmailService().send(content=content_str, subject=title)
 
-    def encode_missing_papers(self, arxiv_papers: List[ArxivPaper]):
+    def _encode_missing_papers(self, arxiv_papers: List[ArxivPaper]):
         """
         Encode all papers between the date_from and date_to into embeddings
         """
