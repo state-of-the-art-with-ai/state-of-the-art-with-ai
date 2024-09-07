@@ -6,6 +6,7 @@ from tqdm import tqdm
 import datetime
 import logging
 
+from state_of_the_art.tables.mine_history import ArxivMiningHistory
 from state_of_the_art.utils.internet import has_internet
 
 
@@ -27,7 +28,7 @@ class ArxivMiner:
         self.existing_papers_urls = self.load_existing_papers_urls()
         self.arxiv_gateway = ArxivGateway()
 
-    def register_all_new_papers(
+    def mine_all_keywords(
         self, dry_run=False, topic=None
     ):
         """
@@ -45,21 +46,27 @@ class ArxivMiner:
             keywords_to_mine,
         )
 
-        papers = []
+        total_new_papers_found = []
         for topic in tqdm(keywords_to_mine):
             print("Mining papers for topic: ", topic)
             candidate_papers = self.arxiv_gateway.find_by_query(query=topic, sort_by=self.SORT_COLUMN)
             real_new_papers = [p for p in candidate_papers if p.abstract_url not in self.existing_papers_urls]
             print("Unique new papers found: ", len(real_new_papers), " for topic: ", topic)
-            papers = papers + real_new_papers
+            total_new_papers_found = total_new_papers_found + real_new_papers
 
 
-        logging.info("Found ", len(papers), " new papers")
+        logging.info("Found ", len(total_new_papers_found), " new papers")
 
         if dry_run:
-            return len(papers), 0
+            return len(total_new_papers_found), 0
 
-        total_registered, total_skipped = self._register_given_papers(papers)
+
+        total_registered, total_skipped = self._register_given_papers(total_new_papers_found)
+        ArxivMiningHistory().add(
+            keywords = ",".join(keywords_to_mine),
+            total_new_papers_found=len(total_new_papers_found),
+        )
+
         print("New papers ", total_registered, " papers")
         print("Skipped ", total_skipped, " papers")
 

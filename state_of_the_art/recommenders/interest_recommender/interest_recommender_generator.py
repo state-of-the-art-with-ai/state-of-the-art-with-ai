@@ -38,7 +38,7 @@ class InterestsRecommender:
             print("No new papers since {self.date_from} so skipping mining ")
         elif not skip_register_new_papers:
             print("Will now mine new papers")
-            ArxivMiner().register_all_new_papers()
+            ArxivMiner().mine_all_topics()
 
 
         self.load_papers_and_embeddings(self.date_from, self.date_to)
@@ -178,7 +178,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
                 by_value=paper_id,
                 new_values={
                     "paper_id": paper_id,
-                    "content": papers_dict['paper_id'].title + " " + papers_dict['paper_id'].abstract,
+                    "content": papers_dict[paper_id].title + " " + papers_dict[paper_id].abstract,
                     "embedding": result[index],
                 }
             )
