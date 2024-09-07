@@ -28,9 +28,7 @@ class ArxivMiner:
         self.existing_papers_urls = self.load_existing_papers_urls()
         self.arxiv_gateway = ArxivGateway()
 
-    def mine_all_keywords(
-        self, dry_run=False, topic=None
-    ):
+    def mine_all_keywords(self, dry_run=False, topic=None):
         """
         Register all papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
@@ -49,20 +47,29 @@ class ArxivMiner:
         total_new_papers_found = []
         for topic in tqdm(keywords_to_mine):
             print("Mining papers for topic: ", topic)
-            candidate_papers = self.arxiv_gateway.find_by_query(query=topic, sort_by=self.SORT_COLUMN)
-            real_new_papers = [p for p in candidate_papers if p.abstract_url not in self.existing_papers_urls]
-            print("Unique new papers found: ", len(real_new_papers), " for topic: ", topic)
+            candidate_papers = self.arxiv_gateway.find_by_query(
+                query=topic, sort_by=self.SORT_COLUMN
+            )
+            real_new_papers = [
+                p
+                for p in candidate_papers
+                if p.abstract_url not in self.existing_papers_urls
+            ]
+            print(
+                "Unique new papers found: ", len(real_new_papers), " for topic: ", topic
+            )
             total_new_papers_found = total_new_papers_found + real_new_papers
-
 
         logging.info("Found ", len(total_new_papers_found), " new papers")
 
         if dry_run:
             return len(total_new_papers_found), 0
 
-        total_registered, total_skipped = self._register_given_papers(total_new_papers_found)
+        total_registered, total_skipped = self._register_given_papers(
+            total_new_papers_found
+        )
         ArxivMiningHistory().add(
-            keywords = ",".join(keywords_to_mine),
+            keywords=",".join(keywords_to_mine),
             total_new_papers_found=len(total_new_papers_found),
         )
 
@@ -138,12 +145,9 @@ class ArxivMiner:
         return registered, skipped
 
 
-
-class ArxivGateway():
+class ArxivGateway:
     def find_by_id(self, ids) -> List[ArxivPaper]:
-        search = arxiv.Search(
-            id_list=ids, max_results=len(ids)
-        )
+        search = arxiv.Search(id_list=ids, max_results=len(ids))
 
         return self._build_papers_from_results(search.results())
 
@@ -151,9 +155,8 @@ class ArxivGateway():
         self,
         query=None,
         number_of_papers=None,
-        sort_by: Literal["submitted", "relevance", 'updated'] = "submitted",
+        sort_by: Literal["submitted", "relevance", "updated"] = "submitted",
     ) -> List[ArxivPaper]:
-
         if not number_of_papers:
             number_of_papers = config.papers_to_mine_per_query()
 
@@ -168,10 +171,12 @@ class ArxivGateway():
         print("Sorting by: ", sort_by)
 
         search = arxiv.Search(
-            query=query, max_results=number_of_papers, sort_by=sort, sort_order=arxiv.SortOrder.Descending
+            query=query,
+            max_results=number_of_papers,
+            sort_by=sort,
+            sort_order=arxiv.SortOrder.Descending,
         )
         return self._build_papers_from_results(search.results())
-
 
     def _build_papers_from_results(self, results):
         papers = []
@@ -185,6 +190,7 @@ class ArxivGateway():
             )
             papers.append(paper)
         return papers
+
 
 if __name__ == "__main__":
     import fire

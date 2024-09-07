@@ -32,11 +32,10 @@ class BaseTable:
     def read(cls, recent_first=False):
         try:
             df = tdw.event(cls.table_name)
+            if recent_first:
+                df = df.sort_values(by="tdw_timestamp", ascending=False)
         except ValueError:
             return pd.DataFrame(columns=cls.schema.keys())
-
-        if recent_first:
-            df = df.sort_values(by="tdw_timestamp", ascending=False)
 
         return df
 
@@ -65,17 +64,22 @@ class BaseTable:
         tdw.replace_df(cls.table_name, df, dry_run=dry_run)
 
     @classmethod
+    def is_empty(cls) -> bool:
+        return cls.read().empty
+
+    @classmethod
     def update_or_create(cls, by_key: str, by_value: Any, new_values: dict):
-        df = cls.read()
+        # fix the new values using the key when missing
         if by_key not in new_values:
             new_values[by_key] = by_value
 
-        filtered_df = df[df[by_key] == by_value]
-        if filtered_df.empty:
-            cls.add(**new_values)
+        df= cls.read()
+        if cls.is_empty():
+            filtered_df = df[df[by_key] == by_value]
+            if filtered_df.empty:
+                cls.add(**new_values)
         else:
             # udpate the pandas rows that match the key with the new column values
-
             for column, new_value in new_values.items():
                 df[column] = df.apply(
                     lambda row: new_value if row[by_key] == by_value else row[column],
@@ -94,4 +98,4 @@ class BaseTable:
         return True
 
     def last(cls):
-        return cls.read().sort_values(by='tdw_timestamp', ascending=False).iloc[0]
+        return cls.read().sort_values(by="tdw_timestamp", ascending=False).iloc[0]

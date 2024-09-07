@@ -29,16 +29,16 @@ class Config:
 
     KEYWORDS_TO_MINE = [
         "data science",
-        'mlops',
-        'cs',
-        'computer science',
-        'ai',
-        'artificial intelligence',
-        'machine learning',
-        'statistics',
-        'deep learning',
-        'ethics',
-        'data',
+        "mlops",
+        "cs",
+        "computer science",
+        "ai",
+        "artificial intelligence",
+        "machine learning",
+        "statistics",
+        "deep learning",
+        "ethics",
+        "data",
     ]
 
     def get_max_articles_to_return_rank(self) -> int:

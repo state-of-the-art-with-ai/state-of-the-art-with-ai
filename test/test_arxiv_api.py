@@ -13,30 +13,28 @@ def test_arxiv_api():
     assert results[0].entry_id is not None
 
 
-
 def test_latest_date():
     result = arxiv.Search(
-        query="test",
-        sort_by = arxiv.SortCriterion.SubmittedDate,
-        max_results=1)
+        query="test", sort_by=arxiv.SortCriterion.SubmittedDate, max_results=1
+    )
     result_list = list(result.results())
     past_week = (datetime.datetime.now() - datetime.timedelta(days=7)).date()
     assert result_list[0].published.date() >= past_week
 
 
-
 def test_find_by_id():
-    result = arxiv.Search(
-        id_list=['2409.02069'])
+    result = arxiv.Search(id_list=["2409.02069"])
     result_list = list(result.results())
     result_list[0].published.date() >= datetime.date(2024, 9, 4)
+
 
 def test_last_updated_date():
     result = arxiv.Search(
         query="Machine Learning",
-        sort_by = arxiv.SortCriterion.LastUpdatedDate,
-        sort_order = arxiv.SortOrder.Descending,
-        max_results=1)
+        sort_by=arxiv.SortCriterion.LastUpdatedDate,
+        sort_order=arxiv.SortOrder.Descending,
+        max_results=1,
+    )
 
     result_list = list(result.results())
     print(result_list)

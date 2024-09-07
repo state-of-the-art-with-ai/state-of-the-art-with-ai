@@ -18,10 +18,10 @@ latest_date_with_papers = ArxivMiner().latest_date_with_papers()
 
 c1, c2 = st.columns([1, 1])
 with c1:
-    st.metric(f"Latest date with papers in arxiv", str(latest_date_with_papers))
+    st.metric("Latest date with papers in arxiv", str(latest_date_with_papers))
 with c2:
     last_mine = ArxivMiningHistory().last().to_dict()
-    st.metric(f"Latest date mined", str(last_mine['tdw_timestamp']).split(".")[0])
+    st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
 
 if "date" in st.query_params:
     default_date_filter = st.query_params["date"]
