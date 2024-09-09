@@ -1,10 +1,17 @@
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.paper_entity import Paper
 import os
 from state_of_the_art.utils import pdf
 
+class PaperDownloader:
 
-class Downloader:
-    def download(self, pdf_url: str, force_download=False, title=None) -> str:
+    def download_from_arxiv(self, paper: ArxivPaper, force_download=False) -> str:
+        self.download(paper.pdf_url, given_title=paper.title, force_download=force_download)
+    
+    def open_from_arxiv(self, paper: ArxivPaper):
+        self.open(paper.pdf_url, title=paper.title)
+
+    def download(self, pdf_url: str, force_download=False, given_title=None) -> str:
         """
         Downloads a paper from a given url
         :param url:
@@ -16,7 +23,7 @@ class Downloader:
 
         paper = Paper(pdf_url=pdf_url)
         print(f"Downloading paper from {paper.pdf_url}")
-        destination = self._get_destination(pdf_url, title=title)
+        destination = self._get_destination(pdf_url, title=given_title)
 
         if os.path.exists(destination):
             if "FORCE_DOWNLOAD" in os.environ or force_download:
@@ -47,7 +54,7 @@ class Downloader:
             os.remove(path)
             print(f"Removed file {path}")
 
-    def open(self, pdf_url):
-        path = self._get_destination(pdf_url)
+    def open(self, pdf_url, title=None):
+        path = self._get_destination(pdf_url, title=title)
         pdf.open_pdf(path)
         print(f"Opened file {path}")

@@ -1,5 +1,5 @@
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
-from state_of_the_art.paper.downloader import Downloader
+from state_of_the_art.paper.downloader import PaperDownloader
 from state_of_the_art.paper.paper_entity import Paper
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.utils import pdf
@@ -31,7 +31,7 @@ def get_pdf_content(url):
         paper_title = url.split("/")[-1].replace(".pdf", "")
     print("Paper title: ", paper_title)
 
-    local_location = Downloader().download(paper.pdf_url, title=paper_title)
+    local_location = PaperDownloader().download(paper.pdf_url, given_title=paper_title)
     paper_content = pdf.read_content(local_location)
 
     return paper_content, paper_title, local_location

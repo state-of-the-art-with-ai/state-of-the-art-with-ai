@@ -13,7 +13,6 @@ class RecommendationsHistoryTable(BaseTable):
         "recommended_papers": {"type": str},
     }
 
-
     def get_parsed_recommended_papers(self):
         df = self.last()
         data = df.to_dict()

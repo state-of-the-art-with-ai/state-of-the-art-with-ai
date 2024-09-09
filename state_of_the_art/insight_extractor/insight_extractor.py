@@ -23,7 +23,7 @@ class InsightExtractor:
     Looks into a single paper and extracts insights
     """
 
-    TABLE_NAME = "sota_paper_insight"
+    INSIGHTS_TABLE_NAME = "sota_paper_insight"
 
     def extract_from_url_in_clipboard(self):
         """
@@ -82,7 +82,7 @@ Abstract: {url}
             return
 
         config.get_datawarehouse().write_event(
-            self.TABLE_NAME,
+            self.INSIGHTS_TABLE_NAME,
             {
                 "abstract_url": url,
                 "insights": result,
@@ -137,7 +137,7 @@ Abstract: {url}
         return paper_path
 
     def _open_insight_summary_if_exists(self, abstract_url) -> bool:
-        df = config.get_datawarehouse().event(self.TABLE_NAME)
+        df = config.get_datawarehouse().event(self.INSIGHTS_TABLE_NAME)
         filtered = df[(df["abstract_url"] == abstract_url) & ~(df["pdf_path"].isnull())]
         if filtered.empty:
             return False

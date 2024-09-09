@@ -55,7 +55,16 @@ class ArxivPaper(Paper):
         return url
 
     @staticmethod
-    def load_from_dict(data):
+    def load_from_dict(data) -> "ArxivPaper":
+        if "abstract_url" not in data:
+            raise Exception(f"Abstract url not found in {data}")
+        if "published" not in data:
+            raise Exception(f"Published date not found in {data}")
+        if "title" not in data:
+            raise Exception(f"Title not found in {data}")
+        if "abstract" not in data:
+            raise Exception(f"Abstract not found in {data}")
+
         return ArxivPaper(
             abstract_url=data["abstract_url"],
             published=data["published"],
@@ -71,7 +80,7 @@ class ArxivPaper(Paper):
     def load_paper_from_url(url: str) -> "ArxivPaper":
         from state_of_the_art.paper.papers_data_loader import PapersLoader
 
-        result = PapersLoader().load_from_url(url)
+        result = PapersLoader().load_from_partial_url(url)
         if result.empty:
             raise Exception(f'Paper not found for url "{url}"')
 

@@ -73,7 +73,7 @@ class BaseTable:
         if by_key not in new_values:
             new_values[by_key] = by_value
 
-        df= cls.read()
+        df = cls.read()
         if cls.is_empty():
             filtered_df = df[df[by_key] == by_value]
             if filtered_df.empty:

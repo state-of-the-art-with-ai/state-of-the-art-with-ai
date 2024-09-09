@@ -61,7 +61,7 @@ with c2:
 
 with c3:
     if st.button("Open paper locally"):
-        open_paper_locally(paper.abstract_url)
+        open_paper_locally(paper)
 
 with st.expander("Abstract"):
     st.markdown(paper.abstract)

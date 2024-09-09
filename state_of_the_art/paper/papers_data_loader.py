@@ -90,6 +90,14 @@ class PapersLoader:
         result = papers[papers["abstract_url"] == url]
         return result
 
+    def load_from_partial_url(self, url) -> Optional[pd.DataFrame]:
+        papers = self.load_papers()
+        match = papers[papers["abstract_url"].str.contains(url)]
+
+        print(f"While searching by partial url match found {match}")
+
+        return match
+
     def load_from_urls(
         self, urls: List[str], as_dict=False, fail_on_missing_ids=True
     ) -> pd.DataFrame:
@@ -137,7 +145,7 @@ class PapersLoader:
 
     def is_paper_url_registered(self, url: str) -> bool:
         try:
-            self.load_paper_from_url(url)
+            self.load_from_partial_url(url)
             return True
         except BaseException as e:
             print("Could not find paper from url ", url, e)
@@ -146,12 +154,15 @@ class PapersLoader:
     def load_paper_from_url(self, url: str) -> ArxivPaper:
         if not url:
             raise Exception("Url not defined to load any paper")
+        result = self.load_from_partial_url(url)
 
-        result = self.load_papers_from_urls([url])
-        if not result or len(result) == 0:
+        arxiv_data = result.to_dict(orient="records")[0]
+        print("Arxiv data ", arxiv_data)
+        result = ArxivPaper.load_from_dict(arxiv_data)
+        if not result:
             raise Exception(f"Could not find paper from url {url}")
 
-        return result[0]
+        return result
 
     def df_to_papers(self, papers_df) -> List[ArxivPaper]:
         """

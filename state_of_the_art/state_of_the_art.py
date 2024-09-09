@@ -1,4 +1,4 @@
-from state_of_the_art.paper.downloader import Downloader
+from state_of_the_art.paper.downloader import PaperDownloader
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 
@@ -18,7 +18,7 @@ class Sota:
     def __init__(self):
         self.papers = PapersLoader()
         self.InsightExtractor = InsightExtractor
-        self.downloader = Downloader
+        self.downloader = PaperDownloader
         self.ArxivMiner = ArxivMiner
         self.ReportReview = ReportReview
         self.InterestsRecommender = InterestsRecommender

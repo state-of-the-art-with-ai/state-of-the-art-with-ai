@@ -22,7 +22,7 @@ def test_reset_table():
 
 
 def test_update_or_create():
-    tt.reset()
+    tt.reset(dry_run=False)
     tt.add(col_1=111, col_2=222)
     tt.add(col_1=222, col_2=333)
     assert tt.len() == 2

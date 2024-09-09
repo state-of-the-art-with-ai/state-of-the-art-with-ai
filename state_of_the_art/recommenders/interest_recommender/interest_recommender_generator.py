@@ -1,6 +1,4 @@
 import datetime
-import json
-from operator import itemgetter
 from tqdm import tqdm
 from typing import List, Tuple
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
@@ -78,6 +76,9 @@ class InterestsRecommender:
                     paper.abstract_url
                 ] = {"score": score}
 
+        result["interest_papers"] = self._remove_duplicates(result["interest_papers"])
+        result["interest_papers"] = self._sort_by_scores(result["interest_papers"])
+
         RecommendationsHistoryTable().add(
             from_date=self.date_from.isoformat(),
             to_date=self.date_to.isoformat(),
@@ -138,9 +139,9 @@ class InterestsRecommender:
         return self.papers, self.papers_embeddings
 
     def format_and_send_email(self):
-        content_structured, data = RecommendationsHistoryTable().get_parsed_recommended_papers()
-        content_structured = self._remove_duplicates(content_structured)
-        content_structured = self._sort_by_scores(content_structured)
+        content_structured, data = (
+            RecommendationsHistoryTable().get_parsed_recommended_papers()
+        )
         content_str = f"""
 Period from: {data['from_date']}
 Period to: {data['to_date']}
@@ -186,9 +187,12 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         if self.rencode_all_embeddings:
             table.reset(dry_run=False)
 
-
         existing_embedding_ds = table.read()
-        existing_papers_df = existing_embedding_ds["paper_id"].to_list() if not existing_embedding_ds.empty else []
+        existing_papers_df = (
+            existing_embedding_ds["paper_id"].to_list()
+            if not existing_embedding_ds.empty
+            else []
+        )
         papers_to_add = list(set(papers_candidates_ids) - set(existing_papers_df))
 
         if not papers_to_add:
@@ -196,8 +200,8 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
             return
 
         papers_str_list = [
-            #papers_dict[paper_id].title + " " + papers_dict[paper_id].abstract
-            papers_dict[paper_id].title 
+            # papers_dict[paper_id].title + " " + papers_dict[paper_id].abstract
+            papers_dict[paper_id].title
             for paper_id in papers_to_add
         ]
         result = self._sentence_transformer.encode(
@@ -209,7 +213,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
             if self.rencode_all_embeddings:
                 table.add(
                     paper_id=paper_id,
-                    content= papers_dict[paper_id].title,
+                    content=papers_dict[paper_id].title,
                     embedding=result[index],
                 )
             else:
@@ -235,40 +239,54 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
     def _remove_duplicates(self, recommendation_structure):
         papers_scores_by_category = {}
         for interest in recommendation_structure:
-            for paper in recommendation_structure[interest]['papers']:
-                if not paper in papers_scores_by_category:
-                    papers_scores_by_category[paper] = [(interest, recommendation_structure[interest]['papers'][paper]['score'])]
+            for paper in recommendation_structure[interest]["papers"]:
+                if paper not in papers_scores_by_category:
+                    papers_scores_by_category[paper] = [
+                        (
+                            interest,
+                            recommendation_structure[interest]["papers"][paper][
+                                "score"
+                            ],
+                        )
+                    ]
                 else:
-                    papers_scores_by_category[paper].append((interest, recommendation_structure[interest]['papers'][paper]['score']))
+                    papers_scores_by_category[paper].append(
+                        (
+                            interest,
+                            recommendation_structure[interest]["papers"][paper][
+                                "score"
+                            ],
+                        )
+                    )
 
-
-        papers_scores_by_category = {k: sorted(v, key=lambda item: item[1], reverse=True) for k, v in  papers_scores_by_category.items()}
+        papers_scores_by_category = {
+            k: sorted(v, key=lambda item: item[1], reverse=True)
+            for k, v in papers_scores_by_category.items()
+        }
 
         result = {}
         for interest in recommendation_structure:
             result[interest] = {}
-            result[interest]['papers'] = {}
-            for paper in recommendation_structure[interest]['papers']:
-
+            result[interest]["papers"] = {}
+            for paper in recommendation_structure[interest]["papers"]:
                 best_interest_for_paper = papers_scores_by_category[paper][0][0]
 
                 if best_interest_for_paper == interest:
-                    result[interest]['papers'][paper] = recommendation_structure[interest]['papers'][paper]
-
-
+                    result[interest]["papers"][paper] = recommendation_structure[
+                        interest
+                    ]["papers"][paper]
 
         return result
-                                                                            
 
     def _sort_by_scores(self, recommendation_structure):
-
         interest_scores_sum = {}
         for interest, papers in recommendation_structure.items():
-
-            interest_scores_sum[interest] =  0
-            for _, paper_data in papers['papers'].items():
-                interest_scores_sum[interest] += paper_data['score']
-        sort_interests_scores = sorted(interest_scores_sum.items(), key=lambda item: item[1], reverse=True)
+            interest_scores_sum[interest] = 0
+            for _, paper_data in papers["papers"].items():
+                interest_scores_sum[interest] += paper_data["score"]
+        sort_interests_scores = sorted(
+            interest_scores_sum.items(), key=lambda item: item[1], reverse=True
+        )
 
         # sort given dict with interest scores sum highest first
         # sort with a lambda function
@@ -280,10 +298,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         return result_dict
 
 
-
 if __name__ == "__main__":
     import fire
 
     fire.Fire(InterestsRecommender)
-
-
