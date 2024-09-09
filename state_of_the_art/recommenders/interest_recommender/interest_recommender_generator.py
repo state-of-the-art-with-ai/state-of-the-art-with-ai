@@ -1,5 +1,6 @@
 import datetime
 import json
+from operator import itemgetter
 from tqdm import tqdm
 from typing import List, Tuple
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
@@ -138,7 +139,8 @@ class InterestsRecommender:
 
     def format_and_send_email(self):
         content_structured, data = RecommendationsHistoryTable().get_parsed_recommended_papers()
-        content_structured = self.remove_duplicates(content_structured)
+        content_structured = self._remove_duplicates(content_structured)
+        content_structured = self._sort_by_scores(content_structured)
         content_str = f"""
 Period from: {data['from_date']}
 Period to: {data['to_date']}
@@ -230,7 +232,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         result = result[result["paper_id"].isin(paper_ids)]
         return result
 
-    def remove_duplicates(self, recommendation_structure):
+    def _remove_duplicates(self, recommendation_structure):
         papers_scores_by_category = {}
         for interest in recommendation_structure:
             for paper in recommendation_structure[interest]['papers']:
@@ -258,10 +260,30 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         return result
                                                                             
 
+    def _sort_by_scores(self, recommendation_structure):
+
+        interest_scores_sum = {}
+        for interest, papers in recommendation_structure.items():
+
+            interest_scores_sum[interest] =  0
+            for _, paper_data in papers['papers'].items():
+                interest_scores_sum[interest] += paper_data['score']
+        sort_interests_scores = sorted(interest_scores_sum.items(), key=lambda item: item[1], reverse=True)
+
+        # sort given dict with interest scores sum highest first
+        # sort with a lambda function
+        result_dict = {}
+
+        for interest, score_sum in sort_interests_scores:
+            result_dict[interest] = recommendation_structure[interest]
+
+        return result_dict
+
 
 
 if __name__ == "__main__":
     import fire
 
     fire.Fire(InterestsRecommender)
+
 
