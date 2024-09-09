@@ -3,6 +3,7 @@ import datetime
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
     InterestsRecommender,
 )
+from state_of_the_art.tables.recommendations_history_table import RecommendationsHistoryTable
 
 
 def test_single_interest_relevance():
@@ -16,3 +17,9 @@ def test_single_interest_relevance():
     recommender._encode_missing_papers(papers)
     papers, scores = recommender.get_papers_for_interest(interest)
     print(str([paper.title for paper in papers]))
+
+
+def test_load_results():
+    recommendation, row = RecommendationsHistoryTable().get_parsed_recommended_papers()
+
+    import json ; print(json.dumps(recommendation, indent=4))

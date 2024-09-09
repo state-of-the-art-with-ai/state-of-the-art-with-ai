@@ -7,7 +7,7 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.tables.interest_table import Interests
 from sentence_transformers import SentenceTransformer
-from state_of_the_art.tables.base_table import BaseTable
+from state_of_the_art.tables.papers_embeddings_table import PaperEmbeddingsTable
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
@@ -137,13 +137,7 @@ class InterestsRecommender:
         return self.papers, self.papers_embeddings
 
     def format_and_send_email(self):
-        df = RecommendationsHistoryTable().last()
-        data = df.to_dict()
-
-        json_encoded = data["recommended_papers"].replace("'", '"')
-        print("Json encoded: ", json_encoded)
-        content_structured = json.loads(json_encoded)["interest_papers"]
-
+        content_structured, data = RecommendationsHistoryTable().get_parsed_recommended_papers()
         content_str = f"""
 Period from: {data['from_date']}
 Period to: {data['to_date']}
@@ -234,15 +228,6 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         result = PaperEmbeddingsTable().read()
         result = result[result["paper_id"].isin(paper_ids)]
         return result
-
-
-class PaperEmbeddingsTable(BaseTable):
-    table_name = "paper_embeddings"
-    schema = {
-        "paper_id": {"type": str},
-        "content": {"type": str},
-        "embedding": {"type": list},
-    }
 
 
 if __name__ == "__main__":
