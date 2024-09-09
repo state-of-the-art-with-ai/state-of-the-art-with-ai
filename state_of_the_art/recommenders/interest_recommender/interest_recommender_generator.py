@@ -138,6 +138,7 @@ class InterestsRecommender:
 
     def format_and_send_email(self):
         content_structured, data = RecommendationsHistoryTable().get_parsed_recommended_papers()
+        content_structured = self.remove_duplicates(content_structured)
         content_str = f"""
 Period from: {data['from_date']}
 Period to: {data['to_date']}
@@ -229,8 +230,38 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         result = result[result["paper_id"].isin(paper_ids)]
         return result
 
+    def remove_duplicates(self, recommendation_structure):
+        papers_scores_by_category = {}
+        for interest in recommendation_structure:
+            for paper in recommendation_structure[interest]['papers']:
+                if not paper in papers_scores_by_category:
+                    papers_scores_by_category[paper] = [(interest, recommendation_structure[interest]['papers'][paper]['score'])]
+                else:
+                    papers_scores_by_category[paper].append((interest, recommendation_structure[interest]['papers'][paper]['score']))
+
+
+        papers_scores_by_category = {k: sorted(v, key=lambda item: item[1], reverse=True) for k, v in  papers_scores_by_category.items()}
+
+        result = {}
+        for interest in recommendation_structure:
+            result[interest] = {}
+            result[interest]['papers'] = {}
+            for paper in recommendation_structure[interest]['papers']:
+
+                best_interest_for_paper = papers_scores_by_category[paper][0][0]
+
+                if best_interest_for_paper == interest:
+                    result[interest]['papers'][paper] = recommendation_structure[interest]['papers'][paper]
+
+
+
+        return result
+                                                                            
+
+
 
 if __name__ == "__main__":
     import fire
 
     fire.Fire(InterestsRecommender)
+
