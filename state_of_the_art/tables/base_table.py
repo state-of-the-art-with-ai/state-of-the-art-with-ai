@@ -74,11 +74,11 @@ class BaseTable:
             new_values[by_key] = by_value
 
         df = cls.read()
-        if cls.is_empty():
-            filtered_df = df[df[by_key] == by_value]
-            if filtered_df.empty:
-                cls.add(**new_values)
+        if df.empty or df[df[by_key] == by_value].empty:
+            print(f"Row does not exist for value {by_value}, adding new row")
+            cls.add(**new_values)
         else:
+            print(f"Row does exist for value {by_value}, updating row with values {new_values}" )
             # udpate the pandas rows that match the key with the new column values
             for column, new_value in new_values.items():
                 df[column] = df.apply(

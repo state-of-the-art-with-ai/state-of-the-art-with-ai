@@ -154,10 +154,17 @@ class PapersLoader:
     def load_paper_from_url(self, url: str) -> ArxivPaper:
         if not url:
             raise Exception("Url not defined to load any paper")
+        
+
         result = self.load_from_partial_url(url)
+        if result.empty:
+            raise Exception(f"Could not find paper from url {url}")
 
         arxiv_data = result.to_dict(orient="records")[0]
         print("Arxiv data ", arxiv_data)
+        if not ArxivPaper.is_arxiv_url(url):
+            return Paper(pdf_url=arxiv_data["abstract_url"], title=arxiv_data["title"])
+
         result = ArxivPaper.load_from_dict(arxiv_data)
         if not result:
             raise Exception(f"Could not find paper from url {url}")

@@ -48,5 +48,5 @@ def new_paper(paper_url):
     if st.button("Save"):
         st.success("Paper saved successfully")
         paper_table = PaperTable()
-        paper_table.add(abstract_url=paper_url, title=title, published=None)
+        paper_table.add(abstract_url=paper_url, title=title, published=None, institution="")
         st.rerun()
