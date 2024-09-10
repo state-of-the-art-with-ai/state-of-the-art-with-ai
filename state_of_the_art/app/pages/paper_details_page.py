@@ -1,3 +1,4 @@
+from state_of_the_art.paper.email_paper import EmailAPaper
 from state_of_the_art.register_papers.register_paper import PaperRegister
 import streamlit as st
 from streamlit_tags import st_tags
@@ -54,7 +55,7 @@ with c1:
     )
     st.markdown("Published: " + paper.published_date_str())
 with c2:
-    st.markdown(f"[PDF]({paper.pdf_url})")
+    st.markdown(f"[Online PDF]({paper.pdf_url})")
     st.markdown(
         f"###### Conference ({insights_table.get_lastest_answer('Conference', url)})"
     )
@@ -62,6 +63,11 @@ with c2:
 with c3:
     if st.button("Open paper locally"):
         open_paper_locally(paper)
+    
+    if st.button("Send papert to email"):
+        with st.spinner("Sending paper to email..."):
+            if EmailAPaper().send(paper):
+                st.success("Paper sent successfully")
 
 with st.expander("Abstract"):
     st.markdown(paper.abstract)
