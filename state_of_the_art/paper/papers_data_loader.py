@@ -50,7 +50,7 @@ class PapersLoader:
         result = papers[papers["abstract_url"] == url]
         return result
 
-    def load_from_partial_url(self, url) -> Optional[pd.DataFrame]:
+    def load_from_partial_url(self, url) -> pd.DataFrame:
         papers = self.load_papers()
         match = papers[papers["abstract_url"].str.contains(url)]
 
@@ -105,8 +105,8 @@ class PapersLoader:
 
     def is_paper_url_registered(self, url: str) -> bool:
         try:
-            self.load_from_partial_url(url)
-            return True
+            result = self.load_from_partial_url(url)
+            return True if not result.empty else False
         except BaseException as e:
             print("Could not find paper from url ", url, e)
             return False

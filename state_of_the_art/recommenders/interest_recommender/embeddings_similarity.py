@@ -10,8 +10,8 @@ from typing import List, Tuple
 
 class EmbeddingsSimilarity:
     TOP_PAPERS_TO_SELECT = 10
-    def __init__(self, reencode_all_embeddings: bool = False) -> None:
-        self._sentence_transformer = SentenceTransformer("all-mpnet-base-v2")
+    def __init__(self, base_model="all-mpnet-base-v2", reencode_all_embeddings: bool = False) -> None:
+        self._sentence_transformer = SentenceTransformer(base_model)
         self.rencode_all_embeddings = reencode_all_embeddings
     def load_papers_and_embeddings(self, date_from, date_to):
         papers_df = PapersLoader().load_between_dates(date_from, date_to)

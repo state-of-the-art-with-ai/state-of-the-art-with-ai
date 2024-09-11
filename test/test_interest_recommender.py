@@ -70,7 +70,7 @@ def test_sort_interests_by_paper_scores():
         },
     }
 
-    result = InterestsRecommender()._sort_by_scores(data)
+    result = InterestsRecommender()._sort_interests_by_scores(data)
     iterator = iter(result.items())
     assert next(iterator)[0] == "second interest"
     assert next(iterator)[0] == "first interest"

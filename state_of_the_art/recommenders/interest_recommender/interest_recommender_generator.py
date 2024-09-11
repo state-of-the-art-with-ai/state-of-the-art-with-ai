@@ -24,15 +24,15 @@ class InterestsRecommender:
         skip_register_new_papers=False,
     ):
         """
-        to disable encode set encode=False
+        Generate a new set of recommendations based on the interests and the number of days to look back
         """
         latest_date_with_papers = ArxivMiner().latest_date_with_papers()
         print(f"Latest date with papers submitted in arxiv: {latest_date_with_papers}")
 
         last_recommendation = RecommendationsHistoryTable().last().to_dict()
         if (
+            not repeat_check_disable and 
             last_recommendation["to_date"] == latest_date_with_papers.isoformat()
-            and not repeat_check_disable
         ):
             raise Exception(
                 f"No new papers since last recommendations on {last_recommendation['to_date']}"
@@ -54,6 +54,8 @@ class InterestsRecommender:
             self.date_from, self.date_to
         )
 
+        self.bm25_search.set_papers_and_index(self.papers)
+
         # get all interests
         interests_df = Interests().read()
 
@@ -61,21 +63,34 @@ class InterestsRecommender:
         result["interest_papers"] = {}
         for interest in interests_df.to_dict(orient="records"):
             # get the top most similar papers indexes positions
-            top_papers, scores = self.embedding_similarity.get_papers_for_interest(
-                interest["name"] + " " + interest["description"]
-            )
-            # get teh top scores for the papers
-
+            query = interest["name"] + " " + interest["description"]
             result["interest_papers"][interest["name"]] = {}
             result["interest_papers"][interest["name"]]["papers"] = {}
+
+            papers_and_scores = self.bm25_search.search_returning_tuple(query)
+            for paper, score in papers_and_scores:
+                if paper.abstract_url in result["interest_papers"][interest["name"]]["papers"]:
+                    result["interest_papers"][interest["name"]]["papers"][
+                        paper.abstract_url
+                    ]["bm25_score"] = score
+                else:
+                    result["interest_papers"][interest["name"]]["papers"][
+                        paper.abstract_url
+                    ] = {"bm25_score": score, "semantic_score": 0}
+
+            
+            top_papers, semantic_scores = self.embedding_similarity.get_papers_for_interest(query)
+
             for paper_indice, paper in enumerate(top_papers):
-                score = scores[paper_indice]
+                semantic_score = semantic_scores[paper_indice]
                 result["interest_papers"][interest["name"]]["papers"][
                     paper.abstract_url
-                ] = {"score": score}
+                ] = {"semantic_score": semantic_score, "bm25_score": 0}
+
+
 
         result["interest_papers"] = self._remove_duplicates(result["interest_papers"])
-        result["interest_papers"] = self._sort_by_scores(result["interest_papers"])
+        result["interest_papers"] = self._sort_interests_by_scores(result["interest_papers"])
 
         RecommendationsHistoryTable().add(
             from_date=self.date_from.isoformat(),
@@ -109,7 +124,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
             content_str += f"{topic_counter}. {interest}\n"
 
             for paper in papers[0 : self.PAPER_PER_TOPIC_TO_RENDER]:
-                paper_score = interest_data["papers"][paper.abstract_url]["semantic_score"]
+                paper_score = interest_data["papers"][paper.abstract_url]["bm25_score"]
                 # add paper and url
                 content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
 
@@ -167,7 +182,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
 
         return result
 
-    def _sort_by_scores(self, recommendation_structure, score_column='semantic_score'):
+    def _sort_interests_by_scores(self, recommendation_structure, score_column='bm25_score'):
         interest_scores_sum = {}
         for interest, papers in recommendation_structure.items():
             interest_scores_sum[interest] = 0
