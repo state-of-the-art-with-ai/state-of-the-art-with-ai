@@ -154,7 +154,6 @@ class PapersLoader:
     def load_paper_from_url(self, url: str) -> ArxivPaper:
         if not url:
             raise Exception("Url not defined to load any paper")
-        
 
         result = self.load_from_partial_url(url)
         if result.empty:

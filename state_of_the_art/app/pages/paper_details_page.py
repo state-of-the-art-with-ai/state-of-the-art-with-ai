@@ -63,7 +63,7 @@ with c2:
 with c3:
     if st.button("Open paper locally"):
         open_paper_locally(paper)
-    
+
     if st.button("Send papert to email"):
         with st.spinner("Sending paper to email..."):
             if EmailAPaper().send(paper):

@@ -39,7 +39,13 @@ unique_papers = list(set(all_papers_selected))
 
 papers = PapersLoader().load_papers_from_urls(unique_papers)
 # sort papers by the bookmarked date
-papers = sorted(papers, key=lambda x: all_tags_df[all_tags_df['paper_id'] == x.abstract_url]['tdw_timestamp'].values[0], reverse=True)
+papers = sorted(
+    papers,
+    key=lambda x: all_tags_df[all_tags_df["paper_id"] == x.abstract_url][
+        "tdw_timestamp"
+    ].values[0],
+    reverse=True,
+)
 
 st.divider()
 

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 from state_of_the_art.tables.base_table import BaseTable
 
 

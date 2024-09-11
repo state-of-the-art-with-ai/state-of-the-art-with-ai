@@ -78,7 +78,9 @@ class BaseTable:
             print(f"Row does not exist for value {by_value}, adding new row")
             cls.add(**new_values)
         else:
-            print(f"Row does exist for value {by_value}, updating row with values {new_values}" )
+            print(
+                f"Row does exist for value {by_value}, updating row with values {new_values}"
+            )
             # udpate the pandas rows that match the key with the new column values
             for column, new_value in new_values.items():
                 df[column] = df.apply(

@@ -1,10 +1,9 @@
 import os
 
 import logging
-import os
 from subprocess import PIPE, Popen
-from typing import Optional, Literal
-import subprocess
+from typing import Optional
+
 
 class EmailService:
     default_destination = "j34nc4rl0@gmail.com"
@@ -38,7 +37,6 @@ class EmailService:
     def _send_email(
         self, *, to: str, subject=None, message: Optional[str] = None, attachement=None
     ):
-
         if message:
             message = message.replace("'", "")
 
@@ -57,7 +55,7 @@ class EmailService:
 
         else:
             cmd = f"""curl --url 'smtps://smtp.gmail.com:465' --ssl-reqd --mail-from '{self.SEND_FROM_EMAIL}' --mail-rcpt '{to}' --user '{self.SEND_FROM_EMAIL}:{password}' -T /tmp/foo  """
-        
+
         print("Command to run:", cmd)
 
         self._run(cmd)
@@ -72,7 +70,6 @@ class EmailService:
                 raise Exception("Error sending email" + output)
 
 
-
 def main():
     import fire
 
@@ -81,5 +78,3 @@ def main():
 
 if __name__ == "__main__":
     main(0)
-
-

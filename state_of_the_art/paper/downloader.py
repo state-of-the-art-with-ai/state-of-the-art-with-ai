@@ -3,10 +3,13 @@ from state_of_the_art.paper.paper_entity import Paper
 import os
 from state_of_the_art.utils import pdf
 
+
 class PaperDownloader:
     def download_from_arxiv(self, paper: ArxivPaper, force_download=False) -> str:
-        return self.download(paper.pdf_url, given_title=paper.title, force_download=force_download)
-    
+        return self.download(
+            paper.pdf_url, given_title=paper.title, force_download=force_download
+        )
+
     def open_from_arxiv(self, paper: ArxivPaper):
         self.open(paper.pdf_url, title=paper.title)
 

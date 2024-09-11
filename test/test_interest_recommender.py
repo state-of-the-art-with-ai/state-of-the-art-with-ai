@@ -1,6 +1,7 @@
 import datetime
 
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
+    EmbeddingsSimilarity,
     InterestsRecommender,
 )
 from state_of_the_art.tables.recommendations_history_table import (
@@ -10,7 +11,7 @@ from state_of_the_art.tables.recommendations_history_table import (
 
 def test_single_interest_relevance():
     interest = "security in machine learning "
-    recommender = InterestsRecommender()
+    recommender = EmbeddingsSimilarity()
     number_of_days_look_back = 3
     date_to = (datetime.datetime.now() - datetime.timedelta(days=0)).date()
     date_from = (

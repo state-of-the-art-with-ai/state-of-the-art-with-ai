@@ -1,7 +1,6 @@
 from state_of_the_art.app.data import papers, topics
 from state_of_the_art.app.pages.papers_page_utils import (
     edit_profile,
-    load_papers_from_last_report,
 )
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.paper.papers_data_loader import PapersLoader
@@ -19,10 +18,11 @@ send_by_email = False
 
 topics = Interests()
 topics_df = topics.read()
-topics_names =  topics_df["name"].tolist()
+topics_names = topics_df["name"].tolist()
 
 default_interest = (
-    0 if "interest" not in st.query_params
+    0
+    if "interest" not in st.query_params
     else topics_names.index(st.query_params["interest"])
 )
 
@@ -31,9 +31,7 @@ selected_interest = st.selectbox(
 )
 
 st.query_params["interest"] = selected_interest
-interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0][
-    "name"
-]
+interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0]["name"]
 topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
     "description"
 ]
