@@ -2,6 +2,7 @@ import datetime
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import EmbeddingsSimilarity
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
+from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.interest_table import Interests
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
@@ -14,6 +15,7 @@ class InterestsRecommender:
 
     def __init__(self) -> None:
         self.embedding_similarity = EmbeddingsSimilarity()
+        self.bm25_search = Bm25Search()
 
     def generate(
         self,
