@@ -30,13 +30,13 @@ class Bm25Search:
 
         return matches
 
-    def search_returning_tuple(self, query, n=100) -> List[Tuple[ArxivPaper, float]]:
+    def search_returning_tuple(self, query, n=100) -> Tuple[List[ArxivPaper], List[float]]:
         tokenized_query = self.tokenize(query)
 
         matches = self.bm25.get_top_n(tokenized_query, self.papers_list, n=n)
         scores = sorted(self.bm25.get_scores(tokenized_query)[0:n], reverse=True)
 
-        return zip(matches, scores)
+        return matches, scores
 
 
     def tokenize(self, string):

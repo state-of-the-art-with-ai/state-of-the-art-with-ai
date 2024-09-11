@@ -7,6 +7,8 @@ from state_of_the_art.recommenders.interest_recommender.interest_recommender_gen
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
+import scipy.stats as stats
+
 
 
 def test_single_interest_relevance():
@@ -74,3 +76,18 @@ def test_sort_interests_by_paper_scores():
     iterator = iter(result.items())
     assert next(iterator)[0] == "second interest"
     assert next(iterator)[0] == "first interest"
+
+
+def test_normalize():
+    series = [35, 10, 5, 0, 1]
+    normalized = zscore(series)
+    print("Normalized: ", normalized)
+
+    series_2 = [0.5, 0.3, 0.1, 0]
+    normalized_2 = zscore(series_2)
+    print("Normalized2: ", normalized_2)
+
+
+    
+def zscore(series):
+    return stats.zscore(series)

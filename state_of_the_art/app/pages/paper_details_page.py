@@ -64,8 +64,8 @@ with c3:
     if st.button("Open paper locally"):
         open_paper_locally(paper)
 
-    if st.button("Send papert to email"):
-        with st.spinner("Sending paper to email..."):
+    if st.button("Send paper to email"):
+        with st.spinner("Sending..."):
             if EmailAPaper().send(paper):
                 st.success("Paper sent successfully")
 

@@ -8,6 +8,8 @@ from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
 from state_of_the_art.utils.mail import EmailService
+import scipy.stats as stats
+
 
 
 class InterestsRecommender:
@@ -67,8 +69,10 @@ class InterestsRecommender:
             result["interest_papers"][interest["name"]] = {}
             result["interest_papers"][interest["name"]]["papers"] = {}
 
-            papers_and_scores = self.bm25_search.search_returning_tuple(query)
-            for paper, score in papers_and_scores:
+            papers, bm25_scores = self.bm25_search.search_returning_tuple(query)
+            bm25_scores = stats.zscore(bm25_scores)
+            for paper_indice, paper in enumerate(papers):
+                score = bm25_scores[paper_indice]
                 if paper.abstract_url in result["interest_papers"][interest["name"]]["papers"]:
                     result["interest_papers"][interest["name"]]["papers"][
                         paper.abstract_url
@@ -80,14 +84,24 @@ class InterestsRecommender:
 
             
             top_papers, semantic_scores = self.embedding_similarity.get_papers_for_interest(query)
+            semantic_scores = stats.zscore(semantic_scores)
 
             for paper_indice, paper in enumerate(top_papers):
                 semantic_score = semantic_scores[paper_indice]
                 result["interest_papers"][interest["name"]]["papers"][
                     paper.abstract_url
                 ] = {"semantic_score": semantic_score, "bm25_score": 0}
-
-
+        
+        # sum scores in a final score
+        for interest in result["interest_papers"]:
+            for paper in result["interest_papers"][interest]["papers"]:
+                result["interest_papers"][interest]["papers"][paper][
+                    "final_score"
+                ] = result["interest_papers"][interest]["papers"][paper][
+                    "bm25_score"
+                ] + result["interest_papers"][interest]["papers"][paper][
+                    "semantic_score"
+                ]
 
         result["interest_papers"] = self._remove_duplicates(result["interest_papers"])
         result["interest_papers"] = self._sort_interests_by_scores(result["interest_papers"])
@@ -140,7 +154,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         )
         EmailService().send(content=content_str, subject=title)
 
-    def _remove_duplicates(self, recommendation_structure, score_column='semantic_score'):
+    def _remove_duplicates(self, recommendation_structure, score_column='final_score'):
         papers_scores_by_category = {}
         for interest in recommendation_structure:
             for paper in recommendation_structure[interest]["papers"]:
@@ -182,7 +196,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
 
         return result
 
-    def _sort_interests_by_scores(self, recommendation_structure, score_column='bm25_score'):
+    def _sort_interests_by_scores(self, recommendation_structure, score_column='final_score'):
         interest_scores_sum = {}
         for interest, papers in recommendation_structure.items():
             interest_scores_sum[interest] = 0
