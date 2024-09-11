@@ -9,47 +9,6 @@ from state_of_the_art.paper.paper_entity import Paper
 
 class PapersLoader:
     TITLE_MAX_LENGH = 80
-
-    def get_latest_articles(
-        self,
-        from_date: Optional[str] = None,
-        to_date: Optional[str] = None,
-        lookback_days=None,
-        article_slices=None,
-        batch=1,
-        batch_size=100,
-    ) -> pd.DataFrame:
-        if not from_date and not lookback_days:
-            lookback_days = config.DEFAULT_LOOK_BACK_DAYS
-
-        max_papers = batch_size
-        if not article_slices:
-            article_slices = (max_papers * (batch - 1), max_papers * batch)
-        print("Look back days ", lookback_days)
-
-        from_date = (
-            from_date
-            if from_date
-            else (datetime.date.today() - datetime.timedelta(days=lookback_days))
-        ).isoformat()
-        to_date = to_date if to_date else datetime.date.today().isoformat()
-
-        articles = self.load_between_dates_str(from_date, to_date)
-        amount_of_articles = len(articles)
-        print(
-            "Found  ",
-            amount_of_articles,
-            f" articles with date filters but filtering down to {max_papers} ",
-        )
-
-        if amount_of_articles < max_papers:
-            article_slices = (0, amount_of_articles)
-        print("Slicing articles ", article_slices)
-
-        articles = articles[article_slices[0] : article_slices[1]]
-
-        return articles
-
     def load_papers(self):
         df = config.get_datawarehouse().event("arxiv_papers")
         # @todo Fix duplicates
@@ -71,18 +30,19 @@ class PapersLoader:
 
         return papers
 
-    def load_between_dates_str(self, start: str, end: str):
+    def load_between_dates(self, start: datetime.date, end: datetime.date):
+        df = self.load_papers()
+        return df[
+            (df["published"].dt.date >= start) & (df["published"].dt.date <= end)
+        ].sort_values(by="published", ascending=False)
+
+
+    def load_between_dates_str(self, start: str, end: str)-> pd.DataFrame:
         df = self.load_papers()
         print("Date filters of publication (from, to): ", start, end)
         return df[
             (df["published"].dt.strftime("%Y-%m-%d") >= start)
             & (df["published"].dt.strftime("%Y-%m-%d") <= end)
-        ].sort_values(by="published", ascending=False)
-
-    def load_between_dates(self, start: datetime.date, end: datetime.date):
-        df = self.load_papers()
-        return df[
-            (df["published"].dt.date >= start) & (df["published"].dt.date <= end)
         ].sort_values(by="published", ascending=False)
 
     def load_from_url(self, url) -> Optional[pd.DataFrame]:
@@ -189,21 +149,3 @@ class PapersLoader:
                 print("Error converting to paper ", i, e)
 
         return result
-
-    def sort_by_recently_published(self, df):
-        return df.sort_values(by="published", ascending=False)
-
-    def load_papers_between_published_dates(self, start, end) -> pd.DataFrame:
-        df = self.load_papers()
-        return self.sort_by_recently_published(
-            df[
-                (df["published"].dt.strftime("%Y-%m-%d") >= start)
-                & (df["published"].dt.strftime("%Y-%m-%d") <= end)
-            ]
-        )
-
-    def papers_to_urls_str(self, papers: List[ArxivPaper]) -> str:
-        urls = ""
-        for i in papers:
-            urls += i.abstract_url + "\n"
-        return urls

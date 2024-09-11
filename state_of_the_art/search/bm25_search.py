@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import nltk
 from rank_bm25 import BM25Okapi as BM25
@@ -30,6 +30,15 @@ class Bm25Search:
         matches = self.bm25.get_top_n(tokenized_query, self.papers_data, n=n)
 
         return matches
+
+    def search_returning_tuple(self, query, n=100) -> List[Tuple[ArxivPaper, float]]:
+        tokenized_query = self.tokenize(query)
+
+        matches = self.bm25.get_top_n(tokenized_query, self.papers_data, n=n)
+        scores = sorted(self.bm25.get_scores(tokenized_query)[0:n], reverse=True)
+
+        return zip(matches, scores)
+
 
     def tokenize(self, string):
         tokens = self.tokenizer.tokenize(string)

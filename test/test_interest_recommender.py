@@ -1,7 +1,7 @@
 import datetime
 
+from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import EmbeddingsSimilarity
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-    EmbeddingsSimilarity,
     InterestsRecommender,
 )
 from state_of_the_art.tables.recommendations_history_table import (
