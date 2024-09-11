@@ -27,10 +27,9 @@ class Config:
     OPEN_API_KEY = os.environ["SOTA_OPENAI_KEY"]
     dwh = None
 
-    KEYWORDS_TO_MINE = [
+    QUERIES_TO_MINE = [
         "data science",
         "mlops",
-        "computer science",
         "artificial intelligence",
         "machine learning",
         "statistics",

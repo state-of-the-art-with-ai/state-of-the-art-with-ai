@@ -28,7 +28,7 @@ class ArxivMiner:
         self.existing_papers_urls = self.load_existing_papers_urls()
         self.arxiv_gateway = ArxivGateway()
 
-    def mine_all_keywords(self, dry_run=False, topic=None):
+    def mine_all_keywords(self, dry_run=False, keyword=None):
         """
         Register all papers by looking in arxiv api with the keyworkds of the audience configuration
         :param dry_run:
@@ -37,7 +37,7 @@ class ArxivMiner:
         """
         if dry_run:
             print("Dry run, just printing, not registering them")
-        keywords_to_mine = self.config.KEYWORDS_TO_MINE
+        keywords_to_mine = self.config.QUERIES_TO_MINE
 
         print(
             f"Registering papers for the following ({len(keywords_to_mine)}) keywords: ",
@@ -45,10 +45,10 @@ class ArxivMiner:
         )
 
         total_new_papers_found = []
-        for topic in tqdm(keywords_to_mine):
-            print("Mining papers for topic: ", topic)
+        for keyword in tqdm(keywords_to_mine):
+            print("Mining papers for topic: ", keyword)
             candidate_papers = self.arxiv_gateway.find_by_query(
-                query=topic, sort_by=self.SORT_COLUMN
+                query=keyword, sort_by=self.SORT_COLUMN
             )
             real_new_papers = [
                 p
@@ -56,7 +56,7 @@ class ArxivMiner:
                 if p.abstract_url not in self.existing_papers_urls
             ]
             print(
-                "Unique new papers found: ", len(real_new_papers), " for topic: ", topic
+                "Unique new papers found: ", len(real_new_papers), " for topic: ", keyword
             )
             total_new_papers_found = total_new_papers_found + real_new_papers
 
