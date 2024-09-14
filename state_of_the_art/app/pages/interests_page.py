@@ -5,7 +5,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.interest_table import Interests
+from state_of_the_art.tables.interest_table import InterestsTable
 import streamlit as st
 
 generated_date = None
@@ -16,7 +16,7 @@ st.title("Discover Papers by Interest")
 papers = None
 send_by_email = False
 
-topics = Interests()
+topics = InterestsTable()
 topics_df = topics.read()
 topics_names = topics_df["name"].tolist()
 
@@ -49,6 +49,8 @@ with c1:
 with c2:
     if st.button("Delete Interest"):
         topics.delete_by(column="name", value=interest_name)
+        del st.query_params["interest"]
+        st.rerun()
         st.success("Interest deleted successfully")
 
 c1, c2 = st.columns([3, 1])

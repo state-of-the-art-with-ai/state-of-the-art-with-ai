@@ -3,13 +3,12 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import EmbeddingsSimilarity
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.interest_table import Interests
+from state_of_the_art.tables.interest_table import InterestsTable
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
 from state_of_the_art.utils.mail import EmailService
 import scipy.stats as stats
-
 
 
 class InterestsRecommender:
@@ -59,7 +58,7 @@ class InterestsRecommender:
         self.bm25_search.set_papers_and_index(self.papers)
 
         # get all interests
-        interests_df = Interests().read()
+        interests_df = InterestsTable().read()
 
         result = {}
         result["interest_papers"] = {}
@@ -122,9 +121,16 @@ class InterestsRecommender:
         content_structured, data = (
             RecommendationsHistoryTable().get_parsed_recommended_papers()
         )
+        import datetime ;
+        
+        to_date = datetime.datetime.strptime(data['to_date'], "%Y-%m-%d").date()
+        from_date = datetime.datetime.strptime(data['from_date'], "%Y-%m-%d").date()
+        days = (to_date - from_date).days
+
         content_str = f"""
 Period from: {data['from_date']}
 Period to: {data['to_date']}
+Days = {days}
 Generated at: {data['tdw_timestamp']}
 Papers analysed: {data['papers_analysed_total']}\n\n"""
 
@@ -149,7 +155,7 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
         print("Content str: ", content_str)
 
         title = (
-            "Latest recommendations, generated at "
+            f"Latest recommendations covering {days} days up to "
             + str(datetime.datetime.now()).split(".")[0]
         )
         EmailService().send(content=content_str, subject=title)
