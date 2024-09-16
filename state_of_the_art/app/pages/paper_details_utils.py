@@ -1,4 +1,5 @@
 from state_of_the_art.tables.arxiv_paper_table import PaperTable
+from state_of_the_art.tables.tags_table import TagsTable
 import streamlit as st
 from state_of_the_art.insight_extractor.insight_extractor import (
     InsightExtractor,
@@ -41,7 +42,7 @@ def questions(paper_url):
 
 
 @st.dialog("Questions")
-def new_paper(paper_url):
+def create_new(paper_url):
     st.write("New paper")
     title = st.text_input("Title")
     paper_url = st.text_input("Url", paper_url)
@@ -51,4 +52,8 @@ def new_paper(paper_url):
         paper_table.add(
             abstract_url=paper_url, title=title, published=None, institution=""
         )
+        tags_table = TagsTable()
+        tags_table.add_tag_to_paper(paper_url, "Manually Created")
+        st.query_params["paper_url"] = paper_url
         st.rerun()
+

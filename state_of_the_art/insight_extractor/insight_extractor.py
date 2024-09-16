@@ -205,6 +205,7 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
 
         structured_results = result.choices[0].message.function_call.arguments
         structured_results = json.loads(str(structured_results))
+        print("structured_results:", structured_results)
         return json.dumps(structured_results, indent=3), structured_results
 
 

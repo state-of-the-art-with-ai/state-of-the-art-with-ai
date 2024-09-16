@@ -1,9 +1,10 @@
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.email_paper import EmailAPaper
 from state_of_the_art.register_papers.register_paper import PaperRegister
 import streamlit as st
 from streamlit_tags import st_tags
 from state_of_the_art.app.data import insights
-from state_of_the_art.app.pages.paper_details_utils import new_paper, questions
+from state_of_the_art.app.pages.paper_details_utils import create_new, questions
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.tables.comments_table import Comments
@@ -22,9 +23,14 @@ url = st.text_input(
 )
 if url:
     url = url.strip()
-    url = url.replace("https", "http")
+    if ArxivPaper.is_abstract_url(url):
+        url = url.replace("https", "http")
+    url = url.replace("file:///", "/")
+    url = url.replace("/pdf/", "/abs/")
+    url = url.replace("www.", "")
     st.query_params.paper_url = url
 
+tags_table = TagsTable()
 
 c1, c2 = st.columns([1, 7])
 with c1:
@@ -32,7 +38,7 @@ with c1:
 with c2:
     add = st.button("Add new Paper")
     if add:
-        new_paper(url)
+        create_new(url)
 
 if not url:
     st.error("Load a paper to see details")
@@ -86,7 +92,6 @@ if extract_insights:
         )
     st.rerun()
 
-tags_table = TagsTable()
 tags_table_df = tags_table.read()
 existing_tags = []
 existing_tags_df = tags_table_df[tags_table_df["paper_id"] == paper.abstract_url]
@@ -146,7 +151,7 @@ with st.expander("Comments", expanded=True if comments_list else False):
 st.markdown("### Existing Insights")
 
 insights = insights_table.read()
-insights = insights[insights["paper_id"] == url]
+insights = insights[insights["paper_id"] == paper.abstract_url]
 insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 
 st.markdown(f""" ##### Structure
