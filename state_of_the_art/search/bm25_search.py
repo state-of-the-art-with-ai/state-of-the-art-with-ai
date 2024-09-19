@@ -23,7 +23,7 @@ class Bm25Search:
 
         self.bm25 = BM25(tokenized_corpus)
 
-    def search(self, query, n=100) -> List[ArxivPaper]:
+    def search_returning_papers(self, query, n=100) -> List[ArxivPaper]:
         tokenized_query = self.tokenize(query)
 
         matches = self.bm25.get_top_n(tokenized_query, self.papers_list, n=n)

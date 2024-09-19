@@ -9,7 +9,7 @@ from state_of_the_art.paper.paper_entity import Paper
 
 class PapersLoader:
     TITLE_MAX_LENGH = 80
-    def load_papers(self):
+    def load_papers_df(self) -> pd.DataFrame:
         df = config.get_datawarehouse().event("arxiv_papers")
         # @todo Fix duplicates
         df.drop_duplicates(subset=["abstract_url"], keep="first", inplace=True)
@@ -17,7 +17,7 @@ class PapersLoader:
         return df
 
     def get_all_papers(self) -> List[ArxivPaper]:
-        df = self.load_papers().sort_values(by="published", ascending=False)
+        df = self.load_papers_df().sort_values(by="published", ascending=False)
         return self.to_papers(df)
 
     def to_papers(self, df) -> Union[List[ArxivPaper], dict[str, ArxivPaper]]:
@@ -31,14 +31,14 @@ class PapersLoader:
         return papers
 
     def load_between_dates(self, start: datetime.date, end: datetime.date):
-        df = self.load_papers()
+        df = self.load_papers_df()
         return df[
             (df["published"].dt.date >= start) & (df["published"].dt.date <= end)
         ].sort_values(by="published", ascending=False)
 
 
     def load_between_dates_str(self, start: str, end: str)-> pd.DataFrame:
-        df = self.load_papers()
+        df = self.load_papers_df()
         print("Date filters of publication (from, to): ", start, end)
         return df[
             (df["published"].dt.strftime("%Y-%m-%d") >= start)
@@ -46,12 +46,12 @@ class PapersLoader:
         ].sort_values(by="published", ascending=False)
 
     def load_from_url(self, url) -> Optional[pd.DataFrame]:
-        papers = self.load_papers()
+        papers = self.load_papers_df()
         result = papers[papers["abstract_url"] == url]
         return result
 
     def load_from_partial_url(self, url) -> pd.DataFrame:
-        papers = self.load_papers()
+        papers = self.load_papers_df()
         match = papers[papers["abstract_url"].str.contains(url)]
 
         print(f"While searching by partial url match found {match}")
@@ -62,7 +62,7 @@ class PapersLoader:
         self, urls: List[str], as_dict=False, fail_on_missing_ids=True
     ) -> pd.DataFrame:
         urls = list(set(urls))
-        papers = self.load_papers()
+        papers = self.load_papers_df()
         if as_dict:
             result = {}
             for url in urls:

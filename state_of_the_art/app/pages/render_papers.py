@@ -5,6 +5,7 @@ import streamlit as st
 
 @st.dialog("More details")
 def preview(paper):
+    st.markdown("Title: " + paper.title)
     st.markdown("Published at: " + paper.published_date_str())
     st.markdown(paper.abstract)
 
@@ -14,11 +15,14 @@ tags_table = TagsTable()
 
 def render_papers(
     papers,
-    papers_metadata: Optional[dict] = None,
+    papers_metadata: Optional[dict[str, str]] = None,
     generated_date=None,
-    metadata: Optional[dict] = None,
+    metadata: Optional[dict[str, str]] = None,
     max_num_of_renderable_results=None,
 ):
+    """
+    metadata is a dictionary with the metadata to be displayed as titles
+    """
     if generated_date:
         st.markdown(f"###### Generated at {str(generated_date).split('.')[0]}")
     if metadata:
@@ -29,7 +33,7 @@ def render_papers(
             st.markdown("No papers found")
             return
         else:
-            st.markdown(f"#### {len(papers)} papers found")
+            st.markdown(f"#### {len(papers)} papers rendered")
 
         for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
             c1, c2, c3, c4= st.columns([9, 2, 1, 1])
@@ -48,7 +52,7 @@ def render_papers(
             with c2:
                 st.write(f"({paper.published_date_str()})")
             with c3:
-                if st.button("More", key=f"preview{k}"):
+                if st.button("More", key=f"review{k}"):
                     preview(paper)
             with c4:
                 if st.button("Save", key=f"save{k}"):

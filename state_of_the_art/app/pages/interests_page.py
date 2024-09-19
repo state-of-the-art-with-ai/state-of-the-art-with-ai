@@ -41,13 +41,13 @@ interest_name = st.text_input("Interest name", value=interest_name)
 
 c1, c2 = st.columns(2)
 with c1:
-    if st.button("Save Interest"):
+    if st.button("Save new Interest"):
         topics.add(name=interest_name, description=topic_description)
         st.query_params["interest"] = interest_name
         st.success("Interest saved successfully")
         st.rerun()
 with c2:
-    if st.button("Delete Interest"):
+    if st.button("Delete"):
         topics.delete_by(column="name", value=interest_name)
         del st.query_params["interest"]
         st.rerun()
@@ -64,7 +64,7 @@ st.divider()
 
 with st.spinner("Loading papers"):
     papers = PapersLoader().get_all_papers()
-    papers = Bm25Search(papers).search(interest_name + " " + topic_description)
+    papers = Bm25Search(papers).search_returning_papers(interest_name + " " + topic_description)
 
 # render all papeers
 render_papers(papers, generated_date=generated_date)

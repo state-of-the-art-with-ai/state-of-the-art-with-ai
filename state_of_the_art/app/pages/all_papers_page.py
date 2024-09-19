@@ -1,6 +1,7 @@
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
+from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.mine_history import ArxivMiningHistory
 import streamlit as st
 
@@ -8,9 +9,9 @@ generated_date = None
 lookback_days = None
 topic_description = None
 
-st.title("All Arxiv Papers")
+st.title("All Papers")
 
-papers = None
+papers_df = None
 
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
@@ -33,9 +34,19 @@ else:
 date_filter = st.date_input("By Day", value=default_date_filter)
 st.query_params["date"] = date_filter
 
-papers = PapersLoader().load_papers()
-papers = papers[papers["published"].dt.date == date_filter]
-papers = PapersLoader().to_papers(papers)
+search_query = st.text_input("Enter your Query", value="")
+filters = {}
 
-st.divider()
-render_papers(papers, generated_date=generated_date)
+with st.spinner("Fetching papers..."):
+    papers_df = PapersLoader().load_papers_df()
+    if not search_query:
+        papers_df = papers_df[papers_df["published"].dt.date == date_filter]
+        filters['Date'] = date_filter.isoformat()
+    papers = PapersLoader().to_papers(papers_df)
+
+    if search_query:
+        papers = Bm25Search(papers).search_returning_papers(search_query)
+        filters['Query']  = search_query
+
+    st.divider()
+    render_papers(papers, metadata=filters,generated_date=generated_date)

@@ -27,6 +27,7 @@ class InterestsRecommender:
         """
         Generate a new set of recommendations based on the interests and the number of days to look back
         """
+        print(f"Generating recomemndations for the last {number_of_days_to_look_back} days")
         latest_date_with_papers = ArxivMiner().latest_date_with_papers()
         print(f"Latest date with papers submitted in arxiv: {latest_date_with_papers}")
 
