@@ -38,14 +38,14 @@ def test_remove_duplicates():
     data = {
         "first interest": {
             "papers": {
-                "http://arxiv.org/abs/2409.04332": {"score": 0.1},
-                "http://arxiv.org/abs/2409.04348": {"score": 0.2},
+                "http://arxiv.org/abs/2409.04332": {"final_score": 0.1},
+                "http://arxiv.org/abs/2409.04348": {"final_score": 0.2},
             }
         },
         "second interest": {
             "papers": {
-                "http://arxiv.org/abs/2409.04332": {"score": 0.9},
-                "http://arxiv.org/abs/2409.04348": {"score": 0.1},
+                "http://arxiv.org/abs/2409.04332": {"final_score": 0.9},
+                "http://arxiv.org/abs/2409.04348": {"final_score": 0.1},
             }
         },
     }
@@ -60,14 +60,14 @@ def test_sort_interests_by_paper_scores():
     data = {
         "first interest": {
             "papers": {
-                "http://arxiv.org/abs/2409.04332": {"score": 0.1},
-                "http://arxiv.org/abs/2409.04348": {"score": 0.2},
+                "http://arxiv.org/abs/2409.04332": {"final_score": 0.1},
+                "http://arxiv.org/abs/2409.04348": {"final_score": 0.2},
             }
         },
         "second interest": {
             "papers": {
-                "http://arxiv.org/abs/2409.04332": {"score": 0.9},
-                "http://arxiv.org/abs/2409.04348": {"score": 0.1},
+                "http://arxiv.org/abs/2409.04332": {"final_score": 0.9},
+                "http://arxiv.org/abs/2409.04348": {"final_score": 0.1},
             }
         },
     }

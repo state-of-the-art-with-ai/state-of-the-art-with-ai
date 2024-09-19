@@ -9,7 +9,7 @@ def test_bm25():
     assert len(some_papers_df.index) > 0 
     some_papers = PapersLoader().to_papers(some_papers_df)
     search = Bm25Search(some_papers)
-    result = search.search_returning_tuple("machine learning")
+    result = search.search_returning_paper_and_score("machine learning")
     result = list(result)
-    assert result[0][1] > 0 
+    assert result[1][0] > 0 
     assert isinstance(result[0][0], ArxivPaper)

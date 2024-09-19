@@ -68,7 +68,7 @@ class InterestsRecommender:
             result["interest_papers"][interest["name"]] = {}
             result["interest_papers"][interest["name"]]["papers"] = {}
 
-            papers, bm25_scores = self.bm25_search.search_returning_tuple(query)
+            papers, bm25_scores = self.bm25_search.search_returning_paper_and_score(query)
             bm25_scores = stats.zscore(bm25_scores)
             for paper_indice, paper in enumerate(papers):
                 score = bm25_scores[paper_indice]
