@@ -1,1 +1,3 @@
 reports/*
+.models/*
+.pytest_cache/*

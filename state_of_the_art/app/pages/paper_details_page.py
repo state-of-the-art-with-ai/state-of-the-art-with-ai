@@ -1,6 +1,6 @@
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.email_paper import EmailAPaper
-from state_of_the_art.register_papers.register_paper import PaperRegister
+from state_of_the_art.register_papers.register_paper import ArxivPaperRegister
 import streamlit as st
 from streamlit_tags import st_tags
 from state_of_the_art.app.data import insights
@@ -45,17 +45,20 @@ if not url:
     st.stop()
 
 insights_table = InsightsTable()
-if not PaperRegister().is_paper_registered(url):
+if not ArxivPaperRegister().is_paper_registered(url):
     with st.spinner("Registering paper..."):
-        PaperRegister().register_by_url(url)
-        st.rerun()
+        if ArxivPaper.is_arxiv_url(url):
+            ArxivPaperRegister().register_by_url(url)
+            st.rerun()
+        else:
+            st.write("Not registered and not created. Create this paper before.")
 
 paper = PapersLoader().load_paper_from_url(url)
 
 st.markdown(f"### {paper.title}")
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
-    st.markdown(f"[{url}](url)")
+    st.markdown(f"[{paper.abstract_url}]({paper.abstract_url})")
     st.markdown(
         f"###### Institution ({insights_table.get_lastest_answer('Institution', url)})"
     )
