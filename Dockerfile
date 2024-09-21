@@ -1,4 +1,4 @@
-FROM python:3.12-bookworm
+FROM --platform=linux/amd64 python:3.12-bookworm
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR  /app
