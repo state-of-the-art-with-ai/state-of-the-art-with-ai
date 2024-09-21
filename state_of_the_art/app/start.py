@@ -11,6 +11,9 @@ pages = {
         st.Page("pages/paper_details_page.py", title="Dive into a Paper"),
         st.Page("pages/papers_report_page.py", title="Past Recomendations"),
     ],
+    "Settings": [
+        st.Page("pages/settings_page.py", title="Data Retrival"),
+    ]
 }
 
 
