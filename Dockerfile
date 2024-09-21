@@ -10,9 +10,6 @@ RUN pip install --upgrade pip
 RUN set -o vi
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&  unzip awscliv2.zip && ./aws/install 
 RUN poetry config --local virtualenvs.create false && poetry install  
-
-RUN sota cicd aws authentication_profile_str > /root/.aws/credentials
-
 # cleanups of caches and other stuff
 RUN rm -rf /root/.cache/*
 
