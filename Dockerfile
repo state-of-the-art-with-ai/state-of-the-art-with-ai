@@ -10,4 +10,4 @@ RUN poetry config --local virtualenvs.create false && poetry install  && rm -rf 
 ENV PYTHON_PATH "$PYTHON_PATH:/app/"
 RUN set -o vi
 
-CMD streamlit run /app/state_of_the_art/app/start.py
+CMD streamlit run --server.address '0.0.0.0' --server.port '80' --server.enableCORS True state_of_the_art/app/start.py

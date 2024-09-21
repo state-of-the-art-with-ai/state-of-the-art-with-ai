@@ -8,7 +8,7 @@ from state_of_the_art.recommenders.interest_recommender.interest_recommender_gen
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.review import ReportReview
 from state_of_the_art.scheduler import run_scheduler
-from state_of_the_art import ci_cd
+from state_of_the_art.ci_cd import Cli
 
 
 class Sota:
@@ -24,7 +24,7 @@ class Sota:
         self.ReportReview = ReportReview
         self.InterestsRecommender = InterestsRecommender
         self.run_scheduler = run_scheduler
-        self.cicd = ci_cd
+        self.cicd = Cli
 
 
 def main():
