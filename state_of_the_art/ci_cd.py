@@ -10,6 +10,7 @@ data_bucket = 'sota.data'
 class Docker:
     def build(self):
         os.system(f"docker build -t {image_local_tag} .")
+        print("Image size", self.image_size())
 
     def run(self):
         self.docker_stop_all()
@@ -33,10 +34,10 @@ class Docker:
         if not image_id:
             image_id = self.last_image()
 
-        self.tag_image(image_id)
+        self.add_tag_to_image(image_id)
         os.system(f"docker push '{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_image}:latest'")
 
-    def tag_image(self, image_id=None):
+    def add_tag_to_image(self, image_id=None):
         if not image_id:
             image_id = self.last_image()
         os.system(f"docker tag {image_id} '{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_image}:latest'")
@@ -46,7 +47,7 @@ class Docker:
         result = result.strip()
         return result
 
-    def get_ecr(self):
+    def get_ecr_name(self):
         return f"{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_image}:latest"
 
     def image_size(self):

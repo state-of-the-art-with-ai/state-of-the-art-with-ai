@@ -1,3 +1,4 @@
 reports/*
 .models/*
 .pytest_cache/*
+.git/*
