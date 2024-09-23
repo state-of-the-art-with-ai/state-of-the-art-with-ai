@@ -78,17 +78,21 @@ class S3:
     def push_local_data(self):
         os.system(f"aws s3 cp {TINY_DATA_WAREHOUSE_EVENTS} s3://{data_bucket}/tinydatawerehouse_events --recursive")
 
-    def pull_data(self):
-        destination = TINY_DATA_WAREHOUSE_EVENTS
+    def pull_data(self, destination=None):
+        if not destination:
+            destination = TINY_DATA_WAREHOUSE_EVENTS
+            if HOME == '/Users/jean.machado':
+                print("Pulling data to", destination)
+                destination = '/tmp/tinydatawerehouse_events'
+
+        yield "Using destination: " + destination
+
         if not os.path.exists(destination):
-            os.system(f"mkdir -p {destination}")
+            yield subprocess.check_output(f"mkdir -p {destination}", shell=True, text=True)
+        else: 
+            yield f"Path {destination} already exists skipping creation"
 
-        if HOME == '/Users/jean.machado':
-            print("Pulling data to", destination)
-            destination = '/tmp/tinydatawerehouse_events'
-
-        os.system(f"aws s3 cp s3://{data_bucket}/tinydatawerehouse_events {destination} --recursive")
-
+        yield subprocess.check_output(f"aws s3 cp s3://{data_bucket}/tinydatawerehouse_events {destination} --recursive", shell=True, text=True)
 class Cli:
     def __init__(self):
         self.docker = Docker
