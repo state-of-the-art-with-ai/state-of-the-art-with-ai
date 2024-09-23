@@ -1,24 +1,25 @@
 import time
+import datetime
 
+from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
 
 def job():
     print("Running recommender")
-    from state_of_the_art.deprecated_recommender.generator import Recommender
 
     try:
-        Recommender().generate(
-            skip_register=False,
-            disable_open_pdf=True,
-            disable_pdf=True,
-            number_lookback_days=2,
+        InterestsRecommender().generate(
+            repeat_check_disable=True,
         )
     except Exception as e:
         print("Error in scheduler job", e)
 
+def print_test():
+    print("Run at " + datetime.datetime.now().isoformat())
 
 def run_scheduler():
     import schedule
 
+    schedule.every(5).minutes.do(print_test)
     schedule.every().day.at("09:00").do(job)
     print("Scheduler infinite loop started")
     while True:

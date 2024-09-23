@@ -13,4 +13,4 @@ RUN poetry config --local virtualenvs.create false && poetry install
 # cleanups of caches and other stuff
 RUN rm -rf /root/.cache/*
 
-CMD streamlit run --server.address '0.0.0.0' --server.port '80' state_of_the_art/app/start.py
+CMD ./start_monorepo.sh
