@@ -30,7 +30,7 @@ with st.expander("Recommendations options"):
 
     if st.button("Generate new recommendations"):
         with st.spinner("Generating new recommendations"):
-            InterestsRecommender(reencode_all_embeddings=True).generate(
+            InterestsRecommender().generate(
                 skip_register_new_papers=True,
                 number_of_days_to_look_back=lookback_days,
                 repeat_check_disable=True,
