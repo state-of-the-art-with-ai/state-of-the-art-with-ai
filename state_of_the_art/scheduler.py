@@ -18,6 +18,7 @@ def print_test():
 
 def run_scheduler():
     import schedule
+    print("starting scheduler setup")
 
     schedule.every(5).minutes.do(print_test)
     schedule.every().day.at("09:00").do(job)
