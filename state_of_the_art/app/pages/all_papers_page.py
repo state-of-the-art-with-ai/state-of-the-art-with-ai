@@ -1,4 +1,5 @@
 from state_of_the_art.app.pages.render_papers import render_papers
+from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
 from state_of_the_art.search.bm25_search import Bm25Search
@@ -36,6 +37,9 @@ st.query_params["date"] = date_filter
 
 search_query = st.text_input("Enter your Query", value="")
 filters = {}
+
+if st.button("Mine new papers"):
+    ArxivMiner().mine_all_keywords()
 
 with st.spinner("Fetching papers..."):
     papers_df = PapersLoader().load_papers_df()
