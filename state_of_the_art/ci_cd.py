@@ -87,7 +87,11 @@ class S3:
         
     def push_local_data(self):
         self.validate_credentials()
-        os.system(f"aws s3 cp {TINY_DATA_WAREHOUSE_EVENTS} s3://{data_bucket}/tinydatawerehouse_events --recursive")
+        cmd = f"aws s3 cp {TINY_DATA_WAREHOUSE_EVENTS} s3://{data_bucket}/tinydatawerehouse_events --recursive"
+        p = subprocess.Popen(cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        return out, error
+
 
     def pull_data(self, destination=None):
         self.validate_credentials()
@@ -104,7 +108,10 @@ class S3:
         else: 
             yield f"Path {destination} already exists skipping creation"
 
-        yield subprocess.check_output(f"aws s3 cp s3://{data_bucket}/tinydatawerehouse_events {destination} --recursive", shell=True, text=True)
+        shell_cmd = f"aws s3 cp s3://{data_bucket}/tinydatawerehouse_events {destination} --recursive"
+        p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        yield "Error: " + error + "Output: " + out
 class Cli:
     def __init__(self):
         self.docker = Docker

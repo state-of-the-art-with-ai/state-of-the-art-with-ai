@@ -12,7 +12,7 @@ pages = {
         st.Page("pages/papers_report_page.py", title="Past Recomendations"),
     ],
     "Settings": [
-        st.Page("pages/settings_page.py", title="Admin"),
+        st.Page("pages/admin_page.py", title="Admin"),
     ]
 }
 

@@ -6,18 +6,19 @@ from state_of_the_art.ci_cd import S3
 
 st.title("Settings")
 
-if st.button("Pull latest data"):
-    with st.status("Pulling data"):
-        for log in S3().pull_data():
-            st.write(log)
+c1, c2 = st.columns([1, 1])
+with c1:
+    if st.button("Pull latest data"):
+        with st.status("Pulling data"):
+            for log in S3().pull_data():
+                st.write(log)
+with c2:
+    if st.button("Push data"):
+        with st.spinner("Pushing data"):
+            out, error = S3().push_local_data()
+            st.write(error)
+            st.write(out)
 
-if st.button("Push data"):
-    with st.spinner("Pushing data"):
-        S3().push_local_data()
-
-
-
-import streamlit as st
 
 
 st.markdown("### Debug shell")
