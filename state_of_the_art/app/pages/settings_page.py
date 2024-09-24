@@ -19,6 +19,7 @@ if st.button("Push data"):
 
 import streamlit as st
 
+
 st.markdown("### Debug shell")
 
 shell_cmd = st.text_input("Shell command")
@@ -29,6 +30,11 @@ if shell_cmd:
 
     st.write(error)
     st.write(out)
+
+p = subprocess.Popen('uptime', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+out, error  = p.communicate()
+st.metric("Uptime", out)
+
 
 def check_password():
     """Returns `True` if the user had the correct password."""
