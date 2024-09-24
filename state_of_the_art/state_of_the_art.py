@@ -1,3 +1,4 @@
+from state_of_the_art.container_startup import ContainerStartup
 from state_of_the_art.paper.downloader import PaperDownloader
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
@@ -25,6 +26,7 @@ class Sota:
         self.InterestsRecommender = InterestsRecommender
         self.scheduler = scheduler
         self.cicd = Cli
+        self.container_startup = ContainerStartup
 
 
 def main():

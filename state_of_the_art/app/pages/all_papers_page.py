@@ -39,7 +39,8 @@ search_query = st.text_input("Enter your Query", value="")
 filters = {}
 
 if st.button("Mine new papers"):
-    ArxivMiner().mine_all_keywords()
+    with st.spinner("Mining all keywords"):
+        ArxivMiner().mine_all_keywords()
 
 with st.spinner("Fetching papers..."):
     papers_df = PapersLoader().load_papers_df()
