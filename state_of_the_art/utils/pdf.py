@@ -1,6 +1,7 @@
 import os
 import datetime
 from typing import List, Optional
+from state_of_the_art.config import config
 
 
 def create_pdf(
@@ -37,13 +38,13 @@ def create_pdf_path(description_path: str, disable_timestamp=False) -> str:
         description_path = now + " " + description_path
     description_path = description_path.replace(" ", "_")
     description_path = "".join(x for x in description_path if x.isalnum() or x == "_")
-    base_path = "/Users/jean.machado/projects/state-of-the-art-via-ai/reports/"
+    base_path = config.get_local_papers_path()
 
     if os.environ.get("SOTA_TEST"):
         base_path = "/tmp/"
         print("Given that tests are enabled will use /tmp/ as base path for pdfs.")
 
-    return base_path + description_path + ".pdf"
+    return base_path + '/' + description_path + ".pdf"
 
 
 def open_pdf(output_path):

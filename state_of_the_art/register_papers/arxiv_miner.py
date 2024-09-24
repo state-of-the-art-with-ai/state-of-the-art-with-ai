@@ -93,10 +93,10 @@ class ArxivMiner:
         if not has_internet():
             raise Exception("No internet connection found")
 
-        query = "cat:Artificial Intelligence"
+        query = "cat:cs.AI"
 
         result = self.arxiv_gateway.find_by_query(
-            query=query, number_of_papers=10, sort_by=self.SORT_COLUMN
+            query=query, number_of_papers=3, sort_by='submitted'
         )
         if not result:
             raise Exception(f"Did not find any paper with Query {query}")

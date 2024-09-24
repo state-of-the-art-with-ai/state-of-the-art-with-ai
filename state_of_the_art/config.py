@@ -70,5 +70,16 @@ class Config:
 
         return self.dwh
 
+    def get_local_papers_path(self) -> str:
+        """ return the location where the papers are stored """
+
+        path = f"{Config.HOME}/.sota/papers"
+
+        if not os.path.exists(path):
+            os.system("mkdir -p " + path)
+        
+        return path
+
+
 
 config = Config.load_config()

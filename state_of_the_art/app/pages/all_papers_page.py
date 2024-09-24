@@ -20,7 +20,7 @@ latest_date_with_papers = ArxivMiner().latest_date_with_papers()
 
 c1, c2 = st.columns([1, 1])
 with c1:
-    st.metric("Latest date with papers in arxiv", str(latest_date_with_papers))
+    st.metric("Latest paper date in arxiv API", str(latest_date_with_papers))
 with c2:
     last_mine = ArxivMiningHistory().last().to_dict()
     st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
