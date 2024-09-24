@@ -20,6 +20,9 @@ class UserTable(BaseTable):
             return False
         password = df.loc[df["email"] == email, "password_hash"].values[0]
         return password == given_password
+    
+    def list_users(self):
+        return self.read().to_dict(orient="records")
 
 if __name__ == "__main__":
     import fire
