@@ -75,10 +75,22 @@ class S3:
     def list_content(self):
         os.system(f"aws s3 ls s3://{data_bucket}")
 
+    def validate_credentials(self):
+        if os.path.exists(f"{HOME}/.aws/credentials"):
+            return
+        if not os.environ.get('AWS_ACCESS_KEY_ID'):
+            raise Exception("AWS_ACCESS_KEY_ID not set")
+        if not os.environ.get('AWS_SECRET_ACCESS_KEY'):
+            raise Exception("AWS_SECRET_ACCESS_KEY not set")
+        if not os.environ.get('AWS_DEFAULT_REGION'):
+            raise Exception("AWS_DEFAULT_REGION not set")
+        
     def push_local_data(self):
+        self.validate_credentials()
         os.system(f"aws s3 cp {TINY_DATA_WAREHOUSE_EVENTS} s3://{data_bucket}/tinydatawerehouse_events --recursive")
 
     def pull_data(self, destination=None):
+        self.validate_credentials()
         if not destination:
             destination = TINY_DATA_WAREHOUSE_EVENTS
             if HOME == '/Users/jean.machado':
