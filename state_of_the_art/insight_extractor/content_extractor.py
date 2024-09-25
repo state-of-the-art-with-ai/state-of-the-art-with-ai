@@ -2,6 +2,7 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.downloader import PaperDownloader
 from state_of_the_art.paper.paper_entity import Paper
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
+from state_of_the_art.register_papers.register_paper import PaperCreator
 from state_of_the_art.utils import pdf
 import os
 
@@ -23,7 +24,7 @@ def get_content_from_url(url):
 def get_pdf_content(url):
     if ArxivPaper.is_arxiv_url(url):
         paper = ArxivPaper(abstract_url=url)
-        ArxivMiner().register_paper_if_not_registered(paper)
+        PaperCreator().register_if_not_found(url)
         paper = ArxivPaper.load_paper_from_url(paper.abstract_url)
         paper_title = paper.title
     else:

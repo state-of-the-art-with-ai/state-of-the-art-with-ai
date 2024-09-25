@@ -1,6 +1,6 @@
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.email_paper import EmailAPaper
-from state_of_the_art.register_papers.register_paper import ArxivPaperRegister
+from state_of_the_art.register_papers.register_paper import PaperCreator
 import streamlit as st
 from streamlit_tags import st_tags
 from state_of_the_art.app.data import insights
@@ -45,10 +45,10 @@ if not url:
     st.stop()
 
 insights_table = InsightsTable()
-if not ArxivPaperRegister().is_paper_registered(url):
+if not PaperCreator().is_paper_registered(url):
     with st.spinner("Registering paper..."):
         if ArxivPaper.is_arxiv_url(url):
-            ArxivPaperRegister().register_by_url(url)
+            PaperCreator().register_by_url(url)
             st.rerun()
         else:
             st.write("Not registered and not created. Create this paper before.")

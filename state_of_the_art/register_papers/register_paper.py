@@ -3,7 +3,7 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 
 
-class ArxivPaperRegister:
+class PaperCreator:
     def __init__(self):
         self.papers = []
 
