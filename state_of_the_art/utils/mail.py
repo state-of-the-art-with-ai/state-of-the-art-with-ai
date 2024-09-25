@@ -4,7 +4,6 @@ import logging
 from subprocess import PIPE, Popen
 from typing import Optional
 
-
 class EmailService:
     default_destination = "j34nc4rl0@gmail.com"
     SEND_FROM_EMAIL = "j34nc4rl0@gmail.com"
@@ -25,11 +24,6 @@ class EmailService:
             )
             return
 
-        with open("/tmp/mail_content.txt", "w") as f:
-            f.write(content)
-        os.system(
-            f"cat /tmp/mail_content.txt | mail.py send_email --to '{recepient}' --subject '{subject}'"
-        )
         self._send_email(
             to=recepient, subject=subject, message=content, attachement=attachment
         )
@@ -41,10 +35,32 @@ class EmailService:
             message = message.replace("'", "")
 
         password = os.environ["SECOND_MAIL_APPS_PASSWORD"]
-        logging.debug(f"Pass: {password}")
-        os.system(
-            f"echo 'From: {self.SEND_FROM_EMAIL}\nTo: {self.SEND_FROM_EMAIL}\nSubject: {subject}\n\n{message}' > /tmp/foo"
-        )
+        if False:
+            body_content = f"""From: {self.SEND_FROM_EMAIL}
+To: {to}
+Subject: {subject}
+
+{message}"""
+        else:
+            body_content = f"""From: {self.SEND_FROM_EMAIL}
+To: {to}
+Subject: {subject}
+Content-Type: text/html; charset="UTF-8"
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    {message}
+ </body>
+</html>
+"""
+
+
+        with open("/tmp/foo", "w") as myfile:
+            myfile.write(body_content)
 
         attachement_part = ""
         if attachement:
@@ -57,7 +73,6 @@ class EmailService:
             cmd = f"""curl --url 'smtps://smtp.gmail.com:465' --ssl-reqd --mail-from '{self.SEND_FROM_EMAIL}' --mail-rcpt '{to}' --user '{self.SEND_FROM_EMAIL}:{password}' -T /tmp/foo  """
 
         print("Command to run:", cmd)
-
         self._run(cmd)
 
     def _run(self, cmd):

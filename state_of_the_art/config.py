@@ -1,5 +1,6 @@
 import os
 from state_of_the_art.user_preferences.audience import Audience
+from state_of_the_art.user_preferences.preferences import SotaPreferences
 from tiny_data_warehouse import DataWarehouse
 
 
@@ -51,9 +52,50 @@ class Config:
         return self.DEFAUL_MAX_PAPERS_TO_MINE_PER_QUERY
 
     def get_current_audience(self) -> Audience:
-        # @todo implement this dynamically
-        from examples.gyg_teams import sota_preferences
+        jean = Audience(
+            audience_description=f"""Jean Machado, a Data Science Manager for GetYourGuide.
+        Jean wants the following out this tool:
+        2. to understand exciting and important topics with further depth
+        1. to have actionable insights and learnings he can apply in his teams
+        3. to stay on the bleeding edge of the field
 
+        to see what is going on on important institutions and companies in the field of data science and machine learning and computer science
+
+        Jean manages the following teams in GetYourGuide:
+        Jean is interseted in the following high level topics:
+
+        - data science
+        - ai for social good
+        - experimentation design, analysis and interpretation
+        - search engine optimization
+        - ai ethics
+        - data science leadership
+        - truth, and fake news
+
+            """,
+            keywords=['cs.AI', 'cs.LG', 'cs.SI', 'stat.ML',
+                    'ai', 'machine learning',
+                    'data science',
+                    'large language models',
+                    'ai for social good',
+                    'ai ethics'
+                    'data science management and data science teams  performance',
+                    'ai regulation',
+                    'forecasting',
+                    'bidding',
+                    'deep learning & neural nets',
+                    'mlops',
+                    'ads',
+                    'computer science',
+                    'knowledge graphs',
+                    'graph neural networks',
+                    'ai productivity',
+                    'explainable ai',
+                    'xai'
+                    ]
+
+        )
+        sota_preferences = SotaPreferences(audiences={'jean': jean}, default_profile='jean')
         return sota_preferences.get_current_audience()
 
     @staticmethod

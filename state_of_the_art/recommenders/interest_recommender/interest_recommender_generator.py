@@ -129,11 +129,11 @@ class InterestsRecommender:
         days = (to_date - from_date).days
 
         content_str = f"""
-Period from: {data['from_date']}
-Period to: {data['to_date']}
-Days = {days}
-Generated at: {data['tdw_timestamp']}
-Papers analysed: {data['papers_analysed_total']}\n\n"""
+Period from: {data['from_date']}<br>
+Period to: {data['to_date']}<br>
+Days = {days}<br>
+Generated at: {data['tdw_timestamp']}<br>
+Papers analysed: {data['papers_analysed_total']}<br><br>"""
 
         print(content_str)
         topic_counter = 1
@@ -142,15 +142,14 @@ Papers analysed: {data['papers_analysed_total']}\n\n"""
             papers = PapersLoader().load_papers_from_urls(
                 interest_data["papers"].keys()
             )
-            content_str += f"{topic_counter}. {interest}\n"
+            content_str += f"{topic_counter}. {interest}<br>"
 
             for paper in papers[0 : self.PAPER_PER_TOPIC_TO_RENDER]:
                 paper_score = interest_data["papers"][paper.abstract_url]["bm25_score"]
                 # add paper and url
-                content_str += f"{paper.title}: {paper.abstract_url} ({paper.published_date_str()}) ({round(paper_score, 2)}) \n"
+                content_str += f'<a href="https://state-of-the-art-with-ai-750989039686.europe-west3.run.app/paper_details_page?paper_url={paper.abstract_url}"> {paper.title} {paper.published_date_str()} ({round(paper_score, 2)})</a> <br>'
 
-            content_str += "\n"
-            content_str += "\n"
+            content_str += "<br><br>"
             topic_counter += 1
 
         print("Content str: ", content_str)

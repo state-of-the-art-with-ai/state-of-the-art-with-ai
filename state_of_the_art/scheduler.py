@@ -31,6 +31,8 @@ def run_scheduler():
     schedule.every(5).minutes.do(print_test)
     schedule.every(3).hours.do(push_data_to_s3)
     schedule.every().day.at("22:00").do(send_email_job)
+    schedule.every().day.at("15:00").do(send_email_job)
+    schedule.every().day.at("11:00").do(send_email_job)
     print("Scheduler infinite loop started")
     while True:
         schedule.run_pending()
