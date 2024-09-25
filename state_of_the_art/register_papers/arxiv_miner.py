@@ -132,7 +132,7 @@ curl "http://export.arxiv.org/api/query?search_query=all:Artificial+Intelligence
 
         return result
 
-    def register_paper_if_not_registered(self, paper: ArxivPaper):
+    def register_paper_if_no_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
             self.register_by_id(ArxivPaper.id_from_url(paper.pdf_url))
         else:
