@@ -1,11 +1,11 @@
-import arxiv
-from typing import Literal, List
+from typing import List
 from state_of_the_art.config import config
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from tqdm import tqdm
 import datetime
 import logging
 
+from state_of_the_art.register_papers.arxiv_gateway import ArxivGateway
 from state_of_the_art.tables.mine_history import ArxivMiningHistory
 from state_of_the_art.utils.internet import has_internet
 
@@ -102,6 +102,35 @@ class ArxivMiner:
             raise Exception(f"Did not find any paper with Query {query}")
         date_str = result[0].updated.date().isoformat()
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+    
+    def debug_latest_date_with_papers(self):
+        if not has_internet():
+            raise Exception("No internet connection found")
+
+        query = "cat:cs.AI"
+
+        query_result = self.arxiv_gateway.find_by_query(
+            query=query, number_of_papers=3, sort_by='submitted'
+        )
+        dates = [(entry.abstract_url, entry.updated.date().isoformat()) for entry in query_result]
+        result = {}
+        result['submitted'] = dates
+        query_result = self.arxiv_gateway.find_by_query(
+            query=query, number_of_papers=3, sort_by='updated'
+        )
+        dates = [(entry.abstract_url, entry.updated.date().isoformat()) for entry in query_result]
+        result['updated'] = dates
+
+        import subprocess
+        shell_cmd = """
+curl "http://export.arxiv.org/api/query?search_query=all:Artificial+Intelligence&sortBy=submittedDate&sortOrder=descending" | grep -i published
+        """
+        p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        print(out)
+        print(error)
+
+        return result
 
     def register_paper_if_not_registered(self, paper: ArxivPaper):
         if not paper.exists_in_db(paper.pdf_url):
@@ -143,53 +172,6 @@ class ArxivMiner:
 
         print("Registered ", registered, " papers", "Skipped ", skipped, " papers")
         return registered, skipped
-
-
-class ArxivGateway:
-    def find_by_id(self, ids) -> List[ArxivPaper]:
-        search = arxiv.Search(id_list=ids, max_results=len(ids))
-
-        return self._build_papers_from_results(search.results())
-
-    def find_by_query(
-        self,
-        query=None,
-        number_of_papers=None,
-        sort_by: Literal["submitted", "relevance", "updated"] = "submitted",
-    ) -> List[ArxivPaper]:
-        if not number_of_papers:
-            number_of_papers = config.papers_to_mine_per_query()
-
-        if sort_by == "submitted":
-            sort = arxiv.SortCriterion.SubmittedDate
-        elif sort_by == "relevance":
-            sort = arxiv.SortCriterion.Relevance
-        elif sort_by == "updated":
-            sort = arxiv.SortCriterion.LastUpdatedDate
-
-        print("Searching by query: ", query)
-        print("Sorting by: ", sort_by)
-
-        search = arxiv.Search(
-            query=query,
-            max_results=number_of_papers,
-            sort_by=sort,
-            sort_order=arxiv.SortOrder.Descending,
-        )
-        return self._build_papers_from_results(search.results())
-
-    def _build_papers_from_results(self, results):
-        papers = []
-        for r in results:
-            paper = ArxivPaper(
-                abstract_url=r.entry_id,
-                title=r.title,
-                abstract=r.summary,
-                published=r.published,
-                updated=r.updated,
-            )
-            papers.append(paper)
-        return papers
 
 
 if __name__ == "__main__":

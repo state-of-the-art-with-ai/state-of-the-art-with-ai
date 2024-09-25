@@ -18,12 +18,16 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 
 latest_date_with_papers = ArxivMiner().latest_date_with_papers()
 
-c1, c2 = st.columns([1, 1])
+c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     st.metric("Latest paper date in arxiv API", str(latest_date_with_papers))
 with c2:
     last_mine = ArxivMiningHistory().last().to_dict()
     st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
+with c3:
+    if st.button("Mine new papers"):
+        with st.spinner("Mining all keywords"):
+            ArxivMiner().mine_all_keywords()
 
 if "date" in st.query_params:
     default_date_filter = st.query_params["date"]
@@ -38,9 +42,6 @@ st.query_params["date"] = date_filter
 search_query = st.text_input("Enter your Query", value="")
 filters = {}
 
-if st.button("Mine new papers"):
-    with st.spinner("Mining all keywords"):
-        ArxivMiner().mine_all_keywords()
 
 with st.spinner("Fetching papers..."):
     papers_df = PapersLoader().load_papers_df()
