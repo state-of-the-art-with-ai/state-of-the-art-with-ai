@@ -6,7 +6,6 @@ from state_of_the_art.recommenders.interest_recommender.interest_recommender_gen
 
 def send_email_job():
     print("Running recommender")
-
     try:
         InterestsRecommender().generate(
             repeat_check_disable=True,

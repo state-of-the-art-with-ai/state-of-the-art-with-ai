@@ -1,5 +1,7 @@
 import os
 import subprocess
+
+from state_of_the_art.tables.data_sync_table import PushHistory
 region = 'eu-central-1'
 aws_account_id = '467863034863'
 streamlit_port = 80
@@ -90,6 +92,7 @@ class S3:
         cmd = f"aws s3 cp {TINY_DATA_WAREHOUSE_EVENTS} s3://{data_bucket}/tinydatawerehouse_events --recursive"
         p = subprocess.Popen(cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, error  = p.communicate()
+        PushHistory().add()
         return out, error
 
 
@@ -97,9 +100,6 @@ class S3:
         self.validate_credentials()
         if not destination:
             destination = TINY_DATA_WAREHOUSE_EVENTS
-            if HOME == '/Users/jean.machado':
-                print("Pulling data to", destination)
-                destination = '/tmp/tinydatawerehouse_events'
 
         yield "Using destination: " + destination
 
