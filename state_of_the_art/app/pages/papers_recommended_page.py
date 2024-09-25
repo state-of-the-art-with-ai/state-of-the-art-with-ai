@@ -1,4 +1,5 @@
 import json
+import subprocess
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
@@ -23,18 +24,20 @@ PAPER_PER_TOPIC_TO_RENDER = 3
 
 
 lookback_days = 1
-with st.expander("Recommendations options"):
+generate_clicked = False
+with st.expander("Recommendations options", expanded=True):
     lookback_days = st.number_input(
         "Lookback days", value=1, min_value=1, max_value=365
     )
 
-    if st.button("Generate new recommendations"):
-        with st.spinner("Generating new recommendations"):
-            InterestsRecommender().generate(
-                skip_register_new_papers=True,
-                number_of_days_to_look_back=lookback_days,
-                repeat_check_disable=True,
-            )
+    generate_clicked = st.button("Generate new recommendations")
+
+if generate_clicked:
+    with st.status(f"Generating new recommendations for {lookback_days} days ... "):
+        p = subprocess.Popen(f'sota InterestsRecommender generate -s -n {lookback_days} -r | tee /tmp/generator.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        st.write(error)
+        st.write(out)
 
 papers = []
 for interest, interest_data in structured["interest_papers"].items():
