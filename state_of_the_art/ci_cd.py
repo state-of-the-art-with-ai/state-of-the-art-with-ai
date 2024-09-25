@@ -1,22 +1,18 @@
 import os
 import subprocess
 
-from state_of_the_art.tables.data_sync_table import PushHistory
-region = 'eu-central-1'
-aws_account_id = '467863034863'
-streamlit_port = 80
-ecr_image = 'sota/monorepo'
-image_local_tag = 'sota'
-data_bucket = 'sota.data'
+from state_of_the_art.infrastructure.s3 import S3
+from state_of_the_art.config import config
+
 
 class Docker:
     def build(self):
-        os.system(f"docker build -t {image_local_tag} .")
+        os.system(f"docker build -t {config.image_local_tag} .")
         print("Image size", self.image_size())
 
     def run(self):
         self.docker_stop_all()
-        os.system(f"docker run -it --rm -p {streamlit_port}:{streamlit_port} sota")
+        os.system(f"docker run -it --rm -p {config.streamlit_port}:{config.streamlit_port} sota")
 
     def build_and_run(self):
         self.build()
@@ -30,19 +26,19 @@ class Docker:
         os.system("docker stop $(docker ps -a -q)")
 
     def login(self):
-        os.system(f"aws ecr get-login-password --region {region} |  docker login --username AWS --password-stdin {aws_account_id}.dkr.ecr.{region}.amazonaws.com")
+        os.system(f"aws ecr get-login-password --region {config.region} |  docker login --username AWS --password-stdin {config.aws_account_id}.dkr.ecr.{config.region}.amazonaws.com")
 
     def push(self, image_id=None):
         if not image_id:
             image_id = self.last_image()
 
         self.add_tag_to_image(image_id)
-        os.system(f"docker push '{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_image}:latest'")
+        os.system(f"docker push '{config.aws_account_id}.dkr.ecr.{config.region}.amazonaws.com/{config.ecr_image}:latest'")
 
     def add_tag_to_image(self, image_id=None):
         if not image_id:
             image_id = self.last_image()
-        os.system(f"docker tag {image_id} '{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_image}:latest'")
+        os.system(f"docker tag {image_id} '{config.aws_account_id}.dkr.ecr.{config.region}.amazonaws.com/{config.ecr_image}:latest'")
 
     def last_image(self) -> str:
         result = subprocess.check_output('docker images --filter=reference=sota --format "{{.ID}}"', shell=True, text=True)
@@ -50,7 +46,7 @@ class Docker:
         return result
 
     def get_ecr_name(self):
-        return f"{aws_account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_image}:latest"
+        return f"{config.aws_account_id}.dkr.ecr.{config.region}.amazonaws.com/{config.ecr_image}:latest"
 
     def image_size(self):
         return subprocess.check_output('docker images --filter=reference=sota --format "{{.ID}}: {{.Size}}"', shell=True, text=True)
@@ -68,50 +64,6 @@ role_arn = arn:aws:iam::467863034863:user/sota_deployed_role_for_s3
 source_profile = sota_deployed_role_for_s3
         """
 
-HOME = os.environ['HOME']
-TINY_DATA_WAREHOUSE_EVENTS = f"{HOME}/.tinyws/events"
-class S3:
-    def list_buckets(sel):
-        os.system("aws s3api list-buckets")
-    
-    def list_content(self):
-        os.system(f"aws s3 ls s3://{data_bucket}")
-
-    def validate_credentials(self):
-        if os.path.exists(f"{HOME}/.aws/credentials"):
-            return
-        if not os.environ.get('AWS_ACCESS_KEY_ID'):
-            raise Exception("AWS_ACCESS_KEY_ID not set")
-        if not os.environ.get('AWS_SECRET_ACCESS_KEY'):
-            raise Exception("AWS_SECRET_ACCESS_KEY not set")
-        if not os.environ.get('AWS_DEFAULT_REGION'):
-            raise Exception("AWS_DEFAULT_REGION not set")
-        
-    def push_local_data(self):
-        self.validate_credentials()
-        cmd = f"aws s3 cp {TINY_DATA_WAREHOUSE_EVENTS} s3://{data_bucket}/tinydatawerehouse_events --recursive"
-        p = subprocess.Popen(cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        out, error  = p.communicate()
-        PushHistory().add()
-        return out, error
-
-
-    def pull_data(self, destination=None):
-        self.validate_credentials()
-        if not destination:
-            destination = TINY_DATA_WAREHOUSE_EVENTS
-
-        yield "Using destination: " + destination
-
-        if not os.path.exists(destination):
-            yield subprocess.check_output(f"mkdir -p {destination}", shell=True, text=True)
-        else: 
-            yield f"Path {destination} already exists skipping creation"
-
-        shell_cmd = f"aws s3 cp s3://{data_bucket}/tinydatawerehouse_events {destination} --recursive"
-        p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        out, error  = p.communicate()
-        yield "Error: " + error + "Output: " + out
 class Cli:
     def __init__(self):
         self.docker = Docker

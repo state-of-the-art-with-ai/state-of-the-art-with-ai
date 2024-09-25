@@ -1,7 +1,7 @@
 import time
 import datetime
 
-from state_of_the_art.ci_cd import S3
+from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
 
 def send_email_job():

@@ -2,6 +2,7 @@ from state_of_the_art.relevance_model.neuralnet import NeuralNetwork
 import torch
 from typing import List
 from sentence_transformers import SentenceTransformer
+from state_of_the_art.config import config
 
 
 class Inference:
@@ -15,11 +16,8 @@ class Inference:
         )
         print(f"Using {self.device} device")
 
-        MODEL_PATH = (
-            "/Users/jean.machado/projects/state-of-the-art-via-ai/.models/model.pth"
-        )
         self.model = NeuralNetwork()
-        self.model.load_state_dict(torch.load(MODEL_PATH))
+        self.model.load_state_dict(torch.load(config.MODEL_LOCALLY))
         self.model.to(self.device)
         self.model.eval()
 

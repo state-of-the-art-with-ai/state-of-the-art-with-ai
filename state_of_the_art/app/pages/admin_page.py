@@ -2,7 +2,7 @@ import os
 from state_of_the_art.tables.user_table import UserTable
 import streamlit as st
 import subprocess 
-from state_of_the_art.ci_cd import S3
+from state_of_the_art.S3 import S3
 
 st.title("Settings")
 

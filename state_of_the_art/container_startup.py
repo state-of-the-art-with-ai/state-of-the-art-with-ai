@@ -1,6 +1,6 @@
 
 
-from state_of_the_art.ci_cd import S3
+from state_of_the_art.infrastructure.s3 import S3
 
 
 class ContainerStartup:
@@ -12,6 +12,8 @@ class ContainerStartup:
         
         print("Downloading ntlk")
         self.download_ntlk()
+
+        S3().pull_models()
 
     def download_ntlk(self):
         print("Downloading ntlk")

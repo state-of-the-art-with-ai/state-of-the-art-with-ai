@@ -18,6 +18,18 @@ class Config:
     DEFAULT_LOOK_BACK_DAYS = 1
     MINIMAL_CONFIRMATION_COST = 0.35
     DEFAULT_REPORT_LOOKBACK_DAYS = 2
+    region = 'eu-central-1'
+    aws_account_id = '467863034863'
+    streamlit_port = 80
+    ecr_image = 'sota/monorepo'
+    image_local_tag = 'sota'
+    data_bucket = 'sota.data'
+    TINY_DATA_WAREHOUSE_EVENTS = f"{HOME}/.tinyws/events"
+    MODEL_NAME = f"model.pth"
+    MODEL_PATH_LOCALLY = f"{HOME}/.tinyws/models/" 
+    MODEL_LOCALLY = f"{HOME}/.tinyws/models/" + MODEL_NAME
+    MODEL_FOLDER_IN_CLOUD = f"s3://{data_bucket}/models"
+    MODEL_IN_CLOUD = f"s3://{data_bucket}/models/" + MODEL_NAME
 
     # the maximum number of papers to compute while sorting the batch of papers
     GPT_MODEL = "gpt-4o"
