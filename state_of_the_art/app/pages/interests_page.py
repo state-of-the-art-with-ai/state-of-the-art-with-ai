@@ -62,9 +62,10 @@ with c2:
 
 st.divider()
 
-with st.spinner("Loading papers"):
-    papers = PapersLoader().get_all_papers()
-    papers = Bm25Search(papers).search_returning_papers(interest_name + " " + topic_description)
+if st.button("Fetch Papers"):
+    with st.spinner("Loading papers"):
+        papers = PapersLoader().get_all_papers()
+        papers = Bm25Search(papers).search_returning_papers(interest_name + " " + topic_description)
 
-# render all papeers
-render_papers(papers, generated_date=generated_date)
+    # render all papeers
+    render_papers(papers, generated_date=generated_date)
