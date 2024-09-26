@@ -3,42 +3,13 @@ from state_of_the_art.paper.email_paper import EmailAPaper
 from state_of_the_art.register_papers.register_paper import PaperCreator
 import streamlit as st
 from state_of_the_art.app.data import insights
-from state_of_the_art.app.pages.paper_details_utils import create_new, questions, render_reading_progress, render_tags
+from state_of_the_art.app.pages.paper_details_utils import load_different_paper, questions, render_reading_progress, render_tags
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.tables.comments_table import Comments
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.relevance_model.inference import Inference
-
-@st.dialog("Load a different paper")
-def load_different_paper():
-    default_url = st.query_params.get("paper_url", "")
-    url = st.text_input(
-        "Paper URL",
-        value=default_url,
-        key="paper_url",
-        help="Type the URL of the paper to be loaded",
-    )
-    if url:
-        url = url.strip()
-        if ArxivPaper.is_abstract_url(url):
-            url = url.replace("https", "http")
-        url = url.replace("file:///", "/")
-        url = url.replace("/pdf/", "/abs/")
-        url = url.replace("www.", "")
-        st.query_params.paper_url = url
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        load = st.button("Load Paper")
-        if load:
-            st.rerun()
-    with c2:
-        add = st.button("Add new Paper")
-        if add:
-            create_new(url)
-
-
 
 if st.button("Load a paper"):
     load_different_paper()
@@ -63,6 +34,7 @@ paper = PapersLoader().load_paper_from_url(url)
 insights_table = InsightsTable()
 insights = insights_table.read()
 insights = insights[insights["paper_id"] == paper.abstract_url]
+insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 has_insights = not insights.empty
 
 st.markdown(f"### {paper.title}")
@@ -86,10 +58,6 @@ with c1:
     render_tags(paper)
 with c2:
     render_reading_progress(paper)
-
-with st.expander("Abstract", expanded=not has_insights):
-    st.markdown(paper.abstract)
-
 
 if edit_questions:
     questions(url)
@@ -115,6 +83,10 @@ with c2:
             f"###### Conference ({conference})"
         )
 
+with st.expander("Abstract", expanded=not has_insights):
+    st.markdown(paper.abstract)
+
+
 with st.expander("Top insights", expanded=True):
     defintions = insights_table.get_all_answers("TopInsights", url)
     for definition in defintions:
@@ -125,7 +97,6 @@ st.markdown(f""" ##### Outcomes
 {insights_table.get_lastest_answer("Outcomes", url)}
 """)
 
-insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 st.markdown(f""" ##### Structure
 {insights_table.get_lastest_answer("DeepSummaryOfStructure", url)}
 """)

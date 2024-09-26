@@ -1,4 +1,5 @@
 from streamlit_tags import st_tags
+from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.tables.arxiv_paper_table import PaperTable
 from state_of_the_art.tables.paper_metadata_from_user_table import PaperMetadataFromUser
 from state_of_the_art.tables.tags_table import TagsTable
@@ -98,4 +99,32 @@ def render_reading_progress(paper):
             new_values={"progress": new_set_progress},
         )
         st.success("Progress updated successfully")
+
+
+@st.dialog("Load a different paper")
+def load_different_paper():
+    default_url = st.query_params.get("paper_url", "")
+    url = st.text_input(
+        "Paper URL",
+        value=default_url,
+        key="paper_url",
+        help="Type the URL of the paper to be loaded",
+    )
+    if url:
+        url = url.strip()
+        if ArxivPaper.is_abstract_url(url):
+            url = url.replace("https", "http")
+        url = url.replace("file:///", "/")
+        url = url.replace("/pdf/", "/abs/")
+        url = url.replace("www.", "")
+        st.query_params.paper_url = url
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        load = st.button("Load Paper")
+        if load:
+            st.rerun()
+    with c2:
+        add = st.button("Add new Paper")
+        if add:
+            create_new(url)
 
