@@ -9,7 +9,7 @@ pages = {
         st.Page("pages/papers_recommended_page.py", title="New Papers Recommendations"),
         st.Page("pages/interests_page.py", title="Your Interests"),
         st.Page("pages/all_papers_page.py", title="All Papers"),
-        st.Page("pages/papers_report_page.py", title="Past Recomendations"),
+        #st.Page("pages/papers_report_page.py", title="Past Recomendations"),
         st.Page("pages/paper_details_page.py", title="Paper details "),
     ],
     "Settings": [

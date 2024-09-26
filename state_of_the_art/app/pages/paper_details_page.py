@@ -13,34 +13,43 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.relevance_model.inference import Inference
 
-default_url = st.query_params.get("paper_url", "")
-url = st.text_input(
-    "Paper URL",
-    value=default_url,
-    key="paper_url",
-    help="Type the URL of the paper to be loaded",
-)
-if url:
-    url = url.strip()
-    if ArxivPaper.is_abstract_url(url):
-        url = url.replace("https", "http")
-    url = url.replace("file:///", "/")
-    url = url.replace("/pdf/", "/abs/")
-    url = url.replace("www.", "")
-    st.query_params.paper_url = url
+@st.dialog("Load a different paper")
+def load_different_paper():
+    default_url = st.query_params.get("paper_url", "")
+    url = st.text_input(
+        "Paper URL",
+        value=default_url,
+        key="paper_url",
+        help="Type the URL of the paper to be loaded",
+    )
+    if url:
+        url = url.strip()
+        if ArxivPaper.is_abstract_url(url):
+            url = url.replace("https", "http")
+        url = url.replace("file:///", "/")
+        url = url.replace("/pdf/", "/abs/")
+        url = url.replace("www.", "")
+        st.query_params.paper_url = url
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        load = st.button("Load Paper")
+        if load:
+            st.rerun()
+    with c2:
+        add = st.button("Add new Paper")
+        if add:
+            create_new(url)
+
+
+
+if st.button("Load a paper"):
+    load_different_paper()
 
 tags_table = TagsTable()
 
-c1, c2 = st.columns([1, 7])
-with c1:
-    load = st.button("Load Paper")
-with c2:
-    add = st.button("Add new Paper")
-    if add:
-        create_new(url)
-
+url = st.query_params.get("paper_url", "")
 if not url:
-    st.error("Load a paper to see details")
+    st.write("Load a paper to see details")
     st.stop()
 
 if not PaperCreator().is_paper_registered(url):
@@ -50,6 +59,7 @@ if not PaperCreator().is_paper_registered(url):
             st.rerun()
         else:
             st.write("Not registered and not created. Create this paper before.")
+            st.stop()
 
 paper = PapersLoader().load_paper_from_url(url)
 
@@ -130,27 +140,7 @@ if new_set_progress != current_progress:
     )
     st.success("Progress updated successfully")
 
-comments = Comments()
-df_comments = comments.load_with_value(
-    column="paper_url", value=paper.abstract_url, recent_first=True
-)
-comments_list = list(df_comments.iterrows())
-with st.expander("Comments", expanded=True if comments_list else False):
-    for index, comment in comments_list:
-        st.markdown(
-            f"{str(comment['tdw_timestamp']).split('.')[0]}  " + comment["message"]
-        )
-
-    c1, c2 = st.columns([2, 1])
-    with c1:
-        message = st.text_input("New comment")
-    with c2:
-        if st.button("Save new comment"):
-            comments.add(message=message, paper_url=paper.abstract_url)
-            st.success("Comment added successfully")
-            st.rerun()
-
-st.markdown("### Existing Insights")
+st.markdown("### Insights")
 
 insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 
