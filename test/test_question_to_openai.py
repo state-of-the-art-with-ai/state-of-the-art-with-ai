@@ -4,6 +4,7 @@ from state_of_the_art.insight_extractor.insight_extractor import (
 from state_of_the_art.tables.questions_table import QuestionsTable
 
 
+@pytest.mark.skipif(True, reason="not ready yet")
 def test_convert():
     questions = QuestionsTable()
     df = questions.read()

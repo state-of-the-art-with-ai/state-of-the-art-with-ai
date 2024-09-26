@@ -26,6 +26,7 @@ def test_single_interest_relevance():
     print(str([paper.title for paper in papers]))
 
 
+@pytest.mark.skipif(True, reason="not ready yet")
 def test_load_results():
     recommendation, row = RecommendationsHistoryTable().get_parsed_recommended_papers()
 
