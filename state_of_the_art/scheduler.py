@@ -28,10 +28,31 @@ def run_scheduler():
     print("starting scheduler setup at " + datetime.datetime.now().isoformat())
 
     schedule.every(5).minutes.do(print_test)
-    schedule.every(2).hours.do(push_data_to_s3)
+
+    schedule.every().day.at("01:00").do(push_data_to_s3)
+    schedule.every().day.at("04:00").do(push_data_to_s3)
+    schedule.every().day.at("06:00").do(push_data_to_s3)
+    schedule.every().day.at("08:00").do(push_data_to_s3)
+    schedule.every().day.at("09:00").do(push_data_to_s3)
+    schedule.every().day.at("10:00").do(push_data_to_s3)
+    schedule.every().day.at("12:00").do(push_data_to_s3)
+    schedule.every().day.at("13:00").do(push_data_to_s3)
+    schedule.every().day.at("14:00").do(push_data_to_s3)
+    schedule.every().day.at("15:00").do(push_data_to_s3)
+    schedule.every().day.at("16:00").do(push_data_to_s3)
+    schedule.every().day.at("17:00").do(push_data_to_s3)
+    schedule.every().day.at("18:00").do(push_data_to_s3)
+    schedule.every().day.at("19:00").do(push_data_to_s3)
+    schedule.every().day.at("20:00").do(push_data_to_s3)
+    schedule.every().day.at("21:00").do(push_data_to_s3)
+    schedule.every().day.at("22:00").do(push_data_to_s3)
+    schedule.every().day.at("23:00").do(push_data_to_s3)
+
+    # send email
     schedule.every().day.at("22:00").do(send_email_job)
     schedule.every().day.at("15:00").do(send_email_job)
     schedule.every().day.at("11:00").do(send_email_job)
+
     print("Scheduler infinite loop started")
     while True:
         schedule.run_pending()
