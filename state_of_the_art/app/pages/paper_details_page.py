@@ -100,14 +100,14 @@ existing_tags = []
 existing_tags_df = tags_table_df[tags_table_df["paper_id"] == paper.abstract_url]
 if not existing_tags_df.empty:
     existing_tags = existing_tags_df.iloc[0]["tags"].split(",")
-selected_tags = st_tags(
+currently_selected_tags = st_tags(
     label="", value=existing_tags, suggestions=TagsTable.DEFAULT_TAGS
 )
-if selected_tags:
+if set(currently_selected_tags) != set(existing_tags):
     tags_table.update_or_create(
         by_key="paper_id",
         by_value=paper.abstract_url,
-        new_values={"tags": ",".join(selected_tags)},
+        new_values={"tags": ",".join(currently_selected_tags)},
     )
     st.success("Tags updated successfully")
 
@@ -119,17 +119,16 @@ if not query_progress.empty:
 else:
     current_progress = 0
 
-progress = st.select_slider(
+new_set_progress = st.select_slider(
     "Reading progress", options=tuple(range(0, 105, 5)), value=current_progress
 )
-if progress:
+if new_set_progress != current_progress:
     PaperMetadataFromUser().update_or_create(
         by_key="abstract_url",
         by_value=paper.abstract_url,
-        new_values={"progress": progress},
+        new_values={"progress": new_set_progress},
     )
     st.success("Progress updated successfully")
-
 
 comments = Comments()
 df_comments = comments.load_with_value(
