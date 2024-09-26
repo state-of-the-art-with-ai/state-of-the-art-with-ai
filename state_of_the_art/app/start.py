@@ -1,6 +1,7 @@
 import subprocess
 import streamlit as st
 
+from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
 
 pages = {
@@ -29,6 +30,12 @@ with st.sidebar:
     hours = int(minutes / 60)
     remaining_minutes = round(minutes % 60)
     st.markdown(f"#### Time since last push: {hours} hours {remaining_minutes} minutes")
+
+    if st.button("Push data"):
+        with st.spinner("Pushing data"):
+            out, error = S3().push_local_events_data()
+            st.write(error)
+            st.write(out)
 
 
 
