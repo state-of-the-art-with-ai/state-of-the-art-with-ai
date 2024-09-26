@@ -4,16 +4,19 @@ from state_of_the_art.infrastructure.s3 import S3
 
 
 class ContainerStartup:
+    def __init__(self) -> None:
+        self.pull_models = S3().pull_models
+        self.pull_events_data = S3().pull_events_data
     def setup(self):
         print(f"Setting up container ")
         print("Pulling data from S3")
-        for log in S3().pull_events_data():
+        for log in self.pull_events_data():
             print(log)
         
         print("Downloading ntlk")
         self.download_ntlk()
 
-        S3().pull_models()
+        self.pull_models()
 
     def download_ntlk(self):
         print("Downloading ntlk")
