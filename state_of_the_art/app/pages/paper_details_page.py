@@ -43,7 +43,6 @@ if not url:
     st.error("Load a paper to see details")
     st.stop()
 
-insights_table = InsightsTable()
 if not PaperCreator().is_paper_registered(url):
     with st.spinner("Registering paper..."):
         if ArxivPaper.is_arxiv_url(url):
@@ -53,6 +52,11 @@ if not PaperCreator().is_paper_registered(url):
             st.write("Not registered and not created. Create this paper before.")
 
 paper = PapersLoader().load_paper_from_url(url)
+
+insights_table = InsightsTable()
+insights = insights_table.read()
+insights = insights[insights["paper_id"] == paper.abstract_url]
+has_insights= not insights.empty
 
 st.markdown(f"### {paper.title}")
 c1, c2, c3 = st.columns([1, 1, 1])
@@ -74,7 +78,7 @@ with c3:
             if EmailAPaper().send(paper):
                 st.success("Paper sent successfully")
 
-with st.expander("Abstract"):
+with st.expander("Abstract", expanded=not has_insights):
     st.markdown(paper.abstract)
 
 c1, c2 = st.columns([1, 5])
@@ -148,8 +152,6 @@ with st.expander("Comments", expanded=True if comments_list else False):
 
 st.markdown("### Existing Insights")
 
-insights = insights_table.read()
-insights = insights[insights["paper_id"] == paper.abstract_url]
 insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 
 st.markdown(f""" ##### Structure
