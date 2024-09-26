@@ -32,33 +32,8 @@ if shell_cmd:
     st.write(error)
     st.write(out)
 
-def check_password():
-    """Returns `True` if the user had the correct password."""
 
-    if st.session_state.get("password_correct") == True:
-        return True
-
-    def password_entered(password):
-        """Checks whether a password entered by the user is correct."""
-        if UserTable().check_password("root", password):
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Don't store the password.
-        else:
-            st.session_state["password_correct"] = False
-
-    password = st.text_input(
-        "Password", type="password", key="password"
-    )
-    if password:
-        password_entered(password)
-
-    if "password_correct" not in st.session_state or not st.session_state["password_correct"]:
-        st.error("😕 Password incorrect")
-    return False
-
-
-if not check_password():
-    st.stop() 
-
-
-st.title("After password")
+if os.path.exists("/tmp/generator.log"):
+    with open("/tmp/generator.log") as f:
+        with st.expander("Generator log"):
+            st.write(f.readlines())

@@ -6,7 +6,7 @@ from state_of_the_art.tables.data_sync_table import PushHistory
 pages = {
     "Discover new Papers": [
         st.Page("pages/all_papers_page.py", title="All Papers"),
-        st.Page("pages/papers_recommended_page.py", title="New Papers Recommendations"),
+        st.Page("pages/papers_recommended_page.py", title="Recommendations"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         st.Page("pages/interests_page.py", title="Your Interests"),
         #st.Page("pages/papers_report_page.py", title="Past Recomendations"),
@@ -17,7 +17,6 @@ pages = {
     ]
 }
 
-
 pg = st.navigation(pages)
 st.set_page_config(layout="wide")
 
@@ -27,7 +26,9 @@ with st.sidebar:
     time_up = out.split(" up ")[1].split(",")[0]
     st.markdown("#### Uptime: " + time_up)
     minutes = PushHistory().minutes_since_last_push()
-    st.markdown("#### Min Since Last Push: " + str(round(minutes, 2)))
+    hours = int(minutes / 60)
+    remaining_minutes = round(minutes % 60)
+    st.markdown(f"#### Time since last push: {hours} hours {remaining_minutes} minutes")
 
 
 
