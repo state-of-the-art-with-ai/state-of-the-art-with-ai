@@ -2,7 +2,7 @@ import os
 from state_of_the_art.tables.user_table import UserTable
 import streamlit as st
 import subprocess 
-from state_of_the_art.S3 import S3
+from state_of_the_art.infrastructure.s3 import S3
 
 st.title("Settings")
 
@@ -10,12 +10,12 @@ c1, c2 = st.columns([1, 1])
 with c1:
     if st.button("Pull latest data"):
         with st.status("Pulling data"):
-            for log in S3().pull_data():
+            for log in S3().pull_events_data():
                 st.write(log)
 with c2:
     if st.button("Push data"):
         with st.spinner("Pushing data"):
-            out, error = S3().push_local_data()
+            out, error = S3().push_local_events_data()
             st.write(error)
             st.write(out)
 

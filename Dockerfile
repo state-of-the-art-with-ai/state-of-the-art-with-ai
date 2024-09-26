@@ -11,6 +11,7 @@ RUN set -o vi
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&  unzip awscliv2.zip && ./aws/install 
 RUN poetry config --local virtualenvs.create false && poetry install  
 # cleanups of caches and other stuff
+RUN pytest 
 RUN rm -rf /root/.cache/*
 
 CMD ./start_monorepo.sh
