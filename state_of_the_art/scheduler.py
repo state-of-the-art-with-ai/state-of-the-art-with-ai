@@ -9,6 +9,7 @@ def send_email_job():
     try:
         InterestsRecommender().generate(
             repeat_check_disable=True,
+            number_of_days_to_look_back=1
         )
     except Exception as e:
         print("Error in scheduler job", e)
@@ -49,6 +50,7 @@ def run_scheduler():
     schedule.every().day.at("23:00").do(push_data_to_s3)
 
     # send email
+    schedule.every().day.at("22:40").do(send_email_job)
     schedule.every().day.at("22:00").do(send_email_job)
     schedule.every().day.at("15:00").do(send_email_job)
     schedule.every().day.at("11:00").do(send_email_job)
