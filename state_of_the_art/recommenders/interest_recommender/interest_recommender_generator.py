@@ -155,7 +155,7 @@ Papers analysed: {data['papers_analysed_total']}<br><br>"""
         print("Content str: ", content_str)
 
         title = (
-            f"Latest recommendations covering {days} days up to "
+            f"Papers covering {days} days up to "
             + str(datetime.datetime.now()).split(".")[0]
         )
         EmailService().send(content=content_str, subject=title)

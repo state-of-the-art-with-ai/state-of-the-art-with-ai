@@ -7,7 +7,7 @@ class ContainerStartup:
     def setup(self):
         print(f"Setting up container ")
         print("Pulling data from S3")
-        for log in S3().pull_data():
+        for log in S3().pull_events_data():
             print(log)
         
         print("Downloading ntlk")

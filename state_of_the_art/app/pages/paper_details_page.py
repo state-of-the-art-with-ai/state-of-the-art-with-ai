@@ -8,7 +8,6 @@ from state_of_the_art.app.pages.paper_details_utils import create_new, questions
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.tables.comments_table import Comments
-from state_of_the_art.paper.local_paper_copy import open_paper_locally
 from state_of_the_art.tables.paper_metadata_from_user_table import PaperMetadataFromUser
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.tags_table import TagsTable
@@ -70,9 +69,6 @@ with c2:
     )
 
 with c3:
-    if st.button("Open paper locally"):
-        open_paper_locally(paper)
-
     if st.button("Send paper to email"):
         with st.spinner("Sending..."):
             if EmailAPaper().send(paper):
