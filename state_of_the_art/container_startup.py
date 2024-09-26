@@ -5,7 +5,7 @@ from state_of_the_art.infrastructure.s3 import S3
 class ContainerStartup:
     def __init__(self) -> None:
         self.pull_models = S3().pull_models
-        self.pull_events_data = S3().pull_events_datas
+        self.pull_events_data = S3().pull_events_data
 
     def setup(self):
         """
