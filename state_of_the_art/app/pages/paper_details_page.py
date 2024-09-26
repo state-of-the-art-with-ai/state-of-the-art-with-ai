@@ -2,13 +2,11 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.email_paper import EmailAPaper
 from state_of_the_art.register_papers.register_paper import PaperCreator
 import streamlit as st
-from streamlit_tags import st_tags
 from state_of_the_art.app.data import insights
-from state_of_the_art.app.pages.paper_details_utils import create_new, questions
+from state_of_the_art.app.pages.paper_details_utils import create_new, questions, render_reading_progress, render_tags
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.tables.comments_table import Comments
-from state_of_the_art.tables.paper_metadata_from_user_table import PaperMetadataFromUser
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.relevance_model.inference import Inference
@@ -45,7 +43,6 @@ def load_different_paper():
 if st.button("Load a paper"):
     load_different_paper()
 
-tags_table = TagsTable()
 
 url = st.query_params.get("paper_url", "")
 if not url:
@@ -66,37 +63,38 @@ paper = PapersLoader().load_paper_from_url(url)
 insights_table = InsightsTable()
 insights = insights_table.read()
 insights = insights[insights["paper_id"] == paper.abstract_url]
-has_insights= not insights.empty
+has_insights = not insights.empty
 
 st.markdown(f"### {paper.title}")
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     st.markdown(f"[{paper.abstract_url}]({paper.abstract_url})")
-    st.markdown(
-        f"###### Institution ({insights_table.get_lastest_answer('Institution', url)})"
-    )
-    st.markdown("Published: " + paper.published_date_str())
+    extract_insights = st.button("Generate AI Insights")
+
 with c2:
     st.markdown(f"[Online PDF]({paper.pdf_url})")
-    st.markdown(
-        f"###### Conference ({insights_table.get_lastest_answer('Conference', url)})"
-    )
-
+    edit_questions = st.button("Edit questions")
 with c3:
+    st.markdown("Published: " + paper.published_date_str())
     if st.button("Send paper to email"):
         with st.spinner("Sending..."):
             if EmailAPaper().send(paper):
                 st.success("Paper sent successfully")
 
+c1, c2 = st.columns([1, 1])
+with c1:
+    render_tags(paper)
+with c2:
+    render_reading_progress(paper)
+
 with st.expander("Abstract", expanded=not has_insights):
     st.markdown(paper.abstract)
 
-c1, c2 = st.columns([1, 5])
-with c1:
-    extract_insights = st.button("Generate Insights")
-with c2:
-    if st.button("Edit questions"):
-        questions(url)
+
+if edit_questions:
+    questions(url)
+
+
 
 if extract_insights:
     with st.spinner("Extracting insights..."):
@@ -105,43 +103,16 @@ if extract_insights:
         )
     st.rerun()
 
-tags_table_df = tags_table.read()
-existing_tags = []
-existing_tags_df = tags_table_df[tags_table_df["paper_id"] == paper.abstract_url]
-if not existing_tags_df.empty:
-    existing_tags = existing_tags_df.iloc[0]["tags"].split(",")
-currently_selected_tags = st_tags(
-    label="", value=existing_tags, suggestions=TagsTable.DEFAULT_TAGS
-)
-if set(currently_selected_tags) != set(existing_tags):
-    tags_table.update_or_create(
-        by_key="paper_id",
-        by_value=paper.abstract_url,
-        new_values={"tags": ",".join(currently_selected_tags)},
+institution = insights_table.get_lastest_answer('Institution', url)
+if institution:
+    st.markdown(
+        f"###### Institution ({institution})"
     )
-    st.success("Tags updated successfully")
-
-query_progress = PaperMetadataFromUser().load_with_value(
-    "abstract_url", paper.abstract_url
-)
-if not query_progress.empty:
-    current_progress = int(query_progress.iloc[0]["progress"])
-else:
-    current_progress = 0
-
-new_set_progress = st.select_slider(
-    "Reading progress", options=tuple(range(0, 105, 5)), value=current_progress
-)
-if new_set_progress != current_progress:
-    PaperMetadataFromUser().update_or_create(
-        by_key="abstract_url",
-        by_value=paper.abstract_url,
-        new_values={"progress": new_set_progress},
+conference = insights_table.get_lastest_answer('Conference', url)
+if conference:
+    st.markdown(
+        f"###### Conference ({conference})"
     )
-    st.success("Progress updated successfully")
-
-st.markdown("### Insights")
-
 insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 
 st.markdown(f""" ##### Structure
@@ -167,8 +138,7 @@ with st.expander("Resources", expanded=True):
     for definition in defintions:
         st.markdown(" - " + definition)
 
-st.markdown("### All Insights")
-with st.spinner("Loading insights..."):
+with st.spinner("Loading more insights..."):
     inference = Inference()
     insights_list = insights.to_dict(orient="records")
     for insight in insights_list:
