@@ -94,8 +94,6 @@ with st.expander("Abstract", expanded=not has_insights):
 if edit_questions:
     questions(url)
 
-
-
 if extract_insights:
     with st.spinner("Extracting insights..."):
         InsightExtractor().extract_insights_from_paper_url(
@@ -103,30 +101,34 @@ if extract_insights:
         )
     st.rerun()
 
-institution = insights_table.get_lastest_answer('Institution', url)
-if institution:
-    st.markdown(
-        f"###### Institution ({institution})"
-    )
-conference = insights_table.get_lastest_answer('Conference', url)
-if conference:
-    st.markdown(
-        f"###### Conference ({conference})"
-    )
-insights = insights.sort_values(by="tdw_timestamp", ascending=False)
-
-st.markdown(f""" ##### Structure
-{insights_table.get_lastest_answer("DeepSummaryOfStructure", url)}
-""")
-
-st.markdown(f""" ##### Outcomes
-{insights_table.get_lastest_answer("Outcomes", url)}
-""")
+c1, c2 = st.columns([1, 1])
+with c1:
+    institution = insights_table.get_lastest_answer('Institution', url)
+    if institution:
+        st.markdown(
+            f"###### Institution ({institution})"
+        )
+with c2:
+    conference = insights_table.get_lastest_answer('Conference', url)
+    if conference:
+        st.markdown(
+            f"###### Conference ({conference})"
+        )
 
 with st.expander("Top insights", expanded=True):
     defintions = insights_table.get_all_answers("TopInsights", url)
     for definition in defintions:
         st.markdown(" - " + definition)
+
+
+st.markdown(f""" ##### Outcomes
+{insights_table.get_lastest_answer("Outcomes", url)}
+""")
+
+insights = insights.sort_values(by="tdw_timestamp", ascending=False)
+st.markdown(f""" ##### Structure
+{insights_table.get_lastest_answer("DeepSummaryOfStructure", url)}
+""")
 
 with st.expander("Definitions"):
     defintions = insights_table.get_all_answers("Definitions", url)
@@ -137,6 +139,8 @@ with st.expander("Resources", expanded=True):
     defintions = insights_table.get_all_answers("Resources", url)
     for definition in defintions:
         st.markdown(" - " + definition)
+
+st.markdown("### More insights by relevance")
 
 with st.spinner("Loading more insights..."):
     inference = Inference()
