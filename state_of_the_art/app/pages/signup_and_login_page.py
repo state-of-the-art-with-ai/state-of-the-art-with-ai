@@ -4,7 +4,8 @@ st.title("Sign up")
 
 st.button("Alread have an account? Log in")
 
-st.text_input("Email")
-st.text_input("Password")
+email = st.text_input("Email")
+password = st.text_input("Password")
 
-st.button("Create account")
+if st.button("Create account")
+    st.success("Account created successfully")
