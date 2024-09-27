@@ -13,38 +13,41 @@ topic_description = None
 st.title("All Papers")
 
 papers_df = None
+filters = {}
 
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
-latest_date_with_papers = ArxivMiner().latest_date_with_papers()
+with st.spinner("Fetching metadata about papers..."):
+    c1, c2, c3 = st.columns([1, 1, 1])
+    latest_date_with_papers = ArxivMiner().latest_date_with_papers()
 
-c1, c2, c3 = st.columns([1, 1, 1])
-with c1:
-    st.metric("Latest paper date in arxiv API", str(latest_date_with_papers))
-with c2:
-    last_mine = ArxivMiningHistory().last().to_dict()
-    st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
-with c3:
-    if st.button("Mine new papers"):
-        with st.spinner("Mining all keywords"):
-            ArxivMiner().mine_all_keywords()
-
-if "date" in st.query_params:
-    default_date_filter = st.query_params["date"]
-    default_date_filter = datetime.datetime.strptime(
-        default_date_filter, "%Y-%m-%d"
-    ).date()
-else:
-    default_date_filter = latest_date_with_papers
-date_filter = st.date_input("By Day", value=default_date_filter)
-st.query_params["date"] = date_filter
-
-search_query = st.text_input("Enter your Query", value="")
-filters = {}
+    with c1:
+        last_mine = ArxivMiningHistory().last().to_dict()
+        st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
+    
+    with c2:
+        st.metric("Latest date with papers", str(latest_date_with_papers).split(".")[0])
+    with c3:
+        if st.button("Mine new papers"):
+            with st.spinner("Mining all keywords"):
+                ArxivMiner().mine_all_keywords()
 
 
-with st.spinner("Fetching papers..."):
+    if "date" in st.query_params:
+        default_date_filter = st.query_params["date"]
+        default_date_filter = datetime.datetime.strptime(
+            default_date_filter, "%Y-%m-%d"
+        ).date()
+    else:
+        default_date_filter = latest_date_with_papers
+    date_filter = st.date_input("Filter By Day", value=default_date_filter)
+    st.query_params["date"] = date_filter
+
+    search_query = st.text_input("Enter your Search Query", value="")
+
+with st.spinner("Fetching the actual papers..."):
     papers_df = PapersLoader().load_papers_df()
+    filters['Total Papers'] = len(papers_df.index)
     if not search_query:
         papers_df = papers_df[papers_df["published"].dt.date == date_filter]
         filters['Date'] = date_filter.isoformat()
