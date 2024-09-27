@@ -39,6 +39,7 @@ with st.sidebar:
             out, error = S3().push_local_events_data()
             st.write(error)
             st.write(out)
+    st.link_button("Give us Feedback", "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform")
 
 
 
