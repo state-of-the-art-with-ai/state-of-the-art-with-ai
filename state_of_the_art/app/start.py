@@ -15,6 +15,7 @@ pages = {
     ],
     "Settings": [
         st.Page("pages/admin_page.py", title="Admin"),
+        st.Page("pages/lead_collection_page.py", title="Leads page"),
     ]
 }
 
