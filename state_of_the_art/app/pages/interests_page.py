@@ -53,13 +53,6 @@ with c2:
         st.rerun()
         st.success("Interest deleted successfully")
 
-c1, c2 = st.columns([3, 1])
-with c1:
-    current_profile = st.selectbox("Profile", ["jean", "gdp", "mlp", "mlops"])
-with c2:
-    if st.button("Manage Profile"):
-        edit_profile(current_profile)
-
 st.divider()
 
 if st.button("Fetch Papers"):
