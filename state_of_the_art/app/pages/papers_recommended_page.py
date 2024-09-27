@@ -14,7 +14,7 @@ generated_date = None
 lookback_days = None
 topic_description = None
 
-st.title("Papers recommendations")
+st.title("Recommendations")
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
 recommendations = RecommendationsHistoryTable().last().to_dict()
