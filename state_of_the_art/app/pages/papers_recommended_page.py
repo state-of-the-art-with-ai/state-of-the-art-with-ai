@@ -25,7 +25,7 @@ PAPER_PER_TOPIC_TO_RENDER = 3
 
 lookback_days = 1
 generate_clicked = False
-with st.expander("Recommendations options", expanded=True):
+with st.expander("Generation options", expanded=False):
     lookback_days = st.number_input(
         "Lookback days", value=1, min_value=1, max_value=365
     )
