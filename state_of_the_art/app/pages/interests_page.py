@@ -57,10 +57,11 @@ with c2:
             del st.query_params["interest"]
             st.rerun()
             st.success("Interest deleted successfully")
+    fetch_papers = st.button("Fetch Papers")
 
 st.divider()
 
-if st.button("Fetch Papers"):
+if fetch_papers:
     with st.spinner("Loading papers"):
         papers = PapersLoader().get_all_papers()
         papers = Bm25Search(papers).search_returning_papers(interest_name + " " + topic_description)
