@@ -33,7 +33,7 @@ def render_papers(
             st.markdown("No papers found")
             return
         else:
-            st.markdown(f"#### {len(papers)} papers rendered")
+            st.markdown(f"#### {len(papers)} papers found")
 
         for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
             c1, c2, c3, c4= st.columns([9, 2, 1, 1])
