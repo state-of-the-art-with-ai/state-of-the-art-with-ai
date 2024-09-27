@@ -20,38 +20,43 @@ topics = InterestsTable()
 topics_df = topics.read()
 topics_names = topics_df["name"].tolist()
 
-default_interest = (
-    0
-    if "interest" not in st.query_params
-    else topics_names.index(st.query_params["interest"])
-)
-
-selected_interest = st.selectbox(
-    "Existing Interest", topics_names, index=default_interest
-)
-
-st.query_params["interest"] = selected_interest
-interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0]["name"]
-topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
-    "description"
-]
-
-topic_description = st.text_area("Query / Description", value=topic_description)
-interest_name = st.text_input("Interest name", value=interest_name)
-
-c1, c2 = st.columns(2)
+c1, c2 = st.columns([1, 2])
 with c1:
-    if st.button("Save new Interest"):
-        topics.add(name=interest_name, description=topic_description)
-        st.query_params["interest"] = interest_name
-        st.success("Interest saved successfully")
-        st.rerun()
+    for topic in topics_names:
+        try:
+            if st.button(topic, key=f't{topic}'):
+                st.query_params["interest"] = topic
+                selected_interest = topic
+        except:
+            pass
 with c2:
-    if st.button("Delete"):
-        topics.delete_by(column="name", value=interest_name)
-        del st.query_params["interest"]
-        st.rerun()
-        st.success("Interest deleted successfully")
+
+    if 'interest' in st.query_params:
+        selected_interest = st.query_params['interest'] 
+    else:
+        selected_interest = topics_names[-1]
+
+    interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0]["name"]
+    topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
+        "description"
+    ]
+
+    topic_description = st.text_area("Query / Description", value=topic_description)
+    interest_name = st.text_input("Interest name", value=interest_name)
+
+    c1, c2 = st.columns([1,7])
+    with c1:
+        if st.button("Save"):
+            topics.add(name=interest_name, description=topic_description)
+            st.query_params["interest"] = interest_name
+            st.success("Interest saved successfully")
+            st.rerun()
+    with c2:
+        if st.button("Delete"):
+            topics.delete_by(column="name", value=interest_name)
+            del st.query_params["interest"]
+            st.rerun()
+            st.success("Interest deleted successfully")
 
 st.divider()
 
