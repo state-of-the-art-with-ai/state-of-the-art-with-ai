@@ -1,12 +1,11 @@
 import time
 import datetime
 
-from state_of_the_art.infrastructure.s3 import S3
-from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
 
 def send_email_job():
     print("Running recommender")
     try:
+        from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
         InterestsRecommender().generate(
             repeat_check_disable=True,
             number_of_days_to_look_back=1
@@ -21,10 +20,11 @@ def print_test():
 
 def push_data_to_s3():
     print("Pushing data to s3")
+    from state_of_the_art.infrastructure.s3 import S3
     out, error = S3().push_local_data()
     print(error, out)
 
-def run_scheduler():
+def run():
     import schedule
     print("starting scheduler setup at " + datetime.datetime.now().isoformat())
 

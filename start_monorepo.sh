@@ -6,6 +6,6 @@ set -e
 sota container_startup setup
 
 echo "Starting scheduler"
-PYTHONUNBUFFERED=TRUE sota scheduler run_scheduler | tee /tmp/scheduler.log &
+PYTHONUNBUFFERED=TRUE sota scheduler run | tee /tmp/scheduler.log &
 
 streamlit run --server.address '0.0.0.0' --server.port '80' --runner.fastReruns True --global.developmentMode False  state_of_the_art/app/start.py
