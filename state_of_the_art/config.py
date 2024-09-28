@@ -26,8 +26,8 @@ class Config:
     data_bucket = 'sota.data'
     TINY_DATA_WAREHOUSE_EVENTS = f"{HOME}/.tinyws/events"
     MODEL_NAME = f"model.pth"
-    MODEL_PATH_LOCALLY = f"{HOME}/.tinyws/models/" 
-    MODEL_LOCALLY = f"{HOME}/.tinyws/models/" + MODEL_NAME
+    MODELS_PATH_LOCALLY = f"{HOME}/.tinyws/models/" 
+    TEXT_PREDICTOR_PATH_LOCALLY = f"{HOME}/.tinyws/models/" + MODEL_NAME
     MODEL_FOLDER_IN_CLOUD = f"s3://{data_bucket}/models"
     MODEL_IN_CLOUD = f"s3://{data_bucket}/models/" + MODEL_NAME
 

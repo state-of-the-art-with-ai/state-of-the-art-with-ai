@@ -74,10 +74,10 @@ class S3:
         return out, error
     
     def pull_models(self):
-        if not os.path.exists(config.MODEL_PATH_LOCALLY):
-            os.system("mkdir -p " + config.MODEL_PATH_LOCALLY)
+        if not os.path.exists(config.MODELS_PATH_LOCALLY):
+            os.system("mkdir -p " + config.MODELS_PATH_LOCALLY)
 
-        shell_cmd = f"aws s3 cp {config.MODEL_FOLDER_IN_CLOUD} {config.MODEL_PATH_LOCALLY} --recursive"
+        shell_cmd = f"aws s3 cp {config.MODEL_FOLDER_IN_CLOUD} {config.MODELS_PATH_LOCALLY} --recursive"
         print("Pull command: ", shell_cmd)
         p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, error  = p.communicate()

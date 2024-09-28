@@ -8,7 +8,7 @@ from state_of_the_art.config import config
 class Inference:
     def __init__(self) -> None:
         self.model = NeuralNetwork()
-        self.model.load_state_dict(torch.load(config.MODEL_LOCALLY))
+        self.model.load_state_dict(torch.load(config.TEXT_PREDICTOR_PATH_LOCALLY))
         self.model.eval()
 
         self.sentence_transformer = SentenceTransformer("all-mpnet-base-v2")
