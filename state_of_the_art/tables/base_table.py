@@ -75,7 +75,6 @@ class BaseTable:
 
         df = cls.read()
         if df.empty or df[df[by_key] == by_value].empty:
-            print(f"Row does not exist for value {by_value}, adding new row")
             cls.add(**new_values)
         else:
             print(
