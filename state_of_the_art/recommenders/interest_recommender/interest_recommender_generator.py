@@ -1,3 +1,4 @@
+import os
 import datetime
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import (
@@ -146,6 +147,7 @@ Period from: {data['from_date']}<br>
 Period to: {data['to_date']}<br>
 Days = {days}<br>
 Generated at: {data['tdw_timestamp']}<br>
+By user: {os.environ['USER']}<br>
 Papers analysed: {data['papers_analysed_total']}<br><br>"""
 
         print(content_str)
