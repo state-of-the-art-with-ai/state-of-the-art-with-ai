@@ -9,16 +9,13 @@ MINUTES_TO_REPEAT_LIVENESS_PROBE = 10
 @capture_exeption()
 def send_recommendations_job():
     print("Running recommender")
-    try:
-        from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-            InterestsRecommender,
-        )
+    from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
+        InterestsRecommender,
+    )
 
-        InterestsRecommender().generate(
-            repeat_check_disable=True, number_of_days_to_look_back=1
-        )
-    except Exception as e:
-        print("Error in scheduler job", e)
+    InterestsRecommender().generate(
+        repeat_check_disable=True, number_of_days_to_look_back=1
+    )
 
 
 @capture_exeption()
