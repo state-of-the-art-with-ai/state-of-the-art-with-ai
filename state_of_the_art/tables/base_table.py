@@ -101,3 +101,7 @@ class BaseTable:
 
     def last(cls):
         return cls.read().sort_values(by="tdw_timestamp", ascending=False).iloc[0]
+
+    def print(self):
+        df = self.read(recent_first=True)
+        print(df)

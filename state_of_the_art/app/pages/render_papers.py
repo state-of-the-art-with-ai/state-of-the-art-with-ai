@@ -2,6 +2,8 @@ from typing import Optional
 from state_of_the_art.tables.tags_table import TagsTable
 import streamlit as st
 
+from state_of_the_art.tables.text_feedback_table import TextFeedbackTable
+
 
 @st.dialog("More details")
 def preview(paper):
@@ -49,10 +51,17 @@ def render_papers(
                 ):
                     for label in papers_metadata[paper.abstract_url]["labels"]:
                         st.markdown(f"###### {label}")
+                feedback_score = st.feedback(options="thumbs", key=f"review{k}")
+                if feedback_score is not None:
+                    TextFeedbackTable().add_feedback(
+                        text=paper.title,
+                        score=feedback_score,
+                        type='paper_title',
+                    )
             with c2:
                 st.write(f"({paper.published_date_str()})")
             with c3:
-                if st.button("More", key=f"review{k}"):
+                if st.button("More", key=f"feedback{k}"):
                     preview(paper)
             with c4:
                 if st.button("Save", key=f"save{k}"):
