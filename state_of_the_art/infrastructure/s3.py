@@ -66,8 +66,8 @@ class S3:
         out, error  = p.communicate()
         yield "Error: " + error + "Output: " + out
 
-    def push_models(self):
-        shell_cmd = f"aws s3 cp {config.MODELS_DIRECTORY} s3://{config.data_bucket}/models/ "
+    def push_model(self):
+        shell_cmd = f"aws s3 cp {config.TEXT_PREDICTOR_PATH_LOCALLY} s3://{config.data_bucket}/models/ "
         p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, error  = p.communicate()
         print("Model pushed to s3")

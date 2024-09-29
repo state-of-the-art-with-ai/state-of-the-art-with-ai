@@ -33,7 +33,10 @@ if shell_cmd:
     st.write(out)
 
 
-if os.path.exists("/tmp/generator.log"):
-    with open("/tmp/generator.log") as f:
-        with st.expander("Generator log"):
-            st.write(f.readlines())
+if st.button("Show log"):
+    with st.expander("Log"):
+        import subprocess
+        p = subprocess.Popen(f'cat /tmp/generator.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        st.write(error)
+        st.write(out)
