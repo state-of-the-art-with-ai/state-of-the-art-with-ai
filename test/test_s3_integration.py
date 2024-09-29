@@ -1,11 +1,9 @@
-
 from state_of_the_art.infrastructure.s3 import S3
 import os
 
 from unittest import mock
 
 import pytest
-
 
 
 def test_s3():

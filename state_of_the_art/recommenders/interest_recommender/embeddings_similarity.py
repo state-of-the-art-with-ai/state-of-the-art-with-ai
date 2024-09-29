@@ -8,11 +8,16 @@ from tqdm import tqdm
 
 from typing import List, Tuple
 
+
 class EmbeddingsSimilarity:
     TOP_PAPERS_TO_SELECT = 10
-    def __init__(self, base_model="all-mpnet-base-v2", reencode_all_embeddings: bool = False) -> None:
+
+    def __init__(
+        self, base_model="all-mpnet-base-v2", reencode_all_embeddings: bool = False
+    ) -> None:
         self._sentence_transformer = SentenceTransformer(base_model)
         self.rencode_all_embeddings = reencode_all_embeddings
+
     def load_papers_and_embeddings(self, date_from, date_to):
         papers_df = PapersLoader().load_between_dates(date_from, date_to)
         if papers_df.empty:
@@ -75,8 +80,7 @@ class EmbeddingsSimilarity:
         papers_dict = {paper.abstract_url: paper for paper in arxiv_papers}
 
         table = PaperEmbeddingsTable()
-        if self.rencode_all_embeddings:
-            table.reset(dry_run=False)
+        table.reset(dry_run=False)
 
         existing_embedding_ds = table.read()
         existing_papers_df = (

@@ -4,6 +4,7 @@ import logging
 from subprocess import PIPE, Popen
 from typing import Optional
 
+
 class EmailService:
     default_destination = "j34nc4rl0@gmail.com"
     SEND_FROM_EMAIL = "j34nc4rl0@gmail.com"
@@ -57,7 +58,6 @@ Content-Type: text/html; charset="UTF-8"
  </body>
 </html>
 """
-
 
         with open("/tmp/foo", "w") as myfile:
             myfile.write(body_content)

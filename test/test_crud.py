@@ -1,8 +1,16 @@
-from state_of_the_art.tables.interest_table import InterestsTable
+from state_of_the_art.tables.base_table import BaseTable
+
+
+class TestTable(BaseTable):
+    table_name = "test_table"
+    schema = {
+        "name": {"type": str},
+        "description": {"type": str},
+    }
 
 
 def test_topic_crud():
-    topics = InterestsTable()
+    topics = TestTable()
     original_size = topics.len()
     topics.add(name="foo", description="bar")
     topics.add(name="baz", description="bar")
@@ -14,4 +22,4 @@ def test_topic_crud():
 
     assert new_size == (original_size + 1)
 
-    InterestsTable().delete_by(column="name", value="baz")
+    TestTable().delete_by(column="name", value="baz")

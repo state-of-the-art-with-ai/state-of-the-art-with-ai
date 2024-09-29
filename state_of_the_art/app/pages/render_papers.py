@@ -36,10 +36,10 @@ def render_papers(
             st.markdown(f"#### {len(papers)} papers found")
 
         for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
-            c1, c2, c3, c4= st.columns([9, 2, 1, 1])
+            c1, c2, c3, c4 = st.columns([9, 2, 1, 1])
             with c1:
                 st.markdown(
-                    f"""##### {k+1}. [{paper.title}](/paper_details_page?paper_url={paper.abstract_url}) 
+                    f"""##### {k+1}. [{paper.title}](/paper_details_page?paper_url={paper.abstract_url})
                 """
                 )
                 if (
@@ -48,7 +48,7 @@ def render_papers(
                     and "labels" in papers_metadata[paper.abstract_url]
                 ):
                     for label in papers_metadata[paper.abstract_url]["labels"]:
-                            st.markdown(f"###### {label}")
+                        st.markdown(f"###### {label}")
             with c2:
                 st.write(f"({paper.published_date_str()})")
             with c3:

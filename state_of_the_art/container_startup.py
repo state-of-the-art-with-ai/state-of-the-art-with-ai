@@ -1,6 +1,5 @@
-
-
 from state_of_the_art.infrastructure.s3 import S3
+
 
 class ContainerStartup:
     def __init__(self) -> None:
@@ -15,7 +14,7 @@ class ContainerStartup:
         print("Pulling data from S3")
         for log in self.pull_events_data():
             print(log)
-        
+
         print("Downloading ntlk")
         self.download_ntlk()
 
@@ -24,9 +23,11 @@ class ContainerStartup:
     def download_ntlk(self):
         print("Downloading ntlk")
         import nltk
+
         nltk.download("wordnet")
 
 
 if __name__ == "__main__":
     import fire
+
     fire.Fire()

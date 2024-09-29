@@ -3,7 +3,12 @@ from state_of_the_art.paper.email_paper import EmailAPaper
 from state_of_the_art.register_papers.register_paper import PaperCreator
 import streamlit as st
 from state_of_the_art.app.data import insights
-from state_of_the_art.app.pages.paper_details_utils import load_different_paper, questions, render_reading_progress, render_tags
+from state_of_the_art.app.pages.paper_details_utils import (
+    load_different_paper,
+    questions,
+    render_reading_progress,
+    render_tags,
+)
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.tables.comments_table import Comments
@@ -71,17 +76,13 @@ if extract_insights:
 
 c1, c2 = st.columns([1, 1])
 with c1:
-    institution = insights_table.get_lastest_answer('Institution', url)
+    institution = insights_table.get_lastest_answer("Institution", url)
     if institution:
-        st.markdown(
-            f"###### Institution ({institution})"
-        )
+        st.markdown(f"###### Institution ({institution})")
 with c2:
-    conference = insights_table.get_lastest_answer('Conference', url)
+    conference = insights_table.get_lastest_answer("Conference", url)
     if conference:
-        st.markdown(
-            f"###### Conference ({conference})"
-        )
+        st.markdown(f"###### Conference ({conference})")
 
 with st.expander("Abstract", expanded=not has_insights):
     st.markdown(paper.abstract)
@@ -93,13 +94,17 @@ with st.expander("Top insights", expanded=True):
         st.markdown(" - " + definition)
 
 
-st.markdown(f""" ##### Outcomes
+st.markdown(
+    f""" ##### Outcomes
 {insights_table.get_lastest_answer("Outcomes", url)}
-""")
+"""
+)
 
-st.markdown(f""" ##### Structure
+st.markdown(
+    f""" ##### Structure
 {insights_table.get_lastest_answer("DeepSummaryOfStructure", url)}
-""")
+"""
+)
 
 with st.expander("Definitions"):
     defintions = insights_table.get_all_answers("Definitions", url)

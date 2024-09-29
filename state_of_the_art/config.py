@@ -12,7 +12,7 @@ class Tables:
 
 
 class Config:
-    
+
     HOME = os.path.expanduser("~")
     NEW_PAPERS_FOLDER = os.path.expanduser("~") + "/.arxiv_papers_new"
     MAX_ABSTRACT_SIZE_RANK = 500
@@ -20,15 +20,15 @@ class Config:
     DEFAULT_LOOK_BACK_DAYS = 1
     MINIMAL_CONFIRMATION_COST = 0.35
     DEFAULT_REPORT_LOOKBACK_DAYS = 2
-    region = 'eu-central-1'
-    aws_account_id = '467863034863'
+    region = "eu-central-1"
+    aws_account_id = "467863034863"
     streamlit_port = 80
-    ecr_image = 'sota/monorepo'
-    image_local_tag = 'sota'
-    data_bucket = 'sota.data'
+    ecr_image = "sota/monorepo"
+    image_local_tag = "sota"
+    data_bucket = "sota.data"
     TINY_DATA_WAREHOUSE_EVENTS = f"{HOME}/.tinyws/events"
     MODEL_NAME = f"model.pth"
-    MODELS_PATH_LOCALLY = f"{HOME}/.tinyws/models/" 
+    MODELS_PATH_LOCALLY = f"{HOME}/.tinyws/models/"
     TEXT_PREDICTOR_PATH_LOCALLY = f"{HOME}/.tinyws/models/" + MODEL_NAME
     MODEL_FOLDER_IN_CLOUD = f"s3://{data_bucket}/models"
     MODEL_IN_CLOUD = f"s3://{data_bucket}/models/" + MODEL_NAME
@@ -90,29 +90,35 @@ class Config:
         - truth, and fake news
 
             """,
-            keywords=['cs.AI', 'cs.LG', 'cs.SI', 'stat.ML',
-                    'ai', 'machine learning',
-                    'data science',
-                    'large language models',
-                    'ai for social good',
-                    'ai ethics'
-                    'data science management and data science teams  performance',
-                    'ai regulation',
-                    'forecasting',
-                    'bidding',
-                    'deep learning & neural nets',
-                    'mlops',
-                    'ads',
-                    'computer science',
-                    'knowledge graphs',
-                    'graph neural networks',
-                    'ai productivity',
-                    'explainable ai',
-                    'xai'
-                    ]
-
+            keywords=[
+                "cs.AI",
+                "cs.LG",
+                "cs.SI",
+                "stat.ML",
+                "ai",
+                "machine learning",
+                "data science",
+                "large language models",
+                "ai for social good",
+                "ai ethics"
+                "data science management and data science teams  performance",
+                "ai regulation",
+                "forecasting",
+                "bidding",
+                "deep learning & neural nets",
+                "mlops",
+                "ads",
+                "computer science",
+                "knowledge graphs",
+                "graph neural networks",
+                "ai productivity",
+                "explainable ai",
+                "xai",
+            ],
         )
-        sota_preferences = SotaPreferences(audiences={'jean': jean}, default_profile='jean')
+        sota_preferences = SotaPreferences(
+            audiences={"jean": jean}, default_profile="jean"
+        )
         return sota_preferences.get_current_audience()
 
     @staticmethod
@@ -130,15 +136,14 @@ class Config:
         return self.dwh
 
     def get_local_papers_path(self) -> str:
-        """ return the location where the papers are stored """
+        """return the location where the papers are stored"""
 
         path = f"{Config.HOME}/.sota/papers"
 
         if not os.path.exists(path):
             os.system("mkdir -p " + path)
-        
-        return path
 
+        return path
 
 
 config = Config.load_config()

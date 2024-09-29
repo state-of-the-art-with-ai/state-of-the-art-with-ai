@@ -56,7 +56,10 @@ class ArxivMiner:
                 if p.abstract_url not in self.existing_papers_urls
             ]
             print(
-                "Unique new papers found: ", len(real_new_papers), " for topic: ", keyword
+                "Unique new papers found: ",
+                len(real_new_papers),
+                " for topic: ",
+                keyword,
             )
             total_new_papers_found = total_new_papers_found + real_new_papers
 
@@ -96,13 +99,13 @@ class ArxivMiner:
         query = "cat:cs.AI"
 
         result = self.arxiv_gateway.find_by_query(
-            query=query, number_of_papers=3, sort_by='submitted'
+            query=query, number_of_papers=3, sort_by="submitted"
         )
         if not result:
             raise Exception(f"Did not find any paper with Query {query}")
         date_str = result[0].updated.date().isoformat()
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-    
+
     def debug_latest_date_with_papers(self):
         if not has_internet():
             raise Exception("No internet connection found")
@@ -110,23 +113,36 @@ class ArxivMiner:
         query = "cat:cs.AI"
 
         query_result = self.arxiv_gateway.find_by_query(
-            query=query, number_of_papers=3, sort_by='submitted'
+            query=query, number_of_papers=3, sort_by="submitted"
         )
-        dates = [(entry.abstract_url, entry.updated.date().isoformat()) for entry in query_result]
+        dates = [
+            (entry.abstract_url, entry.updated.date().isoformat())
+            for entry in query_result
+        ]
         result = {}
-        result['submitted'] = dates
+        result["submitted"] = dates
         query_result = self.arxiv_gateway.find_by_query(
-            query=query, number_of_papers=3, sort_by='updated'
+            query=query, number_of_papers=3, sort_by="updated"
         )
-        dates = [(entry.abstract_url, entry.updated.date().isoformat()) for entry in query_result]
-        result['updated'] = dates
+        dates = [
+            (entry.abstract_url, entry.updated.date().isoformat())
+            for entry in query_result
+        ]
+        result["updated"] = dates
 
         import subprocess
+
         shell_cmd = """
 curl "http://export.arxiv.org/api/query?search_query=all:Artificial+Intelligence&sortBy=submittedDate&sortOrder=descending" | grep -i published
         """
-        p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        out, error  = p.communicate()
+        p = subprocess.Popen(
+            shell_cmd,
+            shell=True,
+            text=True,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+        )
+        out, error = p.communicate()
         print(out)
         print(error)
 

@@ -10,7 +10,7 @@ pages = {
         st.Page("pages/interests_page.py", title="Your Interests"),
         st.Page("pages/papers_recommended_page.py", title="Recommendations"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
-        #st.Page("pages/papers_report_page.py", title="Past Recomendations"),
+        # st.Page("pages/papers_report_page.py", title="Past Recomendations"),
         st.Page("pages/paper_details_page.py", title="Paper details "),
     ],
     "Settings": [
@@ -19,15 +19,17 @@ pages = {
         st.Page("pages/signup_page.py", title="Signup Page"),
         st.Page("pages/login_page.py", title="Login Page"),
         st.Page("pages/profile_page.py", title="Profile Page"),
-    ]
+    ],
 }
 
 pg = st.navigation(pages)
 st.set_page_config(layout="wide")
 
 with st.sidebar:
-    p = subprocess.Popen('uptime', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    out, error  = p.communicate()
+    p = subprocess.Popen(
+        "uptime", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+    )
+    out, error = p.communicate()
     time_up = out.split(" up ")[1].split(",")[0]
     st.markdown("#### Uptime: " + time_up)
     minutes = PushHistory().minutes_since_last_push()
@@ -40,7 +42,10 @@ with st.sidebar:
             out, error = S3().push_local_events_data()
             st.write(error)
             st.write(out)
-    st.link_button("Give us Feedback", "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform")
+    st.link_button(
+        "Give us Feedback",
+        "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform",
+    )
 
 
 pg.run()

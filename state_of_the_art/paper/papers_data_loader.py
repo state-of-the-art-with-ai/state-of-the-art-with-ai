@@ -9,6 +9,7 @@ from state_of_the_art.paper.paper_entity import Paper
 
 class PapersLoader:
     TITLE_MAX_LENGH = 80
+
     def load_papers_df(self) -> pd.DataFrame:
         df = config.get_datawarehouse().event("arxiv_papers")
         # @todo Fix duplicates
@@ -36,8 +37,7 @@ class PapersLoader:
             (df["published"].dt.date >= start) & (df["published"].dt.date <= end)
         ].sort_values(by="published", ascending=False)
 
-
-    def load_between_dates_str(self, start: str, end: str)-> pd.DataFrame:
+    def load_between_dates_str(self, start: str, end: str) -> pd.DataFrame:
         df = self.load_papers_df()
         print("Date filters of publication (from, to): ", start, end)
         return df[

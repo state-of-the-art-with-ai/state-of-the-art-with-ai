@@ -1,7 +1,7 @@
 import os
 from state_of_the_art.tables.user_table import UserTable
 import streamlit as st
-import subprocess 
+import subprocess
 from state_of_the_art.infrastructure.s3 import S3
 
 st.title("Settings")
@@ -20,14 +20,15 @@ with c2:
             st.write(out)
 
 
-
 st.markdown("### Debug shell")
 
 shell_cmd = st.text_input("Shell command")
 
 if shell_cmd:
-    p = subprocess.Popen(shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    out, error  = p.communicate()
+    p = subprocess.Popen(
+        shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+    )
+    out, error = p.communicate()
 
     st.write(error)
     st.write(out)
@@ -37,8 +38,15 @@ with c1:
     if st.button("Show recommnder log"):
         with st.expander("Log"):
             import subprocess
-            p = subprocess.Popen(f'cat /tmp/generator.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            out, error  = p.communicate()
+
+            p = subprocess.Popen(
+                f"cat /tmp/generator.log",
+                shell=True,
+                text=True,
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
+            out, error = p.communicate()
             st.write(error)
             st.write(out)
 
@@ -46,7 +54,14 @@ with c2:
     if st.button("Show scheduler"):
         with st.expander("Log"):
             import subprocess
-            p = subprocess.Popen(f'cat /tmp/scheduler.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            out, error  = p.communicate()
+
+            p = subprocess.Popen(
+                f"cat /tmp/scheduler.log",
+                shell=True,
+                text=True,
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
+            out, error = p.communicate()
             st.write(error)
             st.write(out)

@@ -5,7 +5,7 @@ from state_of_the_art.app.pages.papers_page_utils import (
 from state_of_the_art.app.pages.render_papers import render_papers
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.interest_table import InterestsTable
+from state_of_the_art.tables.interest_table import TestTable
 import streamlit as st
 
 generated_date = None
@@ -16,7 +16,7 @@ st.title("Your Interests")
 papers = None
 send_by_email = False
 
-topics = InterestsTable()
+topics = TestTable()
 topics_df = topics.read()
 topics_names = topics_df["name"].tolist()
 
@@ -24,15 +24,15 @@ c1, c2 = st.columns([2, 1])
 with c2:
     for topic in topics_names:
         try:
-            if st.button(topic, key=f't{topic}'):
+            if st.button(topic, key=f"t{topic}"):
                 st.query_params["interest"] = topic
                 selected_interest = topic
         except:
             pass
 with c1:
 
-    if 'interest' in st.query_params:
-        selected_interest = st.query_params['interest'] 
+    if "interest" in st.query_params:
+        selected_interest = st.query_params["interest"]
     else:
         selected_interest = topics_names[-1]
 
@@ -44,7 +44,7 @@ with c1:
     topic_description = st.text_area("Query / Description", value=topic_description)
     interest_name = st.text_input("Interest name", value=interest_name)
 
-    c1, c2 = st.columns([1,7])
+    c1, c2 = st.columns([1, 7])
     with c1:
         if st.button("Save"):
             topics.add(name=interest_name, description=topic_description)
@@ -64,7 +64,9 @@ st.divider()
 if fetch_papers:
     with st.spinner("Loading papers"):
         papers = PapersLoader().get_all_papers()
-        papers = Bm25Search(papers).search_returning_papers(interest_name + " " + topic_description)
+        papers = Bm25Search(papers).search_returning_papers(
+            interest_name + " " + topic_description
+        )
 
     # render all papeers
     render_papers(papers, generated_date=generated_date)

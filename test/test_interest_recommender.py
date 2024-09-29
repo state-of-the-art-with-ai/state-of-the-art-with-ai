@@ -1,6 +1,8 @@
 import datetime
 
-from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import EmbeddingsSimilarity
+from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import (
+    EmbeddingsSimilarity,
+)
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
     InterestsRecommender,
 )
@@ -8,7 +10,8 @@ from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
 import scipy.stats as stats
-import pytest 
+import pytest
+
 
 @pytest.mark.skipif(True, reason="failing in the ci")
 def test_single_interest_relevance():
@@ -89,6 +92,5 @@ def test_normalize():
     print("Normalized2: ", normalized_2)
 
 
-    
 def zscore(series):
     return stats.zscore(series)

@@ -1,9 +1,11 @@
 import datetime
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import EmbeddingsSimilarity
+from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import (
+    EmbeddingsSimilarity,
+)
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.interest_table import InterestsTable
+from state_of_the_art.tables.interest_table import TestTable
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
@@ -27,14 +29,16 @@ class InterestsRecommender:
         """
         Generate a new set of recommendations based on the interests and the number of days to look back
         """
-        print(f"Generating recomemndations for the last {number_of_days_to_look_back} days")
+        print(
+            f"Generating recomemndations for the last {number_of_days_to_look_back} days"
+        )
         latest_date_with_papers = ArxivMiner().latest_date_with_papers()
         print(f"Latest date with papers submitted in arxiv: {latest_date_with_papers}")
 
         last_recommendation = RecommendationsHistoryTable().last().to_dict()
         if (
-            not repeat_check_disable and 
-            last_recommendation["to_date"] == latest_date_with_papers.isoformat()
+            not repeat_check_disable
+            and last_recommendation["to_date"] == latest_date_with_papers.isoformat()
         ):
             raise Exception(
                 f"No new papers since last recommendations on {last_recommendation['to_date']}"
@@ -52,14 +56,16 @@ class InterestsRecommender:
             print("Will now mine new papers")
             ArxivMiner().mine_all_keywords()
 
-        self.papers, self.papers_embeddings = self.embedding_similarity.load_papers_and_embeddings(
-            self.date_from, self.date_to
+        self.papers, self.papers_embeddings = (
+            self.embedding_similarity.load_papers_and_embeddings(
+                self.date_from, self.date_to
+            )
         )
 
         self.bm25_search.set_papers_and_index(self.papers)
 
         # get all interests
-        interests_df = InterestsTable().read()
+        interests_df = TestTable().read()
 
         result = {}
         result["interest_papers"] = {}
@@ -69,11 +75,16 @@ class InterestsRecommender:
             result["interest_papers"][interest["name"]] = {}
             result["interest_papers"][interest["name"]]["papers"] = {}
 
-            papers, bm25_scores = self.bm25_search.search_returning_paper_and_score(query)
+            papers, bm25_scores = self.bm25_search.search_returning_paper_and_score(
+                query
+            )
             bm25_scores = stats.zscore(bm25_scores)
             for paper_indice, paper in enumerate(papers):
                 score = bm25_scores[paper_indice]
-                if paper.abstract_url in result["interest_papers"][interest["name"]]["papers"]:
+                if (
+                    paper.abstract_url
+                    in result["interest_papers"][interest["name"]]["papers"]
+                ):
                     result["interest_papers"][interest["name"]]["papers"][
                         paper.abstract_url
                     ]["bm25_score"] = score
@@ -82,8 +93,9 @@ class InterestsRecommender:
                         paper.abstract_url
                     ] = {"bm25_score": score, "semantic_score": 0}
 
-            
-            top_papers, semantic_scores = self.embedding_similarity.get_papers_for_interest(query)
+            top_papers, semantic_scores = (
+                self.embedding_similarity.get_papers_for_interest(query)
+            )
             semantic_scores = stats.zscore(semantic_scores)
 
             for paper_indice, paper in enumerate(top_papers):
@@ -91,20 +103,21 @@ class InterestsRecommender:
                 result["interest_papers"][interest["name"]]["papers"][
                     paper.abstract_url
                 ] = {"semantic_score": semantic_score, "bm25_score": 0}
-        
+
         # sum scores in a final score
         for interest in result["interest_papers"]:
             for paper in result["interest_papers"][interest]["papers"]:
-                result["interest_papers"][interest]["papers"][paper][
-                    "final_score"
-                ] = result["interest_papers"][interest]["papers"][paper][
-                    "bm25_score"
-                ] + result["interest_papers"][interest]["papers"][paper][
-                    "semantic_score"
-                ]
+                result["interest_papers"][interest]["papers"][paper]["final_score"] = (
+                    result["interest_papers"][interest]["papers"][paper]["bm25_score"]
+                    + result["interest_papers"][interest]["papers"][paper][
+                        "semantic_score"
+                    ]
+                )
 
         result["interest_papers"] = self._remove_duplicates(result["interest_papers"])
-        result["interest_papers"] = self._sort_interests_by_scores(result["interest_papers"])
+        result["interest_papers"] = self._sort_interests_by_scores(
+            result["interest_papers"]
+        )
 
         RecommendationsHistoryTable().add(
             from_date=self.date_from.isoformat(),
@@ -122,10 +135,10 @@ class InterestsRecommender:
         content_structured, data = (
             RecommendationsHistoryTable().get_parsed_recommended_papers()
         )
-        import datetime ;
-        
-        to_date = datetime.datetime.strptime(data['to_date'], "%Y-%m-%d").date()
-        from_date = datetime.datetime.strptime(data['from_date'], "%Y-%m-%d").date()
+        import datetime
+
+        to_date = datetime.datetime.strptime(data["to_date"], "%Y-%m-%d").date()
+        from_date = datetime.datetime.strptime(data["from_date"], "%Y-%m-%d").date()
         days = (to_date - from_date).days
 
         content_str = f"""
@@ -160,7 +173,7 @@ Papers analysed: {data['papers_analysed_total']}<br><br>"""
         )
         EmailService().send(content=content_str, subject=title)
 
-    def _remove_duplicates(self, recommendation_structure, score_column='final_score'):
+    def _remove_duplicates(self, recommendation_structure, score_column="final_score"):
         papers_scores_by_category = {}
         for interest in recommendation_structure:
             for paper in recommendation_structure[interest]["papers"]:
@@ -202,7 +215,9 @@ Papers analysed: {data['papers_analysed_total']}<br><br>"""
 
         return result
 
-    def _sort_interests_by_scores(self, recommendation_structure, score_column='final_score'):
+    def _sort_interests_by_scores(
+        self, recommendation_structure, score_column="final_score"
+    ):
         interest_scores_sum = {}
         for interest, papers in recommendation_structure.items():
             interest_scores_sum[interest] = 0

@@ -44,7 +44,7 @@ def create_pdf_path(description_path: str, disable_timestamp=False) -> str:
         base_path = "/tmp/"
         print("Given that tests are enabled will use /tmp/ as base path for pdfs.")
 
-    return base_path + '/' + description_path + ".pdf"
+    return base_path + "/" + description_path + ".pdf"
 
 
 def open_pdf(output_path):

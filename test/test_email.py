@@ -1,7 +1,6 @@
-
-
 from state_of_the_art.utils.mail import EmailService
-import pytest 
+import pytest
+
 
 @pytest.mark.skipif(True, reason="do not want spammy emails")
 def test_email():

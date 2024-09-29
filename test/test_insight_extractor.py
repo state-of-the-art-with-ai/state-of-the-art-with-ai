@@ -45,6 +45,8 @@ EXAMPLE_LLM_OUTPUT = {
 }
 
 from unittest import mock
+
+
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_post_extraction():
     InsightExtractor().post_extraction(

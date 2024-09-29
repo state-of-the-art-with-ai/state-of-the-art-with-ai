@@ -31,6 +31,7 @@ class Sota:
 
 def main():
     import fire
+
     fire.Fire(Sota)
 
 

@@ -21,8 +21,9 @@ class Inference:
 
     def create_embeddings(self, texts: List[str]):
         return self.sentence_transformer.encode(texts)
-    
+
 
 if __name__ == "__main__":
     import fire
+
     fire.Fire()

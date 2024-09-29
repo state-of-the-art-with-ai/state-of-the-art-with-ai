@@ -127,4 +127,3 @@ def load_different_paper():
         add = st.button("Add new Paper")
         if add:
             create_new(url)
-

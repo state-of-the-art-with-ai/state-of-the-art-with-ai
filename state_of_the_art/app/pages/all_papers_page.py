@@ -1,5 +1,7 @@
 from state_of_the_art.app.pages.render_papers import render_papers
-from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
+from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
+    InterestsRecommender,
+)
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
 from state_of_the_art.search.bm25_search import Bm25Search
@@ -17,9 +19,11 @@ filters = {}
 
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
+
 @st.cache_data
 def fetch_latest_date_with_papers():
     return ArxivMiner().latest_date_with_papers()
+
 
 with st.spinner("Fetching metadata about papers..."):
     c1, c2, c3 = st.columns([1, 1, 1])
@@ -28,14 +32,13 @@ with st.spinner("Fetching metadata about papers..."):
     with c1:
         last_mine = ArxivMiningHistory().last().to_dict()
         st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
-    
+
     with c2:
         st.metric("Latest date with papers", str(latest_date_with_papers).split(".")[0])
     with c3:
         if st.button("Mine new papers"):
             with st.spinner("Mining all keywords"):
                 ArxivMiner().mine_all_keywords()
-
 
     if "date" in st.query_params:
         default_date_filter = st.query_params["date"]
@@ -51,15 +54,15 @@ with st.spinner("Fetching metadata about papers..."):
 
 with st.spinner("Fetching the actual papers..."):
     papers_df = PapersLoader().load_papers_df()
-    filters['Total Papers'] = len(papers_df.index)
+    filters["Total Papers"] = len(papers_df.index)
     if not search_query:
         papers_df = papers_df[papers_df["published"].dt.date == date_filter]
-        filters['Date'] = date_filter.isoformat()
+        filters["Date"] = date_filter.isoformat()
     papers = PapersLoader().to_papers(papers_df)
 
     if search_query:
         papers = Bm25Search(papers).search_returning_papers(search_query)
-        filters['Query']  = search_query
+        filters["Query"] = search_query
 
     st.divider()
-    render_papers(papers, metadata=filters,generated_date=generated_date)
+    render_papers(papers, metadata=filters, generated_date=generated_date)

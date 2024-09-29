@@ -30,15 +30,19 @@ for index, row in enumerate(df.to_dict(orient="records")):
 
     c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
-        st.markdown(f"""
+        st.markdown(
+            f"""
             ##### Generated at: {str(row["tdw_timestamp"]).split('.')[0]}
             ###### Number of Papers Analysed: {papers_analysed}
-        """)
+        """
+        )
     with c2:
-        st.markdown(f"""
+        st.markdown(
+            f"""
             ###### From Date: {row["from_date"]}
             ###### To Date {row["to_date"]}
-        """)
+        """
+        )
     with c3:
         st.link_button(
             "Open report",

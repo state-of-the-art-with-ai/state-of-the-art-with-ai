@@ -29,7 +29,13 @@ with st.expander("Generation options", expanded=False):
 
 if generate_clicked:
     with st.status(f"Generating new recommendations for {lookback_days} days ... "):
-        p = subprocess.Popen(f'sota InterestsRecommender generate -s -n {lookback_days} -r | tee /tmp/generator.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        p = subprocess.Popen(
+            f"sota InterestsRecommender generate -s -n {lookback_days} -r | tee /tmp/generator.log",
+            shell=True,
+            text=True,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+        )
         for line in p.stdout:
             st.text(line)  # Continuously update the placeholder with the output
 
@@ -46,11 +52,10 @@ with st.spinner("Loading latest recommendations ..."):
     structured = json.loads(recommendations["recommended_papers"].replace("'", '"'))
     papers = []
     for interest, interest_data in structured["interest_papers"].items():
-        for paper in PapersLoader().load_papers_from_urls(interest_data["papers"].keys())[
-            0:PAPER_PER_TOPIC_TO_RENDER
-        ]:
+        for paper in PapersLoader().load_papers_from_urls(
+            interest_data["papers"].keys()
+        )[0:PAPER_PER_TOPIC_TO_RENDER]:
             papers.append(paper)
-
 
     recommendation_metadata = {
         "from_date": recommendations["from_date"],

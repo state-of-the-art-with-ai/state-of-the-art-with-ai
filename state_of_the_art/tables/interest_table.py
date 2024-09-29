@@ -1,7 +1,7 @@
 from state_of_the_art.tables.base_table import BaseTable
 
 
-class InterestsTable(BaseTable):
+class TestTable(BaseTable):
     table_name = "topics"
     schema = {
         "name": {"type": str},
