@@ -1,7 +1,11 @@
 import time
 import datetime
 
+from state_of_the_art.scheduling.utils import capture_exeption
 
+MINUTES_TO_REPEAT_LIVENESS_PROBE = 5
+
+@capture_exeption()
 def send_email_job():
     print("Running recommender")
     try:
@@ -14,21 +18,25 @@ def send_email_job():
         print("Error in scheduler job", e)
 
 
-def print_test():
-    print("Test run every 5 mins at " + datetime.datetime.now().isoformat())
+@capture_exeption()
+def liveness_probe():
+    print(f"Test run every {MINUTES_TO_REPEAT_LIVENESS_PROBE} mins at " + datetime.datetime.now().isoformat())
+    raise Exception("Testing errors")
 
 
+
+@capture_exeption()
 def push_data_to_s3():
     print("Pushing data to s3")
     from state_of_the_art.infrastructure.s3 import S3
-    out, error = S3().push_local_data()
+    out, error = S3().push_local_events_data()
     print(error, out)
 
 def run():
     import schedule
     print("starting scheduler setup at " + datetime.datetime.now().isoformat())
 
-    schedule.every(5).minutes.do(print_test)
+    schedule.every(MINUTES_TO_REPEAT_LIVENESS_PROBE).minutes.do(liveness_probe)
 
     schedule.every().day.at("01:00").do(push_data_to_s3)
     schedule.every().day.at("04:00").do(push_data_to_s3)
@@ -59,3 +67,4 @@ def run():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
