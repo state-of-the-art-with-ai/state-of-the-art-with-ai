@@ -5,7 +5,14 @@ import streamlit as st
 import subprocess
 from state_of_the_art.infrastructure.s3 import S3
 
-st.title("Settings")
+st.title("Admin")
+st.divider()
+
+st.markdown("### Stats")
+st.write(f"Number of feedbacks: {TextFeedbackTable().len()}")
+
+st.divider()
+st.markdown("### Data")
 
 c1, c2 = st.columns([1, 1])
 with c1:
@@ -20,9 +27,8 @@ with c2:
             st.write(error)
             st.write(out)
 
-st.markdown("### Stats")
-st.write(f"Number of feedbacks: {TextFeedbackTable().len()}")
 
+st.divider()
 st.markdown("### Debug shell")
 
 shell_cmd = st.text_input("Shell command")
@@ -36,6 +42,9 @@ if shell_cmd:
     st.write(error)
     st.write(out)
 
+
+st.divider()
+st.markdown("### Logs")
 c1, c2 = st.columns([1, 1])
 with c1:
     if st.button("Show recommnder log"):
