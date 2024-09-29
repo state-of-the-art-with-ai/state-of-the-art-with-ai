@@ -18,6 +18,7 @@ pages = {
         st.Page("pages/lead_collection_page.py", title="Leads page"),
         st.Page("pages/signup_page.py", title="Signup Page"),
         st.Page("pages/login_page.py", title="Login Page"),
+        st.Page("pages/profile_page.py", title="Profile Page"),
     ]
 }
 
@@ -40,8 +41,6 @@ with st.sidebar:
             st.write(error)
             st.write(out)
     st.link_button("Give us Feedback", "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform")
-
-
 
 
 pg.run()

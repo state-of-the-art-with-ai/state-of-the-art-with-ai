@@ -20,15 +20,7 @@ import itertools
 
 merged = list(itertools.chain(*all_tags))
 unique = list(set(merged))
-
-default_tags = []
-if "tags" in st.query_params:
-    default_tags = st.query_params["tags"]
-
-elif st.checkbox("Select all", key="all_tags", value=True):
-    default_tags = unique
-
-selected_tags = st.multiselect("Tags", unique, default_tags)
+selected_tags = unique
 
 all_papers_selected = all_tags_df[
     all_tags_df["tags"].str.contains("|".join(selected_tags))
@@ -46,7 +38,5 @@ papers = sorted(
     ].values[0],
     reverse=True,
 )
-
-st.divider()
 
 render_papers(papers)

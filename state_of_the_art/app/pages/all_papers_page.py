@@ -17,9 +17,13 @@ filters = {}
 
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
+@st.cache_data
+def fetch_latest_date_with_papers():
+    return ArxivMiner().latest_date_with_papers()
+
 with st.spinner("Fetching metadata about papers..."):
     c1, c2, c3 = st.columns([1, 1, 1])
-    latest_date_with_papers = ArxivMiner().latest_date_with_papers()
+    latest_date_with_papers = fetch_latest_date_with_papers()
 
     with c1:
         last_mine = ArxivMiningHistory().last().to_dict()
