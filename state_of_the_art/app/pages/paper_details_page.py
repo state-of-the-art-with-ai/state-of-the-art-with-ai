@@ -3,7 +3,7 @@ from state_of_the_art.paper.email_paper import EmailAPaper
 from state_of_the_art.register_papers.register_paper import PaperCreator
 import streamlit as st
 from state_of_the_art.app.data import insights
-from state_of_the_art.app.pages.paper_details_utils import (
+from state_of_the_art.app.utils.paper_details_utils import (
     load_different_paper,
     questions,
     render_reading_progress,

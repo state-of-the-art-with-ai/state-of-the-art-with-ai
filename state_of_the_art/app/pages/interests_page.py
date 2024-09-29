@@ -1,5 +1,5 @@
 from state_of_the_art.app.data import papers, topics
-from state_of_the_art.app.pages.papers_page_utils import (
+from state_of_the_art.app.utils.papers_page_utils import (
     edit_profile,
 )
 from state_of_the_art.app.pages.render_papers import PapersRenderer
