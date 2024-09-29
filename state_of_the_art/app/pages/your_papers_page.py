@@ -45,4 +45,4 @@ papers = sorted(
     reverse=True,
 )
 
-PapersRenderer(disable_save_button=True).render_papers(papers)
+PapersRenderer(disable_save_button=True, enable_tags=True).render_papers(papers)

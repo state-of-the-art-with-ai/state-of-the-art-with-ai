@@ -7,7 +7,7 @@ from state_of_the_art.app.utils.paper_details_utils import (
     load_different_paper,
     questions,
     render_reading_progress,
-    render_tags,
+    render_tags_for_paper,
 )
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
@@ -62,7 +62,7 @@ with c3:
 
 c1, c2 = st.columns([1, 1])
 with c1:
-    render_tags(paper)
+    render_tags_for_paper(paper)
 with c2:
     render_reading_progress(paper)
 

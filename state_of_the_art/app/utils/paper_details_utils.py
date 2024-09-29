@@ -61,23 +61,35 @@ def create_new(paper_url):
         st.rerun()
 
 
-def render_tags(paper):
+def render_tags_for_paper(paper: ArxivPaper):
+
     tags_table = TagsTable()
     tags_table_df = tags_table.read()
+
     existing_tags = []
     existing_tags_df = tags_table_df[tags_table_df["paper_id"] == paper.abstract_url]
     if not existing_tags_df.empty:
         existing_tags = existing_tags_df.iloc[0]["tags"].split(",")
     currently_selected_tags = st_tags(
-        label="", value=existing_tags, suggestions=TagsTable.DEFAULT_TAGS
+        label="", value=existing_tags, key=f'tags_{paper.abstract_url}', suggestions=TagsTable.DEFAULT_TAGS
     )
+    currently_selected_tags = [tag.strip().lower() for tag in currently_selected_tags]
+
+
     if set(currently_selected_tags) != set(existing_tags):
-        tags_table.update_or_create(
-            by_key="paper_id",
-            by_value=paper.abstract_url,
-            new_values={"tags": ",".join(currently_selected_tags)},
-        )
-        st.success("Tags updated successfully")
+        if not currently_selected_tags:
+            tags_table.delete_by(
+                column="paper_id",
+                value=paper.abstract_url,
+            )
+            st.success("Tags deleted successfully")
+        else:
+            tags_table.update_or_create(
+                by_key="paper_id",
+                by_value=paper.abstract_url,
+                new_values={"tags": ",".join(currently_selected_tags)},
+            )
+            st.success("Tags updated successfully")
 
 
 def render_reading_progress(paper):
