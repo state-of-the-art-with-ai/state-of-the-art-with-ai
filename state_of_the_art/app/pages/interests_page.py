@@ -20,8 +20,8 @@ topics = InterestsTable()
 topics_df = topics.read()
 topics_names = topics_df["name"].tolist()
 
-c1, c2 = st.columns([1, 2])
-with c1:
+c1, c2 = st.columns([2, 1])
+with c2:
     for topic in topics_names:
         try:
             if st.button(topic, key=f't{topic}'):
@@ -29,7 +29,7 @@ with c1:
                 selected_interest = topic
         except:
             pass
-with c2:
+with c1:
 
     if 'interest' in st.query_params:
         selected_interest = st.query_params['interest'] 
