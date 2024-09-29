@@ -44,6 +44,7 @@ def run():
     schedule.every().day.at("08:00").do(push_data_to_s3)
     schedule.every().day.at("09:00").do(push_data_to_s3)
     schedule.every().day.at("10:00").do(push_data_to_s3)
+    schedule.every().day.at("11:00").do(push_data_to_s3)
     schedule.every().day.at("12:00").do(push_data_to_s3)
     schedule.every().day.at("13:00").do(push_data_to_s3)
     schedule.every().day.at("14:00").do(push_data_to_s3)
