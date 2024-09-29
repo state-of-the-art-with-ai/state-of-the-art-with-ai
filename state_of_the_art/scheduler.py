@@ -15,10 +15,13 @@ def send_recommendations_job():
 
     InterestsRecommender().generate(
         repeat_check_disable=True,
-        number_of_days_to_look_back=1,
+        number_of_days_to_look_back=get_random_number_of_days(),
         skip_register_new_papers=True,
     )
 
+def get_random_number_of_days():
+    import random
+    return random.randint(1, 7)
 
 @capture_exeption()
 def liveness_probe():
@@ -54,6 +57,14 @@ def run():
     schedule.every().day.at("22:00").do(send_recommendations_job)
     schedule.every().day.at("22:30").do(send_recommendations_job)
     schedule.every().day.at("23:00").do(send_recommendations_job)
+    schedule.every().day.at("00:00").do(send_recommendations_job)
+    schedule.every().day.at("01:00").do(send_recommendations_job)
+    schedule.every().day.at("02:00").do(send_recommendations_job)
+    schedule.every().day.at("03:00").do(send_recommendations_job)
+    schedule.every().day.at("04:00").do(send_recommendations_job)
+    schedule.every().day.at("05:00").do(send_recommendations_job)
+    schedule.every().day.at("06:00").do(send_recommendations_job)
+    schedule.every().day.at("07:00").do(send_recommendations_job)
 
     schedule.every().day.at("01:00").do(push_data_to_s3)
     schedule.every().day.at("04:00").do(push_data_to_s3)
