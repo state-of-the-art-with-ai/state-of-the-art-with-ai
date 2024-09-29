@@ -20,7 +20,13 @@ import itertools
 
 merged = list(itertools.chain(*all_tags))
 unique = list(set(merged))
-selected_tags = unique
+
+selected_tags = st.selectbox("Filter By tags", options=['Select' ] + unique, index=0)
+
+if selected_tags == 'Select':
+    selected_tags = unique
+else:
+    selected_tags = [selected_tags]
 
 all_papers_selected = all_tags_df[
     all_tags_df["tags"].str.contains("|".join(selected_tags))
