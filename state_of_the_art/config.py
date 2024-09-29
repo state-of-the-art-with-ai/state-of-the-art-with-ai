@@ -32,6 +32,7 @@ class Config:
     TEXT_PREDICTOR_PATH_LOCALLY = f"{HOME}/.tinyws/models/" + MODEL_NAME
     MODEL_FOLDER_IN_CLOUD = f"s3://{data_bucket}/models"
     MODEL_IN_CLOUD = f"s3://{data_bucket}/models/" + MODEL_NAME
+    ONLINE_WEBSITE = 'https://state-of-the-art-with-ai-750989039686.europe-west3.run.app'
 
     # the maximum number of papers to compute while sorting the batch of papers
     GPT_MODEL = "gpt-4o"

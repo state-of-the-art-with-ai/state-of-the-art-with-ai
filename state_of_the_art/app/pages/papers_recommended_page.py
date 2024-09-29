@@ -47,8 +47,13 @@ if generate_clicked:
 
         p.wait()
 
+
+@st.cache_data
+def load_latest_recommendations():
+    return RecommendationsHistoryTable().last().to_dict()
+
 with st.spinner("Loading latest recommendations ..."):
-    recommendations = RecommendationsHistoryTable().last().to_dict()
+    recommendations = load_latest_recommendations()
     structured = json.loads(recommendations["recommended_papers"].replace("'", '"'))
     papers = []
     for interest, interest_data in structured["interest_papers"].items():

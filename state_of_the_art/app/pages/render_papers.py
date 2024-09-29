@@ -2,7 +2,7 @@ from typing import Optional
 from state_of_the_art.tables.tags_table import TagsTable
 import streamlit as st
 
-from state_of_the_art.tables.text_feedback_table import TextFeedbackTable
+from state_of_the_art.config import config
 from state_of_the_art.text_feedback.feedback_elements import render_feedback
 
 
@@ -42,7 +42,7 @@ def render_papers(
             c1, c2, c3, c4 = st.columns([9, 2, 1, 1])
             with c1:
                 st.markdown(
-                    f"""##### {k+1}. [{paper.title}](/paper_details_page?paper_url={paper.abstract_url})
+                    f"""##### {k+1}. [{paper.title}]({config.ONLINE_WEBSITE}/paper_details_page?paper_url={paper.abstract_url})
                 """
                 )
                 if (
