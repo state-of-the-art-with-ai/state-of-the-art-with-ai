@@ -2,6 +2,7 @@ import os
 from state_of_the_art.user_preferences.audience import Audience
 from state_of_the_art.user_preferences.preferences import SotaPreferences
 from tiny_data_warehouse import DataWarehouse
+import time
 
 
 class Tables:
@@ -11,6 +12,7 @@ class Tables:
 
 
 class Config:
+    
     HOME = os.path.expanduser("~")
     NEW_PAPERS_FOLDER = os.path.expanduser("~") + "/.arxiv_papers_new"
     MAX_ABSTRACT_SIZE_RANK = 500
@@ -39,6 +41,9 @@ class Config:
     MAX_CHARS_CONTEXT_LENGHT = 128000 * 4
     OPEN_API_KEY = os.environ["SOTA_OPENAI_KEY"]
     dwh = None
+
+    def __init__(self) -> None:
+        pass
 
     QUERIES_TO_MINE = [
         "data science",

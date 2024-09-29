@@ -2,9 +2,6 @@ import json
 import subprocess
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.pages.render_papers import render_papers
-from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-    InterestsRecommender,
-)
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
@@ -35,9 +32,16 @@ with st.expander("Generation options", expanded=False):
 if generate_clicked:
     with st.status(f"Generating new recommendations for {lookback_days} days ... "):
         p = subprocess.Popen(f'sota InterestsRecommender generate -s -n {lookback_days} -r | tee /tmp/generator.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        out, error  = p.communicate()
-        st.write(error)
-        st.write(out)
+        for line in p.stdout:
+            st.text(line)  # Continuously update the placeholder with the output
+
+        for line in p.stderr:
+            st.text(line)  # Continuously update the placeholder with the output
+
+        p.stderr.close()
+        p.stdout.close()
+
+        p.wait()
 
 papers = []
 for interest, interest_data in structured["interest_papers"].items():

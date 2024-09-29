@@ -3,10 +3,10 @@ import datetime
 
 from state_of_the_art.scheduling.utils import capture_exeption
 
-MINUTES_TO_REPEAT_LIVENESS_PROBE = 5
+MINUTES_TO_REPEAT_LIVENESS_PROBE = 10
 
 @capture_exeption()
-def send_email_job():
+def send_recommendations_job():
     print("Running recommender")
     try:
         from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestsRecommender
@@ -58,10 +58,7 @@ def run():
     schedule.every().day.at("23:00").do(push_data_to_s3)
 
     # send email
-    schedule.every().day.at("22:40").do(send_email_job)
-    schedule.every().day.at("22:00").do(send_email_job)
-    schedule.every().day.at("15:00").do(send_email_job)
-    schedule.every().day.at("11:00").do(send_email_job)
+    schedule.every(30).minutes.do(send_recommendations_job)
 
     print("Scheduler infinite loop started")
     while True:
