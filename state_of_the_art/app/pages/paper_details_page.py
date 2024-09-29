@@ -15,6 +15,7 @@ from state_of_the_art.tables.comments_table import Comments
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.relevance_model.inference import Inference
+from state_of_the_art.text_feedback.feedback_elements import render_feedback
 
 if st.button("Load a paper"):
     load_different_paper()
@@ -43,6 +44,7 @@ insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 has_insights = not insights.empty
 
 st.markdown(f"### {paper.title}")
+render_feedback(paper.title, type='paper_title', context={'paper_id': paper.abstract_url})
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     st.markdown(f"[{paper.abstract_url}]({paper.abstract_url})")
@@ -86,35 +88,43 @@ with c2:
 
 with st.expander("Abstract", expanded=not has_insights):
     st.markdown(paper.abstract)
+    render_feedback(paper.abstract, type='paper_insight', context={'paper_id': paper.abstract_url})
 
 
 with st.expander("Top insights", expanded=True):
     defintions = insights_table.get_all_answers("TopInsights", url)
     for definition in defintions:
         st.markdown(" - " + definition)
+        render_feedback(definition, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 
+outcomes = insights_table.get_lastest_answer("Outcomes", url)
 st.markdown(
     f""" ##### Outcomes
-{insights_table.get_lastest_answer("Outcomes", url)}
+{outcomes}
 """
 )
+render_feedback(outcomes, type="paper_insight", context={'paper_id': paper.abstract_url})
 
+structure = insights_table.get_lastest_answer("DeepSummaryOfStructure", url)
 st.markdown(
     f""" ##### Structure
-{insights_table.get_lastest_answer("DeepSummaryOfStructure", url)}
+{structure}
 """
 )
+render_feedback(structure, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 with st.expander("Definitions"):
     defintions = insights_table.get_all_answers("Definitions", url)
     for definition in defintions:
         st.markdown(" - " + definition)
+        render_feedback(definition, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 with st.expander("Resources", expanded=True):
     defintions = insights_table.get_all_answers("Resources", url)
     for definition in defintions:
         st.markdown(" - " + definition)
+        render_feedback(definition, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 st.markdown("### More insights by relevance")
 
@@ -141,24 +151,19 @@ insights_list = filter(lambda x: x["question"] not in IGNORED_INSIGHTS, insights
 
 for insight in insights_list:
     c1, c2 = st.columns([3, 1])
-    with c1:
-        insight_len = len(insight["insight"])
-        appendix = ""
-        if insight_len > 200:
-            appendix = "..."
+    insight_len = len(insight["insight"])
+    appendix = ""
+    if insight_len > 200:
+        appendix = "..."
 
-        st.markdown(
-            f"**{insight["question"]}**: {insight["insight"][0:200]} {appendix}"
-        )
-        if len(insight["insight"]) > 200:
-            st.expander("Read more").markdown(insight["insight"])
-    with c2:
-        c1, c2 = st.columns(2)
-        with c1:
-            feedback_received = st.feedback(options="faces", key=insight["tdw_uuid"])
-            if feedback_received:
-                InsightsTable().update_score(insight["tdw_uuid"], feedback_received)
-        with c2:
-            st.write("PS: ", insight["predicted_score"])
+    st.markdown(
+        f"**{insight["question"]}**: {insight["insight"][0:200]} {appendix}"
+    )
+    if len(insight["insight"]) > 200:
+        st.expander("Read more").markdown(insight["insight"])
+    render_feedback(insight['insight'], type="paper_insight", context={'paper_id': paper.abstract_url})
+
+    
+
 
 already_rendered = True
