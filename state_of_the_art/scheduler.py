@@ -52,8 +52,9 @@ def run():
     schedule.every().day.at("18:45").do(send_recommendations_job)
     schedule.every().day.at("19:30").do(send_recommendations_job)
     schedule.every().day.at("20:30").do(send_recommendations_job)
+    schedule.every().day.at("22:00").do(send_recommendations_job)
     schedule.every().day.at("22:30").do(send_recommendations_job)
-    schedule.every().day.at("23:30").do(send_recommendations_job)
+    schedule.every().day.at("23:00").do(send_recommendations_job)
 
     schedule.every().day.at("01:00").do(push_data_to_s3)
     schedule.every().day.at("04:00").do(push_data_to_s3)

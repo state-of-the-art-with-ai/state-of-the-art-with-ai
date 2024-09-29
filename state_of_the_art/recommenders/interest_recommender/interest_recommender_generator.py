@@ -147,7 +147,7 @@ Period from: {data['from_date']}<br>
 Period to: {data['to_date']}<br>
 Days = {days}<br>
 Generated at: {data['tdw_timestamp']}<br>
-By user: {os.environ['USER']}<br>
+By user: {os.environ.get('USER', "")}<br>
 Papers analysed: {data['papers_analysed_total']}<br><br>"""
 
         print(content_str)

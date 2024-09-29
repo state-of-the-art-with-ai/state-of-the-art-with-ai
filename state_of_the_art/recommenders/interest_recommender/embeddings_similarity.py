@@ -60,13 +60,6 @@ class EmbeddingsSimilarity:
         scores = [similarity_matrix[0][index].detach().item() for index in top_indices]
         papers = [self.papers[index] for index in top_indices]
         # get teh top scores for the papers
-        print(
-            "Top papers for interest: ",
-            interest_str,
-            " are: ",
-            [paper.title for paper in papers],
-        )
-
         # print top papers matching
         return papers, scores
 

@@ -11,7 +11,7 @@ def capture_exeption():
                 result = func(*args, **kwargs)
             except Exception as e:
                 print(
-                    f"Exception thrown but not failing the application {func.__name__} error: {str(e)}"
+                    f"\nException {str(e)} in function  {func.__name__} but not failing the application\n\n"
                 )
 
             print(f"Function {func.__name__} ended")
