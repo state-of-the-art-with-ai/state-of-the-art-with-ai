@@ -15,7 +15,7 @@ import scipy.stats as stats
 
 
 class InterestsRecommender:
-    PAPER_PER_TOPIC_TO_RENDER = 5
+    MAX_PAPERS_PER_TOPIC = 4
 
     def __init__(self) -> None:
         self.embedding_similarity = EmbeddingsSimilarity()
@@ -159,7 +159,7 @@ Papers analysed: {data['papers_analysed_total']}<br><br>"""
             )
             content_str += f"{topic_counter}. {interest}<br>"
 
-            for paper in papers[0 : self.PAPER_PER_TOPIC_TO_RENDER]:
+            for paper in papers[0 : self.MAX_PAPERS_PER_TOPIC]:
                 paper_score = interest_data["papers"][paper.abstract_url]["bm25_score"]
                 # add paper and url
                 content_str += f'<a href="https://state-of-the-art-with-ai-750989039686.europe-west3.run.app/paper_details_page?paper_url={paper.abstract_url}"> {paper.title} {paper.published_date_str()} ({round(paper_score, 2)})</a> <br>'
