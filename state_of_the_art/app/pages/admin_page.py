@@ -1,4 +1,5 @@
 import os
+from state_of_the_art.tables.text_feedback_table import TextFeedbackTable
 from state_of_the_art.tables.user_table import UserTable
 import streamlit as st
 import subprocess
@@ -19,6 +20,8 @@ with c2:
             st.write(error)
             st.write(out)
 
+st.markdown("### Stats")
+st.write(f"Number of feedbacks: {TextFeedbackTable().len()}")
 
 st.markdown("### Debug shell")
 
