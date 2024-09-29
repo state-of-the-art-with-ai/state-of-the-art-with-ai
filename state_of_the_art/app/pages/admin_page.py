@@ -33,10 +33,18 @@ if shell_cmd:
     st.write(out)
 
 
-if st.button("Show log"):
+if st.button("Show recommnder log"):
     with st.expander("Log"):
         import subprocess
         p = subprocess.Popen(f'cat /tmp/generator.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        st.write(error)
+        st.write(out)
+
+if st.button("Show scheduler"):
+    with st.expander("Log"):
+        import subprocess
+        p = subprocess.Popen(f'cat /tmp/scheduler.log', shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, error  = p.communicate()
         st.write(error)
         st.write(out)
