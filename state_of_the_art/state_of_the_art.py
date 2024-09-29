@@ -10,6 +10,7 @@ from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.review import ReportReview
 from state_of_the_art import scheduler
 from state_of_the_art.ci_cd import Cli
+from state_of_the_art.tables.user_table import UserTable
 
 
 class Sota:
@@ -27,6 +28,7 @@ class Sota:
         self.scheduler = scheduler
         self.cicd = Cli
         self.container_startup = ContainerStartup
+        self.user_table = UserTable
 
 
 def main():

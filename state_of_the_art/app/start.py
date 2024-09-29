@@ -1,8 +1,44 @@
 import subprocess
+import os
 import streamlit as st
+
+st.set_page_config(layout="wide")
 
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
+from state_of_the_art.tables.user_table import UserTable
+from streamlit_cookies_manager import EncryptedCookieManager
+
+
+
+cookies = EncryptedCookieManager(
+    # This prefix will get added to all your cookie names.
+    # This way you can run your app on Streamlit Cloud without cookie name clashes with other apps.
+    prefix="sota/state-of-the-art",
+    # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
+    password='1234',
+)
+if not cookies.ready():
+    # Wait for the component to load and send us current cookies.
+    st.stop()
+
+if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
+    # Create login form
+    st.write('Please login')
+    username = st.text_input('Username')
+    password = st.text_input('Password', type='password')
+    submit = st.button('Login')
+
+    # Check if user is logged in
+    if submit:
+        if UserTable().check_password(username, password):
+            cookies['username'] = username
+            cookies['logged_in'] = 'True'
+            cookies.save()
+            st.rerun()
+        else:
+            st.warning('Invalid username or password')
+    st.stop()
 
 pages = {
     "Discover new Papers": [
@@ -17,13 +53,11 @@ pages = {
         st.Page("pages/admin_page.py", title="Admin"),
         st.Page("pages/lead_collection_page.py", title="Leads page"),
         st.Page("pages/signup_page.py", title="Signup Page"),
-        st.Page("pages/login_page.py", title="Login Page"),
         st.Page("pages/profile_page.py", title="Profile Page"),
     ],
 }
 
 pg = st.navigation(pages)
-st.set_page_config(layout="wide")
 
 with st.sidebar:
     p = subprocess.Popen(
@@ -46,6 +80,13 @@ with st.sidebar:
         "Give us Feedback",
         "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform",
     )
+
+    if st.button("Logout"):
+        cookies['logged_in'] = 'False'
+        cookies.save()
+        st.success("Logged out")
+        st.rerun()
+        
 
 
 pg.run()
