@@ -1,4 +1,4 @@
-from state_of_the_art.app.pages.render_papers import render_papers
+from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
     InterestsRecommender,
 )
@@ -65,4 +65,4 @@ with st.spinner("Fetching the actual papers..."):
         filters["Query"] = search_query
 
     st.divider()
-    render_papers(papers, metadata=filters, generated_date=generated_date)
+    PapersRenderer().render_papers(papers, metadata=filters, generated_date=generated_date)

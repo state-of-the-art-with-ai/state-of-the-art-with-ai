@@ -1,10 +1,10 @@
-import json
 import subprocess
 from state_of_the_art.app.data import papers
-from state_of_the_art.app.pages.render_papers import render_papers
+from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
+import json
 import streamlit as st
 
 generated_date = None
@@ -78,7 +78,7 @@ with st.spinner("Loading latest recommendations ..."):
                 else {"labels": papers_metadata[paper]["labels"] + [topic]}
             )
 
-    render_papers(
+    PapersRenderer().render_papers(
         papers,
         papers_metadata=papers_metadata,
         generated_date=generated_date,

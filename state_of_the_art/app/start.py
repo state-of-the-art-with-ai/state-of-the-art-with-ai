@@ -1,5 +1,4 @@
 import subprocess
-import os
 import streamlit as st
 st.set_page_config(page_title='State of the Art with AI', layout="wide", initial_sidebar_state='expanded', menu_items=None)
 
@@ -7,9 +6,6 @@ st.set_page_config(page_title='State of the Art with AI', layout="wide", initial
 from state_of_the_art.app.utils.login_utils import logout, setup_login
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
-
-
-setup_login()
 
 pages = {
     "Discover new Papers": [
@@ -29,6 +25,9 @@ pages = {
 }
 
 pg = st.navigation(pages)
+
+# login should be after navigation
+setup_login()
 
 with st.sidebar:
     p = subprocess.Popen(
@@ -55,6 +54,5 @@ with st.sidebar:
     if st.button("Logout"):
         logout()
         
-
 
 pg.run()

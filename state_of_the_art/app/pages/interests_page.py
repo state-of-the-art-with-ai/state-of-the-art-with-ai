@@ -2,7 +2,7 @@ from state_of_the_art.app.data import papers, topics
 from state_of_the_art.app.pages.papers_page_utils import (
     edit_profile,
 )
-from state_of_the_art.app.pages.render_papers import render_papers
+from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.interest_table import TestTable
@@ -69,4 +69,4 @@ if fetch_papers:
         )
 
     # render all papeers
-    render_papers(papers, generated_date=generated_date)
+    PapersRenderer().render_papers(papers, generated_date=generated_date)
