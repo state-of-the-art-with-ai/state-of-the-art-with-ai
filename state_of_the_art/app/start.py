@@ -1,43 +1,15 @@
 import subprocess
 import os
 import streamlit as st
-
 st.set_page_config(page_title='State of the Art with AI', layout="wide", initial_sidebar_state='expanded', menu_items=None)
 
+
+from state_of_the_art.app.utils.login_utils import logout, setup_login
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
-from state_of_the_art.tables.user_table import UserTable
-from streamlit_cookies_manager import EncryptedCookieManager
 
 
-cookies = EncryptedCookieManager(
-    # This prefix will get added to all your cookie names.
-    # This way you can run your app on Streamlit Cloud without cookie name clashes with other apps.
-    prefix="sota/state-of-the-art",
-    # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
-    password='1234',
-)
-if not cookies.ready():
-    # Wait for the component to load and send us current cookies.
-    st.stop()
-
-if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
-    # Create login form
-    st.write('Please login')
-    username = st.text_input('Username')
-    password = st.text_input('Password', type='password')
-    submit = st.button('Login')
-
-    # Check if user is logged in
-    if submit:
-        if UserTable().check_password(username, password):
-            cookies['username'] = username
-            cookies['logged_in'] = 'True'
-            cookies.save()
-            st.rerun()
-        else:
-            st.warning('Invalid username or password')
-    st.stop()
+setup_login()
 
 pages = {
     "Discover new Papers": [
@@ -81,10 +53,7 @@ with st.sidebar:
     )
 
     if st.button("Logout"):
-        cookies['logged_in'] = 'False'
-        cookies.save()
-        st.success("Logged out")
-        st.rerun()
+        logout()
         
 
 

@@ -42,8 +42,7 @@ def render_papers(
             c1, c2, c3, c4 = st.columns([9, 2, 1, 1])
             with c1:
                 st.markdown(
-                    f"""##### {k+1}. [{paper.title}]({config.ONLINE_WEBSITE}/paper_details_page?paper_url={paper.abstract_url})
-                """
+                    f"""##### {k+1}. [{paper.title}](/paper_details_page?paper_url={paper.abstract_url})"""
                 )
                 if (
                     papers_metadata
