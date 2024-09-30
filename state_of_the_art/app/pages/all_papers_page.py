@@ -4,6 +4,7 @@ from state_of_the_art.recommenders.interest_recommender.interest_recommender_gen
 )
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
+from state_of_the_art.relevance_model.inference import Inference
 from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.mine_history import ArxivMiningHistory
 import streamlit as st
@@ -63,6 +64,13 @@ with st.spinner("Fetching the actual papers..."):
     if search_query:
         papers = Bm25Search(papers).search_returning_papers(search_query)
         filters["Query"] = search_query
+    
+with st.spinner("Sorting papers by predicted relevance..."):
+    inference = Inference()
+    # sort papers by inference score
+    papers = sorted(papers, key=lambda paper: inference.predict(paper.title), reverse=True)
+
 
     st.divider()
+with st.spinner("rendering papers..."):
     PapersRenderer().render_papers(papers, metadata=filters, generated_date=generated_date)
