@@ -54,14 +54,6 @@ def run():
     schedule.every(20).minutes.do(push_data_to_s3)
 
     # send email
-    schedule.every().day.at("01:00").do(send_recommendations_job)
-    schedule.every().day.at("08:00").do(send_recommendations_job)
-    schedule.every().day.at("18:45").do(send_recommendations_job)
-    schedule.every().day.at("19:30").do(send_recommendations_job)
-    schedule.every().day.at("20:30").do(send_recommendations_job)
-    schedule.every().day.at("22:00").do(send_recommendations_job)
-    schedule.every().day.at("22:30").do(send_recommendations_job)
-    schedule.every().day.at("23:00").do(send_recommendations_job)
     schedule.every().day.at("00:00").do(send_recommendations_job)
     schedule.every().day.at("01:00").do(send_recommendations_job)
     schedule.every().day.at("02:00").do(send_recommendations_job)
@@ -70,6 +62,17 @@ def run():
     schedule.every().day.at("05:00").do(send_recommendations_job)
     schedule.every().day.at("06:00").do(send_recommendations_job)
     schedule.every().day.at("07:00").do(send_recommendations_job)
+    schedule.every().day.at("08:00").do(send_recommendations_job)
+    schedule.every().day.at("10:00").do(send_recommendations_job)
+    schedule.every().day.at("13:00").do(send_recommendations_job)
+    schedule.every().day.at("15:00").do(send_recommendations_job)
+    schedule.every().day.at("17:00").do(send_recommendations_job)
+    schedule.every().day.at("18:45").do(send_recommendations_job)
+    schedule.every().day.at("19:30").do(send_recommendations_job)
+    schedule.every().day.at("20:30").do(send_recommendations_job)
+    schedule.every().day.at("22:00").do(send_recommendations_job)
+    schedule.every().day.at("22:30").do(send_recommendations_job)
+    schedule.every().day.at("23:00").do(send_recommendations_job)
 
 
     print("Scheduler infinite loop started")
