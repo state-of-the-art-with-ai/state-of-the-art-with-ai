@@ -8,13 +8,13 @@ from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
 
 pages = {
-    "Discover new Papers": [
-        st.Page("pages/all_papers_page.py", title="All Papers"),
+    "Papers": [
+        st.Page("pages/all_papers_page.py", title="Browse All"),
         st.Page("pages/interests_page.py", title="Your Interests"),
         st.Page("pages/papers_recommended_page.py", title="Recommendations"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         # st.Page("pages/papers_report_page.py", title="Past Recomendations"),
-        st.Page("pages/paper_details_page.py", title="Paper details "),
+        st.Page("pages/paper_details_page.py", title="Load a paper"),
     ],
     "Settings": [
         st.Page("pages/admin_page.py", title="Admin"),
