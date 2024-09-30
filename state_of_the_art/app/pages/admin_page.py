@@ -11,6 +11,11 @@ st.divider()
 st.markdown("### Stats")
 st.write(f"Number of feedbacks: {TextFeedbackTable().len()}")
 
+
+p = subprocess.Popen("free -h", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+out, error  = p.communicate()
+st.write(f"Memory: {out}, {error}")
+
 st.divider()
 st.markdown("### Data")
 
