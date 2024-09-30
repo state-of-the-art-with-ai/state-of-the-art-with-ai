@@ -53,7 +53,8 @@ with st.spinner("Fetching metadata about papers..."):
 
     search_query = st.text_input("Enter your Search Query", value="")
 
-with st.spinner("Fetching the actual papers..."):
+@st.cache
+def load_papers():
     papers_df = PapersLoader().load_papers_df()
     filters["Total Papers"] = len(papers_df.index)
     if not search_query:
@@ -63,14 +64,16 @@ with st.spinner("Fetching the actual papers..."):
 
     if search_query:
         papers = Bm25Search(papers).search_returning_papers(search_query)
-        filters["Query"] = search_query
     
-with st.spinner("Sorting papers by predicted relevance..."):
     inference = Inference()
     # sort papers by inference score
     papers = sorted(papers, key=lambda paper: inference.predict(paper.title), reverse=True)
 
+    return papers
 
-    st.divider()
+if search_query:
+    filters["Query"] = search_query
+
+st.divider()
 with st.spinner("rendering papers..."):
-    PapersRenderer().render_papers(papers, metadata=filters, generated_date=generated_date)
+    PapersRenderer().render_papers(load_papers(), metadata=filters, generated_date=generated_date)
