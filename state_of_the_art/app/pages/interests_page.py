@@ -58,15 +58,15 @@ with c1:
             st.rerun()
             st.success("Interest deleted successfully")
     fetch_papers = st.button("Fetch Papers")
+    st.divider()
 
-st.divider()
+    if fetch_papers or 'fetch_papers_for_topic' in st.session_state and st.session_state['fetch_papers_for_topic'] == interest_name:
+        with st.spinner("Loading papers"):
+            papers = PapersLoader().get_all_papers()
+            papers = Bm25Search(papers).search_returning_papers(
+                interest_name + " " + topic_description
+            )
+        st.session_state['fetch_papers_for_topic'] = interest_name
 
-if fetch_papers:
-    with st.spinner("Loading papers"):
-        papers = PapersLoader().get_all_papers()
-        papers = Bm25Search(papers).search_returning_papers(
-            interest_name + " " + topic_description
-        )
-
-    # render all papeers
-    PapersRenderer().render_papers(papers, generated_date=generated_date)
+        # render all papeers
+        PapersRenderer().render_papers(papers, generated_date=generated_date)
