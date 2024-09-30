@@ -43,7 +43,7 @@ insights = insights[insights["paper_id"] == paper.abstract_url]
 insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 has_insights = not insights.empty
 
-st.markdown(f"### {paper.title}")
+st.title(paper.title)
 render_feedback(paper.title, type='paper_title', context={'paper_id': paper.abstract_url})
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:

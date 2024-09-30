@@ -24,7 +24,7 @@ def send_recommendations_job():
 
 def get_random_number_of_days():
     import random
-    return random.randint(1, 7)
+    return random.randint(1, 20)
 
 @capture_errors()
 def liveness_probe():
