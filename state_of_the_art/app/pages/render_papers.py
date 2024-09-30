@@ -19,7 +19,6 @@ tags_table = TagsTable()
 def render_papers():
     pass
 
-st.session_state.tags_table = []
 
 class PapersRenderer:
     def __init__(self, disable_save_button=False, enable_tags=False):
@@ -73,6 +72,9 @@ class PapersRenderer:
                             tags_table.add_tag_to_paper(paper.abstract_url, "save for later")
                             st.success("Saved")
                     if self.enable_tags:
-                        if st.button("Edit Tags", key=f"etags{k}") or paper.abstract_url in st.session_state.tags_table:
+                        if st.button("Edit Tags", key=f"etags{k}") or ('tags_table' in st.session_state and paper.abstract_url in st.session_state.tags_table):
                             render_tags_for_paper(paper)
-                            st.session_state.tags_table.append(paper.abstract_url)
+                            if not 'tags_table' in st.session_state:
+                                st.session_state.tags_table = [paper.abstract_url]
+                            else:
+                                st.session_state.tags_table.append(paper.abstract_url)
