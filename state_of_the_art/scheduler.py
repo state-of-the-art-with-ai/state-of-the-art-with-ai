@@ -43,11 +43,6 @@ def push_data_to_s3():
 
 
 
-@capture_exeption()
-def test_email():
-    EmailService().send('test email', 'test email subject')
-
-
 def run():
     import schedule
 
