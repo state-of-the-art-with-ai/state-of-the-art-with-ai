@@ -24,6 +24,7 @@ class PapersRenderer:
     def __init__(self, disable_save_button=False, enable_tags=False):
         self.disable_save_button = disable_save_button
         self.enable_tags = enable_tags
+
     def render_papers(
         self,
         papers,
