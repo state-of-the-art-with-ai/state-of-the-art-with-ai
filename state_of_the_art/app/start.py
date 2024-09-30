@@ -1,7 +1,7 @@
 import subprocess
 import streamlit as st
-st.set_page_config(page_title='State of the Art with AI', layout="wide", initial_sidebar_state='expanded', menu_items=None)
 
+st.set_page_config(page_title='State of the Art with AI', layout="wide", initial_sidebar_state='expanded', menu_items=None)
 
 from state_of_the_art.app.utils.login_utils import logout, setup_login
 from state_of_the_art.infrastructure.s3 import S3
@@ -13,13 +13,10 @@ pages = {
         st.Page("pages/interests_page.py", title="Your Interests"),
         st.Page("pages/papers_recommended_page.py", title="Recommendations"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
-        # st.Page("pages/papers_report_page.py", title="Past Recomendations"),
         st.Page("pages/paper_details_page.py", title="Load a paper"),
     ],
     "Settings": [
         st.Page("pages/admin_page.py", title="Admin"),
-        st.Page("pages/lead_collection_page.py", title="Leads page"),
-        st.Page("pages/signup_page.py", title="Signup Page"),
         st.Page("pages/profile_page.py", title="Profile Page"),
     ],
 }
