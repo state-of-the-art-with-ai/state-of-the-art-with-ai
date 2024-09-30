@@ -1,7 +1,6 @@
 import os
-
-import logging
 from subprocess import PIPE, Popen
+import subprocess
 from typing import Optional
 
 
@@ -76,19 +75,15 @@ Content-Type: text/html; charset="UTF-8"
         self._run(cmd)
 
     def _run(self, cmd):
-        command = cmd
-        with Popen(command, stdout=PIPE, stderr=None, shell=True) as process:
-            output = process.communicate()[0].decode("utf-8")
-            print("Email output", output)
-
-            if process.returncode != 0:
-                raise Exception("Error sending email" + output)
-
+        p = subprocess.Popen(cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, error  = p.communicate()
+        print(out)
+        print(error)
 
 def main():
     import fire
 
-    fire.Fire(SendEmail)
+    fire.Fire(EmailService)
 
 
 if __name__ == "__main__":

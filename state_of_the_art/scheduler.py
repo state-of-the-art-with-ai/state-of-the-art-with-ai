@@ -2,6 +2,7 @@ import time
 import datetime
 
 from state_of_the_art.scheduling.utils import capture_exeption
+from state_of_the_art.utils.mail import EmailService
 
 MINUTES_TO_REPEAT_LIVENESS_PROBE = 10
 
@@ -39,6 +40,12 @@ def push_data_to_s3():
 
     out, error = S3().push_local_events_data()
     print(error, out)
+
+
+
+@capture_exeption()
+def test_email():
+    EmailService().send('test email', 'test email subject')
 
 
 def run():
