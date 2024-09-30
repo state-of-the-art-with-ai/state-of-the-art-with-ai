@@ -1,13 +1,15 @@
 import time
 import datetime
 
-from state_of_the_art.scheduling.utils import capture_exeption
+from state_of_the_art.infrastructure.sentry import setup_sentry
+from state_of_the_art.scheduling.utils import capture_errors
 from state_of_the_art.utils.mail import EmailService
 
 MINUTES_TO_REPEAT_LIVENESS_PROBE = 10
 
+setup_sentry()
 
-@capture_exeption()
+@capture_errors()
 def send_recommendations_job():
     print("Running recommender")
     from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
@@ -24,7 +26,7 @@ def get_random_number_of_days():
     import random
     return random.randint(1, 7)
 
-@capture_exeption()
+@capture_errors()
 def liveness_probe():
     print(
         f"Test run every {MINUTES_TO_REPEAT_LIVENESS_PROBE} mins at "
@@ -33,7 +35,7 @@ def liveness_probe():
     raise Exception("Testing errors")
 
 
-@capture_exeption()
+@capture_errors()
 def push_data_to_s3():
     print("Pushing data to s3")
     from state_of_the_art.infrastructure.s3 import S3
