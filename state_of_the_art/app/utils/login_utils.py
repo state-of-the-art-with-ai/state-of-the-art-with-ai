@@ -16,7 +16,6 @@ def setup_login():
     )
     if not cookies.ready():
         # Wait for the component to load and send us current cookies.
-        st.warning("Cookies component is loading...")
         st.stop()
 
     if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
