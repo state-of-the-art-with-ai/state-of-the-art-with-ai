@@ -38,6 +38,7 @@ class UserTable(BaseTable):
     def toggle_admin(self, email: str):
         read = self.read()
         is_admin = read.loc[read["email"] == email, "is_admin"].values[0]
+        print("Current admin status", is_admin, "invert to", not is_admin)
         self.update(by_key="email", by_value=email, new_values={"is_admin": not is_admin})
 
 

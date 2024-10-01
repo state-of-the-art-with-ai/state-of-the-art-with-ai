@@ -16,6 +16,7 @@ def setup_login():
     )
     if not cookies.ready():
         # Wait for the component to load and send us current cookies.
+        st.warning("Cookies component is loading...")
         st.stop()
 
     if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
@@ -48,8 +49,8 @@ def setup_login():
                     cookies['logged_in'] = 'True'
                     cookies.save()
                     st.rerun()
-
         st.stop()
+
 def logout():
     global cookies
     cookies['logged_in'] = 'False'

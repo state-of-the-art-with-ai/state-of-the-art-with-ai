@@ -8,13 +8,9 @@ from state_of_the_art.app.utils.login_utils import LoggedInUser, logout, setup_l
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
 
-setup_login()
-is_admin = LoggedInUser().is_admin()
 settings_pages = [
         st.Page("pages/profile_page.py", title="Profile Page"),
 ]
-if is_admin:
-    settings_pages.append(st.Page("pages/admin_page.py", title="Admin"))
 
 pages = {
     "Papers": [
@@ -29,6 +25,11 @@ pages = {
 
 pg = st.navigation(pages)
 
+setup_login()
+is_admin = LoggedInUser().is_admin()
+if is_admin:
+    settings_pages.append(st.Page("pages/admin_page.py", title="Admin"))
+    pg = st.navigation(pages)
 # login should be after navigation
 
 with st.sidebar:

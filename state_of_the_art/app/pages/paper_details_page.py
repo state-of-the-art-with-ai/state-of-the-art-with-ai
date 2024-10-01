@@ -109,20 +109,22 @@ with st.expander("Top insights", expanded=True):
 
 
 outcomes = insights_table.get_lastest_answer("Outcomes", url)
-st.markdown(
-    f""" ##### Outcomes
-{outcomes}
-"""
-)
-render_feedback(outcomes, type="paper_insight", context={'paper_id': paper.abstract_url})
+if outcomes:
+    st.markdown(
+        f""" ##### Outcomes
+    {outcomes}
+    """
+    )
+    render_feedback(outcomes, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 structure = insights_table.get_lastest_answer("DeepSummaryOfStructure", url)
-st.markdown(
-    f""" ##### Structure
-{structure}
-"""
-)
-render_feedback(structure, type="paper_insight", context={'paper_id': paper.abstract_url})
+if structure:
+    st.markdown(
+        f""" ##### Structure
+    {structure}
+    """
+    )
+    render_feedback(structure, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 with st.expander("Definitions"):
     defintions = insights_table.get_all_answers("Definitions", url)
