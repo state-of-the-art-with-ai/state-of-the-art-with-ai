@@ -53,7 +53,7 @@ with st.spinner("Fetching metadata about papers..."):
 
     search_query = st.text_input("Enter your Search Query", value="")
 
-@st.cache
+@st.cache_data
 def load_papers():
     papers_df = PapersLoader().load_papers_df()
     filters["Total Papers"] = len(papers_df.index)
