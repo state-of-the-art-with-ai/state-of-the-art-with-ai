@@ -46,25 +46,27 @@ class S3:
         PushHistory().add()
         return out, error
 
-    def pull_events_data(self, destination=None):
+    def pull_events_data(self):
         self.validate_credentials()
-        if not destination:
-            destination = config.TINY_DATA_WAREHOUSE_EVENTS
+        DESTINATION = config.TINY_DATA_WAREHOUSE_EVENTS
 
-        yield "Using destination: " + destination
+        yield "Using destination: " + DESTINATION
 
         if os.environ.get("SOTA_TEST"):
             print(f"Test mode, not pulling from s3 cmd {shell_cmd}")
             return
 
-        if not os.path.exists(destination):
+        if os.path.exists(DESTINATION):
+            yield f"Path {DESTINATION} already exists so moving it to {DESTINATION}_old"
             yield subprocess.check_output(
-                f"mkdir -p {destination}", shell=True, text=True
+                f"mv -f {DESTINATION}/ {DESTINATION}_old", shell=True, text=True
             )
-        else:
-            yield f"Path {destination} already exists skipping creation"
 
-        shell_cmd = f"aws s3 cp s3://{config.data_bucket}/tinydatawerehouse_events {destination} --recursive"
+        yield subprocess.check_output(
+            f"mkdir -p {DESTINATION}", shell=True, text=True
+        )
+
+        shell_cmd = f"aws s3 cp s3://{config.data_bucket}/tinydatawerehouse_events {DESTINATION} --recursive"
 
         p = subprocess.Popen(
             shell_cmd,
