@@ -2,6 +2,7 @@ import time
 import datetime
 
 from state_of_the_art.infrastructure.sentry import setup_sentry
+from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.scheduling.utils import capture_errors
 from state_of_the_art.utils.mail import EmailService
 
@@ -43,6 +44,10 @@ def push_data_to_s3():
     out, error = S3().push_local_events_data()
     print(error, out)
 
+@capture_errors()
+def mine_all_keywords():
+    ArxivMiner().mine_all_keywords()
+
 
 
 def run():
@@ -53,6 +58,10 @@ def run():
     schedule.every(MINUTES_TO_REPEAT_LIVENESS_PROBE).minutes.do(liveness_probe)
     schedule.every(20).minutes.do(push_data_to_s3)
 
+    schedule.every().day.at("06:00").do(mine_all_keywords)
+    schedule.every().day.at("12:00").do(mine_all_keywords)
+    schedule.every().day.at("23:00").do(mine_all_keywords)
+
     # send email
     schedule.every().day.at("00:00").do(send_recommendations_job)
     schedule.every().day.at("01:00").do(send_recommendations_job)
@@ -61,17 +70,11 @@ def run():
     schedule.every().day.at("04:00").do(send_recommendations_job)
     schedule.every().day.at("05:00").do(send_recommendations_job)
     schedule.every().day.at("06:00").do(send_recommendations_job)
-    schedule.every().day.at("07:00").do(send_recommendations_job)
-    schedule.every().day.at("08:00").do(send_recommendations_job)
     schedule.every().day.at("10:00").do(send_recommendations_job)
     schedule.every().day.at("13:00").do(send_recommendations_job)
-    schedule.every().day.at("15:00").do(send_recommendations_job)
     schedule.every().day.at("17:00").do(send_recommendations_job)
     schedule.every().day.at("18:45").do(send_recommendations_job)
-    schedule.every().day.at("19:30").do(send_recommendations_job)
-    schedule.every().day.at("20:30").do(send_recommendations_job)
     schedule.every().day.at("22:00").do(send_recommendations_job)
-    schedule.every().day.at("22:30").do(send_recommendations_job)
     schedule.every().day.at("23:00").do(send_recommendations_job)
 
 
