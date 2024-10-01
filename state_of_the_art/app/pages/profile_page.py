@@ -4,10 +4,7 @@ from state_of_the_art.app.utils.login_utils import LoggedInUser
 from state_of_the_art.tables.user_table import UserTable
 
 
-user_uuid = LoggedInUser().get_uuid()
-
-user_df = UserTable().read()
-user_data = user_df[user_df["tdw_uuid"] == user_uuid].iloc[0].to_dict()
+user_data = LoggedInUser().get_user_data()
 
 st.title("Profile page")
 email = st.text_input("Email", value=user_data["email"])

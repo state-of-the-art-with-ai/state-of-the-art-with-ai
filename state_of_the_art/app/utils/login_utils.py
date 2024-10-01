@@ -13,9 +13,13 @@ class LoggedInUser:
     
     def get_uuid(self) -> str:
         if not self.is_logged_in():
-            return None
+            raise ValueError("User is not logged in")
         global cookies
         return cookies['user_uuid']
+    def get_user_data(self):
+        user_uuid = self.get_uuid()
+        user_df = UserTable().read()
+        return user_df[user_df["tdw_uuid"] == user_uuid].iloc[0].to_dict()
 
 def setup_login():
     global cookies 
