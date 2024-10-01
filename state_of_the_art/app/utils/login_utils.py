@@ -57,8 +57,13 @@ def setup_login():
         with c2:
             st.text('Don\'t have an account?')
         with c3:
-            st.button('Create account')
-
+            if st.button('Create account'):
+                with st.spinner("Creating account..."):
+                    uuid = UserTable().add_user(email, password)
+                    cookies['user_uuid'] = uuid
+                    cookies['logged_in'] = 'True'
+                    cookies.save()
+                    st.rerun()
 
         st.stop()
 def logout():

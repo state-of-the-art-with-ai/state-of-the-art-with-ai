@@ -14,7 +14,7 @@ class BaseTable:
             raise Exception("Table name is required")
 
     @classmethod
-    def add(cls, **kwargs):
+    def add(cls, **kwargs) -> str:
         """
         Use like:
             .add(message=message, paper_url=paper.abstract_ur)
@@ -26,7 +26,7 @@ class BaseTable:
 
             data[key] = kwargs[key]
 
-        tdw.write_event(cls.table_name, data)
+        return tdw.write_event(cls.table_name, data)
 
     @classmethod
     def read(cls, recent_first=False):

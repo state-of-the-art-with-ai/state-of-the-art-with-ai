@@ -9,11 +9,11 @@ class UserTable(BaseTable):
         "prompt": {"type": str},
     }
 
-    def add_user(self, email: str, password: str):
+    def add_user(self, email: str, password: str) -> str:
         df = self.read()
         if email in df["email"].values:
             raise ValueError(f"User with email {email} already exists")
-        self.add(email=email, password_hash=password)
+        return self.add(email=email, password_hash=password, prompt="")
 
     def check_password(self, email: str, given_password: str) -> bool:
         df = self.read()
