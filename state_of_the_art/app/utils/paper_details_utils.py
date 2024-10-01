@@ -125,6 +125,7 @@ def create_custom_paper():
     paper_url = st.text_input("Url", "")
     if st.button("Save") or st.session_state.get("save_paper_clicked"):
         st.session_state["save_paper_clicked"] = True
+        st.query_params["paper_url"] = paper_url
         paper_table = PaperTable()
         paper_table.add(
             abstract_url=paper_url, title=title, published=None, institution=""
@@ -133,5 +134,6 @@ def create_custom_paper():
         tags_table.add_tag_to_paper(paper_url, "Manually Created")
         st.success("Paper saved successfully")
         st.link_button("Go to papers page", "/paper_details_page?paper_url=" + paper_url)
-        return True
+        import time;  time.sleep(0.2)
+        st.rerun()
     return False
