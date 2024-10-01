@@ -34,6 +34,11 @@ class UserTable(BaseTable):
 
     def list_users(self):
         return self.read().to_dict(orient="records")
+    
+    def toggle_admin(self, email: str):
+        read = self.read()
+        is_admin = read.loc[read["email"] == email, "is_admin"].values[0]
+        self.update(by_key="email", by_value=email, new_values={"is_admin": not is_admin})
 
 
 if __name__ == "__main__":

@@ -72,3 +72,6 @@ class LoggedInUser:
         user_uuid = self.get_uuid()
         user_df = UserTable().read()
         return user_df[user_df["tdw_uuid"] == user_uuid].iloc[0].to_dict()
+    
+    def is_admin(self):
+        return self.get_user_data().get('is_admin', False)
