@@ -1,7 +1,5 @@
+import time
 from state_of_the_art.app.data import papers, topics
-from state_of_the_art.app.utils.papers_page_utils import (
-    edit_profile,
-)
 from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.search.bm25_search import Bm25Search
@@ -17,7 +15,7 @@ papers = None
 send_by_email = False
 
 topics = TestTable()
-topics_df = topics.read()
+topics_df = topics.read(recent_first=True)
 topics_names = topics_df["name"].tolist()
 
 c1, c2 = st.columns([2, 1])
@@ -26,23 +24,22 @@ with c2:
         try:
             if st.button(topic, key=f"t{topic}"):
                 st.query_params["interest"] = topic
-                selected_interest = topic
         except:
             pass
 with c1:
-
     if "interest" in st.query_params:
         selected_interest = st.query_params["interest"]
     else:
         selected_interest = topics_names[-1]
 
     interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0]["name"]
+
+    interest_name = st.text_input("Interest name", value=interest_name)
+
     topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
         "description"
     ]
-
     topic_description = st.text_area("Query / Description", value=topic_description)
-    interest_name = st.text_input("Interest name", value=interest_name)
 
     c1, c2 = st.columns([1, 7])
     with c1:
@@ -50,6 +47,7 @@ with c1:
             topics.add(name=interest_name, description=topic_description)
             st.query_params["interest"] = interest_name
             st.success("Interest saved successfully")
+            time.sleep(0.1)
             st.rerun()
     with c2:
         if st.button("Delete"):
