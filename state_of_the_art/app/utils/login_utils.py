@@ -6,6 +6,17 @@ from streamlit_cookies_manager import EncryptedCookieManager
 
 cookies = None
 
+class LoggedInUser:
+    def is_logged_in(self):
+        global cookies
+        return 'logged_in' in cookies and cookies['logged_in'] == 'True'
+    
+    def get_uuid(self) -> str:
+        if not self.is_logged_in():
+            return None
+        global cookies
+        return cookies['user_uuid']
+
 def setup_login():
     global cookies 
     cookies = EncryptedCookieManager(
@@ -22,7 +33,7 @@ def setup_login():
     if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
         # Create login form
         st.write('Log in or Sign up')
-        username = st.text_input('E-mail')
+        email = st.text_input('E-mail')
         password = st.text_input('Password', type='password')
 
         c1, c2, c3 = st.columns([1, 1, 3])
@@ -31,8 +42,8 @@ def setup_login():
             # Check if user is logged in
             if submit:
                 with st.spinner("Logging in..."):
-                    if UserTable().check_password(username, password):
-                        cookies['username'] = username
+                    if uuid:= UserTable().get_uuid_if_login_works(email, password):
+                        cookies['user_uuid'] = uuid
                         cookies['logged_in'] = 'True'
                         cookies.save()
                         st.rerun()

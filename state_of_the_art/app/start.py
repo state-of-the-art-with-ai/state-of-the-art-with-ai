@@ -16,8 +16,8 @@ pages = {
         st.Page("pages/paper_details_page.py", title="Load a paper"),
     ],
     "Settings": [
-        st.Page("pages/admin_page.py", title="Admin"),
         st.Page("pages/profile_page.py", title="Profile Page"),
+        st.Page("pages/admin_page.py", title="Admin"),
     ],
 }
 

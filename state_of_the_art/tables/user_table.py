@@ -6,6 +6,7 @@ class UserTable(BaseTable):
     schema = {
         "email": {"type": str},
         "password_hash": {"type": str},
+        "prompt": {"type": str},
     }
 
     def add_user(self, email: str, password: str):
@@ -20,6 +21,15 @@ class UserTable(BaseTable):
             return False
         password = df.loc[df["email"] == email, "password_hash"].values[0]
         return password == given_password
+
+    def get_uuid_if_login_works(self, email: str, given_password: str) -> bool:
+        df = self.read()
+        if email not in df["email"].values:
+            return False
+        password = df.loc[df["email"] == email, "password_hash"].values[0]
+        if password == given_password:
+            return df.loc[df["email"] == email, "tdw_uuid"].values[0]
+        return None
 
     def list_users(self):
         return self.read().to_dict(orient="records")

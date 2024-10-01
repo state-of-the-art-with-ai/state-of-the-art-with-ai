@@ -90,6 +90,28 @@ class BaseTable:
             tdw.replace_df(cls.table_name, df, dry_run=False)
 
     @classmethod
+    def update(cls, by_key: str, by_value: Any, new_values: dict):
+        # fix the new values using the key when missing
+        if by_key not in new_values:
+            new_values[by_key] = by_value
+
+        df = cls.read()
+        if df.empty or df[df[by_key] == by_value].empty:
+            raise ValueError(f"Row does not exist for value {by_value}")
+        else:
+            print(
+                f"Row does exist for value {by_value}, updating row with values {new_values}"
+            )
+            # udpate the pandas rows that match the key with the new column values
+            for column, new_value in new_values.items():
+                df[column] = df.apply(
+                    lambda row: new_value if row[by_key] == by_value else row[column],
+                    axis=1,
+                )
+
+            tdw.replace_df(cls.table_name, df, dry_run=False)
+
+    @classmethod
     def delete_by(cls, column: str, value: Any):
         df = cls.read()
         df = df.reset_index(drop=True)
