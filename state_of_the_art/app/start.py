@@ -1,4 +1,5 @@
 import subprocess
+from state_of_the_art.app.utils.admin_utils import admin_panel
 from state_of_the_art.app.utils.paper_details_utils import create_custom_paper
 import streamlit as st
 
@@ -8,9 +9,6 @@ from state_of_the_art.app.utils.login_utils import LoggedInUser, logout, setup_l
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
 
-settings_pages = [
-        st.Page("pages/profile_page.py", title="Profile Page"),
-]
 
 pages = {
     "Papers": [
@@ -20,18 +18,15 @@ pages = {
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         st.Page("pages/paper_details_page.py", title="Load a paper"),
     ],
-    "Settings": settings_pages,
+    "Settings": [
+        st.Page("pages/profile_page.py", title="Profile Page"),
+],
 }
 
 pg = st.navigation(pages)
 
 setup_login()
 is_admin = LoggedInUser().is_admin()
-if is_admin or True:
-    settings_pages.append(st.Page("pages/admin_page.py", title="Admin"))
-    pg = st.navigation(pages)
-# login should be after navigation
-
 with st.sidebar:
     if is_admin:
         p = subprocess.Popen(
@@ -49,6 +44,8 @@ with st.sidebar:
                 out, error = S3().push_local_events_data()
                 st.write(error)
                 st.write(out)
+    if st.button("Admin panel"):
+        admin_panel()
     st.link_button(
         "Give us Feedback",
         "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform",
