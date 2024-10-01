@@ -1,3 +1,4 @@
+from state_of_the_art.paper.url_sanitizer import UrlSanitizer
 from streamlit_tags import st_tags
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.tables.arxiv_paper_table import PaperTable
@@ -44,21 +45,6 @@ def questions(paper_url):
         st.rerun()
 
 
-@st.dialog("Questions")
-def create_new(paper_url):
-    st.write("New paper")
-    title = st.text_input("Title")
-    paper_url = st.text_input("Url", paper_url)
-    if st.button("Save"):
-        st.success("Paper saved successfully")
-        paper_table = PaperTable()
-        paper_table.add(
-            abstract_url=paper_url, title=title, published=None, institution=""
-        )
-        tags_table = TagsTable()
-        tags_table.add_tag_to_paper(paper_url, "Manually Created")
-        st.query_params["paper_url"] = paper_url
-        st.rerun()
 
 
 def render_tags_for_paper(paper: ArxivPaper):
@@ -113,8 +99,8 @@ def render_reading_progress(paper):
         st.success("Progress updated successfully")
 
 
-@st.dialog("Load a different paper")
-def load_different_paper():
+@st.dialog("Load an Arxiv paper paper")
+def load_arxiv_paper():
     default_url = st.query_params.get("paper_url", "")
     url = st.text_input(
         "Paper URL",
@@ -123,19 +109,29 @@ def load_different_paper():
         help="Type the URL of the paper to be loaded",
     )
     if url:
-        url = url.strip()
+        url = UrlSanitizer().sanitize(url)
         if ArxivPaper.is_abstract_url(url):
             url = url.replace("https", "http")
-        url = url.replace("file:///", "/")
-        url = url.replace("/pdf/", "/abs/")
-        url = url.replace("www.", "")
         st.query_params.paper_url = url
     c1, c2 = st.columns([1, 1])
-    with c1:
-        load = st.button("Load Paper")
-        if load:
-            st.rerun()
-    with c2:
-        add = st.button("Add new Paper")
-        if add:
-            create_new(url)
+    load = st.button("Load Paper")
+    if load:
+        st.rerun()
+
+@st.dialog("Create a paper")
+def create_custom_paper():
+    st.write("New paper")
+    title = st.text_input("Title")
+    paper_url = st.text_input("Url", "")
+    if st.button("Save") or st.session_state.get("save_paper_clicked"):
+        st.session_state["save_paper_clicked"] = True
+        paper_table = PaperTable()
+        paper_table.add(
+            abstract_url=paper_url, title=title, published=None, institution=""
+        )
+        tags_table = TagsTable()
+        tags_table.add_tag_to_paper(paper_url, "Manually Created")
+        st.success("Paper saved successfully")
+        st.link_button("Go to papers page", "/paper_details_page?paper_url=" + paper_url)
+        return True
+    return False

@@ -1,0 +1,4 @@
+[client]
+showSidebarNavigation = false
+showErrorDetails = true
+disableWidgetStateDuplicationWarning = false

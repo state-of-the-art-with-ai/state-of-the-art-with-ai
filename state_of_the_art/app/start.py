@@ -1,4 +1,5 @@
 import subprocess
+from state_of_the_art.app.utils.paper_details_utils import create_custom_paper
 import streamlit as st
 
 st.set_page_config(page_title='State of the Art with AI', layout="wide", initial_sidebar_state='expanded', menu_items=None)

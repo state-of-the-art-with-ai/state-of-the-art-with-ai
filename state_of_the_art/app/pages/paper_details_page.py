@@ -1,10 +1,12 @@
+import streamlit as st
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.email_paper import EmailAPaper
+from state_of_the_art.paper.url_sanitizer import UrlSanitizer
 from state_of_the_art.register_papers.register_paper import PaperCreator
-import streamlit as st
 from state_of_the_art.app.data import insights
 from state_of_the_art.app.utils.paper_details_utils import (
-    load_different_paper,
+    create_custom_paper,
+    load_arxiv_paper,
     questions,
     render_reading_progress,
     render_tags_for_paper,
@@ -17,11 +19,19 @@ from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.relevance_model.inference import Inference
 from state_of_the_art.text_feedback.feedback_elements import render_feedback
 
-if st.button("Load a paper"):
-    load_different_paper()
+with st.expander("Create or load a paper"):
+    c1, c2 = st.columns([1, 4])
+    with c1:
+        if st.button("Load an arxiv paper"):
+            load_arxiv_paper()
+    with c2:
+        if st.button("Create external paper"):
+            create_custom_paper()
 
 
 url = st.query_params.get("paper_url", "")
+url = UrlSanitizer().sanitize(url)
+
 if not url:
     st.write("Load a paper to see details")
     st.stop()
@@ -32,7 +42,7 @@ if not PaperCreator().is_paper_registered(url):
             PaperCreator().register_by_url(url)
             st.rerun()
         else:
-            st.write("Not registered and not created. Create this paper before.")
+            st.write(f"Paper '{url}' not registered and not created. Create this paper before.")
             st.stop()
 
 paper = PapersLoader().load_paper_from_url(url)
