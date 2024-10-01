@@ -57,10 +57,11 @@ class S3:
             return
 
         if os.path.exists(DESTINATION):
-            yield f"Path {DESTINATION} already exists so moving it to {DESTINATION}_old"
-            yield subprocess.check_output(
-                f"mv -f {DESTINATION}/ {DESTINATION}_old", shell=True, text=True
-            )
+            yield f"Path {DESTINATION} already exists so removing it"
+            p = subprocess.Popen(f"rm -rf {DESTINATION}/", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            out, error  = p.communicate()
+            yield out
+            yield error
 
         yield subprocess.check_output(
             f"mkdir -p {DESTINATION}", shell=True, text=True
