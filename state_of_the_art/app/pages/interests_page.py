@@ -6,6 +6,11 @@ from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.interest_table import TestTable
 import streamlit as st
 
+@st.cache_data
+def load_bm25_papers():
+    papers = PapersLoader().get_all_papers()
+    return Bm25Search(papers)
+
 generated_date = None
 lookback_days = None
 topic_description = None
@@ -55,16 +60,13 @@ with c1:
             del st.query_params["interest"]
             st.rerun()
             st.success("Interest deleted successfully")
-    fetch_papers = st.button("Fetch Papers")
-    st.divider()
 
-    if fetch_papers or 'fetch_papers_for_topic' in st.session_state and st.session_state['fetch_papers_for_topic'] == interest_name:
-        with st.spinner("Loading papers"):
-            papers = PapersLoader().get_all_papers()
-            papers = Bm25Search(papers).search_returning_papers(
-                interest_name + " " + topic_description
-            )
-        st.session_state['fetch_papers_for_topic'] = interest_name
+    st.divider()
+    st.write(f"Selected interest: {interest_name}")
+    with st.spinner("Loading papers"):
+        papers = load_bm25_papers().search_returning_papers(
+            interest_name + " " + topic_description
+        )
 
         # render all papeers
         PapersRenderer().render_papers(papers, generated_date=generated_date)

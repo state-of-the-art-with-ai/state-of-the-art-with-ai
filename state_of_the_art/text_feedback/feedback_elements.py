@@ -17,4 +17,5 @@ def render_feedback(text: str, type='paper_title', context=None):
                 )
                 st.success(f"Feedback sent for text {text}!")
     except:
-        st.error("Failed to render feedback component key = " + f"feedback{id}")
+        pass
+        #st.error("Failed to render feedback component key = " + f"feedback{id}")
