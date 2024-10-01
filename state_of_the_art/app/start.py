@@ -27,7 +27,7 @@ pg = st.navigation(pages)
 
 setup_login()
 is_admin = LoggedInUser().is_admin()
-if is_admin:
+if is_admin or True:
     settings_pages.append(st.Page("pages/admin_page.py", title="Admin"))
     pg = st.navigation(pages)
 # login should be after navigation
