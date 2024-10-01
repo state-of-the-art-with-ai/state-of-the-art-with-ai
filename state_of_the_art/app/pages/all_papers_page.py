@@ -55,8 +55,10 @@ with st.spinner("Fetching metadata about papers..."):
 
 @st.cache_data
 def load_papers():
-    papers_df = PapersLoader().load_papers_df()
-    filters["Total Papers"] = len(papers_df.index)
+    return PapersLoader().load_papers_df()
+
+
+def filter(papers_df):
     if not search_query:
         papers_df = papers_df[papers_df["published"].dt.date == date_filter]
         filters["Date"] = date_filter.isoformat()
@@ -73,7 +75,10 @@ def load_papers():
 
 if search_query:
     filters["Query"] = search_query
+    filters["Total Papers"] = len(papers_df.index)
 
 st.divider()
-with st.spinner("rendering papers..."):
-    PapersRenderer().render_papers(load_papers(), metadata=filters, generated_date=generated_date)
+with st.spinner("Rendering papers..."):
+    papers_df = load_papers()
+    papers = filter(papers_df)
+    PapersRenderer().render_papers(papers, metadata=filters, generated_date=generated_date)
