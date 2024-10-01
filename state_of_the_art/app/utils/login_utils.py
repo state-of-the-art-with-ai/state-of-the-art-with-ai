@@ -5,22 +5,6 @@ import streamlit as st
 from streamlit_cookies_manager import EncryptedCookieManager
 
 cookies = None
-
-class LoggedInUser:
-    def is_logged_in(self):
-        global cookies
-        return 'logged_in' in cookies and cookies['logged_in'] == 'True'
-    
-    def get_uuid(self) -> str:
-        if not self.is_logged_in():
-            raise ValueError("User is not logged in")
-        global cookies
-        return cookies['user_uuid']
-    def get_user_data(self):
-        user_uuid = self.get_uuid()
-        user_df = UserTable().read()
-        return user_df[user_df["tdw_uuid"] == user_uuid].iloc[0].to_dict()
-
 def setup_login():
     global cookies 
     cookies = EncryptedCookieManager(
@@ -72,3 +56,19 @@ def logout():
     cookies.save()
     st.success("Logged out")
     st.rerun()
+
+
+class LoggedInUser:
+    def is_logged_in(self):
+        global cookies
+        return 'logged_in' in cookies and cookies['logged_in'] == 'True'
+    
+    def get_uuid(self) -> str:
+        if not self.is_logged_in():
+            raise ValueError("User is not logged in")
+        global cookies
+        return cookies['user_uuid']
+    def get_user_data(self):
+        user_uuid = self.get_uuid()
+        user_df = UserTable().read()
+        return user_df[user_df["tdw_uuid"] == user_uuid].iloc[0].to_dict()

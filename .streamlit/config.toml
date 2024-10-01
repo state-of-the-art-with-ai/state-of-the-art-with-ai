@@ -1,4 +1,10 @@
+[global]
+suppressDeprecationWarnings = true
+
 [client]
 showSidebarNavigation = false
 showErrorDetails = true
 disableWidgetStateDuplicationWarning = false
+
+[browser]
+gatherUsageStats = false

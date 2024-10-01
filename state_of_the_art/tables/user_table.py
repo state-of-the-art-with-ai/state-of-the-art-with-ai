@@ -7,13 +7,14 @@ class UserTable(BaseTable):
         "email": {"type": str},
         "password_hash": {"type": str},
         "prompt": {"type": str},
+        "is_admin": {"type": bool},
     }
 
     def add_user(self, email: str, password: str) -> str:
         df = self.read()
         if email in df["email"].values:
             raise ValueError(f"User with email {email} already exists")
-        return self.add(email=email, password_hash=password, prompt="")
+        return self.add(email=email, password_hash=password, prompt="", is_admin=False)
 
     def check_password(self, email: str, given_password: str) -> bool:
         df = self.read()
