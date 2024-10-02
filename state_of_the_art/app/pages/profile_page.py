@@ -7,8 +7,6 @@ from state_of_the_art.tables.user_table import UserTable
 user_data = LoggedInUser().get_user_data()
 
 st.title("Profile page")
-st.text("Authenticated user uuid: " + str(LoggedInUser.get_instance().get_uuid()))
-st.text("User UUID: " + user_data['tdw_uuid'])
 email = st.text_input("Email", value=user_data["email"])
 prompt = st.text_area("About me prompt", value=user_data.get('prompt', ''))
 password = st.text_input("Password", type="password", value=user_data["password_hash"])

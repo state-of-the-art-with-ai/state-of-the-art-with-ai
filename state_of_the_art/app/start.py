@@ -28,7 +28,7 @@ pg = st.navigation(pages)
 setup_login()
 is_admin = LoggedInUser().is_admin()
 with st.sidebar:
-    if is_admin:
+    if is_admin or True:
         if st.button("Admin panel"):
             admin_panel()
 

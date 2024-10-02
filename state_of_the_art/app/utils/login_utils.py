@@ -20,7 +20,7 @@ def setup_login():
 
     if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
         # Create login form
-        st.write('Log in or Sign up')
+        st.write('Log in')
         email = st.text_input('E-mail')
         password = st.text_input('Password', type='password')
 
@@ -43,6 +43,8 @@ def setup_login():
             st.text('Don\'t have an account?')
         with c3:
             if st.button('Create account'):
+                st.session_state['create_account'] = True
+                st.reload()
                 with st.spinner("Creating account..."):
                     uuid = UserTable().add_user(email, password)
                     cookies['user_uuid'] = uuid
