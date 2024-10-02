@@ -20,40 +20,62 @@ def setup_login():
         st.stop()
 
     if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
-        # Create login form
-        st.write('Log in')
-        email = st.text_input('E-mail')
-        password = st.text_input('Password', type='password')
+        if st.query_params.get('page', False) == 'create_account':
+            render_create_account_ui()
+        else:
+            render_loging_ui()
+        st.stop()
 
-        c1, c2, c3 = st.columns([1, 1, 3])
-        with c1:
-            submit = st.button('Login')
-            # Check if user is logged in
-            if submit:
-                with st.spinner("Logging in..."):
-                    if uuid:= UserTable().get_uuid_if_login_works(email, password):
-                        cookies['user_uuid'] = uuid
-                        cookies['logged_in'] = 'True'
-                        cookies.save()
-                        import time ; time.sleep(0.1)
-                        st.rerun()
-                    else:
-                        st.warning('Invalid username or password')
-        
-        with c2:
-            st.text('Don\'t have an account?')
-        with c3:
-            if st.button('Create account'):
-                st.session_state['create_account'] = True
-                st.reload()
-                with st.spinner("Creating account..."):
-                    uuid = UserTable().add_user(email, password)
+
+def render_loging_ui():
+    st.write('Log in')
+    email = st.text_input('E-mail')
+    password = st.text_input('Password', type='password')
+
+    c1, c2, c3 = st.columns([1, 1, 3])
+    with c1:
+        submit = st.button('Login')
+        # Check if user is logged in
+        if submit:
+            with st.spinner("Logging in..."):
+                if uuid:= UserTable().get_uuid_if_login_works(email, password):
                     cookies['user_uuid'] = uuid
                     cookies['logged_in'] = 'True'
                     cookies.save()
                     import time ; time.sleep(0.1)
                     st.rerun()
-        st.stop()
+                else:
+                    st.warning('Invalid username or password')
+    
+    with c2:
+        st.text('Don\'t have an account?')
+    with c3:
+        st.link_button('Create account', '/?page=create_account')
+
+def render_create_account_ui():
+    st.write('Create account')
+    email = st.text_input('E-mail')
+    password = st.text_input('Password', type='password')
+
+    c1, c2 = st.columns([1, 2])
+    with c1:
+        if st.button('Create account'):
+            st.session_state['create_account'] = True
+            with st.spinner("Creating account..."):
+                try:
+                    uuid = UserTable().add_user(email, password)
+                except ValueError as e:
+                    st.warning(str(e))
+                    return
+                cookies['user_uuid'] = uuid
+                cookies['logged_in'] = 'True'
+                cookies.save()
+                import time ; time.sleep(0.1)
+                st.rerun()
+    with c2:
+        st.text('Already have an have an account?')
+        st.link_button('Login', '/?page=login')
+
 
 def logout():
     global cookies

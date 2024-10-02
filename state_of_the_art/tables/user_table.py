@@ -1,3 +1,4 @@
+import re
 from state_of_the_art.tables.base_table import BaseTable
 
 
@@ -11,6 +12,11 @@ class UserTable(BaseTable):
     }
 
     def add_user(self, email: str, password: str) -> str:
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            raise ValueError(f"Invalid email pattern: {email}")
+        if len(password) < 4:
+            raise ValueError(f"Password is too short")
+
         df = self.read()
         if email in df["email"].values:
             raise ValueError(f"User with email {email} already exists")
