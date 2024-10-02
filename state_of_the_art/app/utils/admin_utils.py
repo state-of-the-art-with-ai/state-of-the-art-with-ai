@@ -55,7 +55,7 @@ def admin_panel():
 
         if st.button("Pull data"):
             with st.spinner("Pushing data"):
-                out, error = S3().pull_events_data
+                out, error = S3().pull_events_data()
                 st.write(error)
                 st.write(out)
 

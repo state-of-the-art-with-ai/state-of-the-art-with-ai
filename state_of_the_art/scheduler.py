@@ -70,11 +70,9 @@ def run():
     schedule.every().day.at("04:00").do(send_recommendations_job)
     schedule.every().day.at("05:00").do(send_recommendations_job)
     schedule.every().day.at("06:00").do(send_recommendations_job)
-    schedule.every().day.at("10:00").do(send_recommendations_job)
+    schedule.every().day.at("08:30").do(send_recommendations_job)
     schedule.every().day.at("13:00").do(send_recommendations_job)
-    schedule.every().day.at("17:00").do(send_recommendations_job)
-    schedule.every().day.at("18:45").do(send_recommendations_job)
-    schedule.every().day.at("22:00").do(send_recommendations_job)
+    schedule.every().day.at("17:35").do(send_recommendations_job)
     schedule.every().day.at("23:00").do(send_recommendations_job)
 
 

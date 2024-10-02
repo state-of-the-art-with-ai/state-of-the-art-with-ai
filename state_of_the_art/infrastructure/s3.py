@@ -44,6 +44,7 @@ class S3:
         )
         out, error = p.communicate()
         PushHistory().add()
+        print("Pushed to s3")
         return out, error
 
     def pull_events_data(self):

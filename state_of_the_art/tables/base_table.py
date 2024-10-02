@@ -20,7 +20,7 @@ class BaseTable:
 
             if self.auth_context:
                 if self.auth_context[1] not in df.columns:
-                    raise Exception("No authentication filter column found. Skipping filter")
+                    raise Exception(f"No authentication filter column found for table {self.table_name}. Skipping filter")
 
                 df = df[df[self.auth_context[1]] == self.auth_context[0]()]
                 print("Filtered df with auth context")

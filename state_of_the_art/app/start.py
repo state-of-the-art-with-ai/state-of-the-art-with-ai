@@ -29,7 +29,7 @@ setup_login()
 is_admin = LoggedInUser().is_admin()
 with st.sidebar:
     if is_admin or True:
-        if st.button("Admin panel"):
+        if st.button("Admin"):
             admin_panel()
 
     if st.button("Logout"):
