@@ -12,7 +12,7 @@ from state_of_the_art.tables.data_sync_table import PushHistory
 
 pages = {
     "Papers": [
-        st.Page("pages/all_papers_page.py", title="Browse All"),
+        st.Page("pages/all_papers_page.py", title="Browse Latest"),
         st.Page("pages/interests_page.py", title="Your Interests"),
         st.Page("pages/papers_recommended_page.py", title="Recommendations"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
@@ -29,30 +29,15 @@ setup_login()
 is_admin = LoggedInUser().is_admin()
 with st.sidebar:
     if is_admin:
-        p = subprocess.Popen(
-            "uptime", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-        )
-        out, error = p.communicate()
-        time_up = out.split(" up ")[1].split(",")[0]
-        st.markdown("#### Uptime: " + time_up)
-        minutes = PushHistory().minutes_since_last_push()
-        hours = int(minutes / 60)
-        remaining_minutes = round(minutes % 60)
-        st.markdown(f"#### Time since last push: {hours} hours {remaining_minutes} minutes")
-        if st.button("Push data"):
-            with st.spinner("Pushing data"):
-                out, error = S3().push_local_events_data()
-                st.write(error)
-                st.write(out)
-    if st.button("Admin panel"):
-        admin_panel()
+        if st.button("Admin panel"):
+            admin_panel()
+
+    if st.button("Logout"):
+        logout()
     st.link_button(
         "Give us Feedback",
         "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform",
     )
-
-    if st.button("Logout"):
-        logout()
         
 
 pg.run()
