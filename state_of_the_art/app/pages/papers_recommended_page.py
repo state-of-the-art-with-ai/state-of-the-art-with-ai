@@ -20,12 +20,12 @@ PAPER_PER_TOPIC_TO_RENDER = 3
 
 lookback_days = 1
 generate_clicked = False
-with st.expander("Generation options", expanded=False):
+with st.expander("Generate new recommendations", expanded=False):
     lookback_days = st.number_input(
         "Lookback days", value=1, min_value=1, max_value=365
     )
 
-    generate_clicked = st.button("Generate new recommendations")
+    generate_clicked = st.button("Generate")
 
 if generate_clicked:
     with st.status(f"Generating new recommendations for {lookback_days} days ... "):

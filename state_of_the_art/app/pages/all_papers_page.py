@@ -27,7 +27,7 @@ def fetch_latest_date_with_papers():
 
 
 with st.spinner("Fetching metadata about papers..."):
-    c1, c2, c3 = st.columns([1, 1, 1])
+    c1, c2 = st.columns([1, 1])
     latest_date_with_papers = fetch_latest_date_with_papers()
 
     with c1:
@@ -36,10 +36,6 @@ with st.spinner("Fetching metadata about papers..."):
 
     with c2:
         st.metric("Latest date with papers", str(latest_date_with_papers).split(".")[0])
-    with c3:
-        if st.button("Mine new papers"):
-            with st.spinner("Mining all keywords"):
-                ArxivMiner().mine_all_keywords()
 
     if "date" in st.query_params:
         default_date_filter = st.query_params["date"]
