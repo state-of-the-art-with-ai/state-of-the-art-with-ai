@@ -34,6 +34,7 @@ def setup_login():
                         cookies['user_uuid'] = uuid
                         cookies['logged_in'] = 'True'
                         cookies.save()
+                        import time ; time.sleep(0.1)
                         st.rerun()
                     else:
                         st.warning('Invalid username or password')
@@ -47,6 +48,7 @@ def setup_login():
                     cookies['user_uuid'] = uuid
                     cookies['logged_in'] = 'True'
                     cookies.save()
+                    import time ; time.sleep(0.1)
                     st.rerun()
         st.stop()
 
