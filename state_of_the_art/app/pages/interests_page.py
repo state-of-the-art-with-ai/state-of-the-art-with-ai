@@ -2,14 +2,13 @@ import time
 from state_of_the_art.app.data import papers, topics
 from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.search.bm25_search import Bm25Search
+from state_of_the_art.search.bm25_search import Bm25Search, PrecomputedSearch
 from state_of_the_art.tables.interest_table import InterestTable
 import streamlit as st
 
 @st.cache_data
 def load_bm25_papers():
-    papers = PapersLoader().get_all_papers()
-    return Bm25Search(papers)
+    return PrecomputedSearch().load_papers_from_pickle()
 
 generated_date = None
 lookback_days = None

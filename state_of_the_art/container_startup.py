@@ -1,4 +1,5 @@
 from state_of_the_art.infrastructure.s3 import S3
+from state_of_the_art.search.bm25_search import PrecomputedSearch
 
 
 class ContainerStartup:
@@ -19,6 +20,8 @@ class ContainerStartup:
         self.download_ntlk()
 
         self.pull_models()
+
+        PrecomputedSearch().pickle_search()
 
     def download_ntlk(self):
         print("Downloading ntlk")
