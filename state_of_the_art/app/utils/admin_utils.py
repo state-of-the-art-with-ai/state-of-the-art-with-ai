@@ -55,9 +55,8 @@ def admin_panel():
 
         if st.button("Pull data"):
             with st.spinner("Pushing data"):
-                out, error = S3().pull_events_data()
-                st.write(error)
-                st.write(out)
+                for out in S3().pull_events_data():
+                    st.write(out)
 
     with tab3:
         if st.button("Show recommnder log"):
