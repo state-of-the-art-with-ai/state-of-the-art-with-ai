@@ -3,7 +3,7 @@ from state_of_the_art.app.data import papers, topics
 from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.interest_table import TestTable
+from state_of_the_art.tables.interest_table import InterestTable
 import streamlit as st
 
 @st.cache_data
@@ -19,7 +19,7 @@ st.title("Your Interests")
 papers = None
 send_by_email = False
 
-topics = TestTable()
+topics = InterestTable()
 topics_df = topics.read(recent_first=True)
 topics_names = topics_df["name"].tolist()
 
@@ -35,15 +35,19 @@ with c1:
     if "interest" in st.query_params:
         selected_interest = st.query_params["interest"]
     else:
-        selected_interest = topics_names[-1]
+        selected_interest = topics_names[-1] if topics_names else ""
 
-    interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0]["name"]
+    if selected_interest:
+        interest_name = topics_df[topics_df["name"] == selected_interest].iloc[0]["name"] 
+        topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
+            "description"
+        ]
+    else: 
+        interest_name = ""
+        topic_description = ""
+
 
     interest_name = st.text_input("Interest name", value=interest_name)
-
-    topic_description = topics_df[topics_df["name"] == selected_interest].iloc[0][
-        "description"
-    ]
     topic_description = st.text_area("Query / Description", value=topic_description)
 
     c1, c2 = st.columns([1, 7])

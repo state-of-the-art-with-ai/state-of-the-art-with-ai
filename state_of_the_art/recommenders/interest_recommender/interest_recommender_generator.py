@@ -6,7 +6,7 @@ from state_of_the_art.recommenders.interest_recommender.embeddings_similarity im
 )
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.interest_table import TestTable
+from state_of_the_art.tables.interest_table import InterestTable
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsHistoryTable,
 )
@@ -66,7 +66,7 @@ class InterestsRecommender:
         self.bm25_search.set_papers_and_index(self.papers)
 
         # get all interests
-        interests_df = TestTable().read()
+        interests_df = InterestTable().read()
 
         result = {}
         result["interest_papers"] = {}

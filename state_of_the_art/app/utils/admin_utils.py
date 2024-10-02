@@ -1,3 +1,4 @@
+from state_of_the_art.app.utils.login_utils import LoggedInUser
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.tables.data_sync_table import PushHistory
 import streamlit as st
@@ -10,8 +11,8 @@ def admin_panel():
     tab1, tab2 = st.tabs(["Stats & Shell", "Logs"])
 
     with tab1:
+        st.text("Authenticated user details: " + str(LoggedInUser.get_instance().get_uuid()))
         st.write(f"Number of feedbacks: {TextFeedbackTable().len()}")
-
 
         p = subprocess.Popen("free -h", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, error  = p.communicate()
@@ -35,6 +36,11 @@ def admin_panel():
                 st.write(error)
                 st.write(out)
 
+        if st.button("Pull data"):
+            with st.spinner("Pushing data"):
+                out, error = S3().pull_events_data
+                st.write(error)
+                st.write(out)
         st.markdown("### Debug shell")
 
         shell_cmd = st.text_input("Shell command")

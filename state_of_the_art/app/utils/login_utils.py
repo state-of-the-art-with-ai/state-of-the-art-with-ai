@@ -61,6 +61,11 @@ def logout():
 
 
 class LoggedInUser:
+    
+    @staticmethod
+    def get_instance():
+        return LoggedInUser()
+
     def is_logged_in(self):
         global cookies
         return 'logged_in' in cookies and cookies['logged_in'] == 'True'
@@ -70,6 +75,7 @@ class LoggedInUser:
             raise ValueError("User is not logged in")
         global cookies
         return cookies['user_uuid']
+
     def get_user_data(self):
         user_uuid = self.get_uuid()
         user_df = UserTable().read()
