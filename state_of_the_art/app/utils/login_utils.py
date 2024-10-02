@@ -14,6 +14,7 @@ def setup_login():
         # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
         password='1234',
     )
+    import time ; time.sleep(0.1)
     if not cookies.ready():
         # Wait for the component to load and send us current cookies.
         st.stop()
