@@ -1,4 +1,5 @@
 import streamlit as st
+
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.paper.papers_data_loader import PapersLoader
