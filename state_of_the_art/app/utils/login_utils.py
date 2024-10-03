@@ -1,11 +1,9 @@
 from state_of_the_art.tables.user_table import UserTable
 
-
-import streamlit as st
-from streamlit_cookies_manager import EncryptedCookieManager
-
 cookies = None
 def setup_login():
+    import streamlit as st
+    from streamlit_cookies_manager import EncryptedCookieManager
     global cookies 
     cookies = EncryptedCookieManager(
         # This prefix will get added to all your cookie names.
@@ -28,6 +26,7 @@ def setup_login():
 
 
 def render_loging_ui():
+    import streamlit as st
     st.write('Log in')
     email = st.text_input('E-mail')
     password = st.text_input('Password', type='password')
@@ -38,20 +37,24 @@ def render_loging_ui():
         # Check if user is logged in
         if submit:
             with st.spinner("Logging in..."):
-                if uuid:= UserTable().get_uuid_if_login_works(email, password):
-                    cookies['user_uuid'] = uuid
-                    cookies['logged_in'] = 'True'
-                    cookies.save()
-                    import time ; time.sleep(0.1)
-                    st.rerun()
-                else:
-                    st.warning(f'Invalid username or password "{email}" "{password}"')
+                try: 
+                    if uuid := UserTable().authenticate_returning_uuid(email, password):
+                        cookies['user_uuid'] = uuid
+                        cookies['logged_in'] = 'True'
+                        cookies.save()
+                        import time ; time.sleep(0.1)
+                        st.rerun()
+                    else:
+                        st.warning(f'Invalid username or password "{email}" "{password}"')
+                except ValueError as e:
+                    st.warning(str(e))
     
     with c2:
         st.text('Don\'t have an account?')
         st.link_button('Create account', '/?page=create_account')
 
 def render_create_account_ui():
+    import streamlit as st
     st.write('Create account')
     email = st.text_input('E-mail')
     password = st.text_input('Password', type='password')
@@ -77,6 +80,7 @@ def render_create_account_ui():
 
 
 def logout():
+    import streamlit as st
     global cookies
     cookies['logged_in'] = 'False'
     cookies.save()

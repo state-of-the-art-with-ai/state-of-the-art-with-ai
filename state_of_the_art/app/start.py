@@ -32,6 +32,7 @@ with st.sidebar:
         if st.button("Admin"):
             admin_panel()
 
+    st.text("Welcome " +  LoggedInUser.get_instance().get_user_data().get("email" ))
     if st.button("Logout"):
         logout()
     st.link_button(

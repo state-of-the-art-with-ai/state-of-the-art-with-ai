@@ -1,4 +1,5 @@
 import re
+from typing import Union
 from state_of_the_art.tables.base_table import BaseTable
 
 
@@ -22,21 +23,21 @@ class UserTable(BaseTable):
             raise ValueError(f"User with email {email} already exists")
         return self.add(email=email, password_hash=password, prompt="", is_admin=False)
 
-    def check_password(self, email: str, given_password: str) -> bool:
-        df = self.read()
-        if email not in df["email"].values:
-            return False
-        password = df.loc[df["email"] == email, "password_hash"].values[0]
-        return password == given_password
+    def authenticate_returning_uuid(self, email: str, given_password: str) ->Union[bool, str]:
+        if not email:
+            raise ValueError("Email is empty")
+        if not given_password:
+            raise ValueError("Password is empty")
 
-    def get_uuid_if_login_works(self, email: str, given_password: str) -> bool:
         df = self.read()
         if email not in df["email"].values:
             return False
+
         password = df.loc[df["email"] == email, "password_hash"].values[0]
         if password == given_password:
             return df.loc[df["email"] == email, "tdw_uuid"].values[0]
-        return None
+
+        return False
 
     def list_users(self):
         return self.read().to_dict(orient="records")
