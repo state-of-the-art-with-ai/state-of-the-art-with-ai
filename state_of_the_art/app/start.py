@@ -10,16 +10,14 @@ from state_of_the_art.app.utils.login_utils import LoggedInUser, logout, setup_l
 
 
 pages = {
-    "Papers": [
-        st.Page("pages/all_papers_page.py", title="Browse Latest"),
+    "": [
+        st.Page("pages/all_papers_page.py", title="Latest Papers"),
         st.Page("pages/interests_page.py", title="Your Interests"),
-        st.Page("pages/papers_recommended_page.py", title="Recommendations"),
+        st.Page("pages/papers_recommended_page.py", title="Our Recommendations"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         st.Page("pages/paper_details_page.py", title="Load a paper"),
-    ],
-    "Settings": [
         st.Page("pages/profile_page.py", title="Profile Page"),
-],
+    ],
 }
 
 pg = st.navigation(pages)

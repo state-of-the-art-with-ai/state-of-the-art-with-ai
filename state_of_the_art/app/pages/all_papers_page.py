@@ -27,15 +27,8 @@ def fetch_latest_date_with_papers():
 
 
 with st.spinner("Fetching metadata about papers..."):
-    c1, c2 = st.columns([1, 1])
     latest_date_with_papers = fetch_latest_date_with_papers()
-
-    with c1:
-        last_mine = ArxivMiningHistory().last().to_dict()
-        st.metric("Latest date mined", str(last_mine["tdw_timestamp"]).split(".")[0])
-
-    with c2:
-        st.metric("Latest date with papers", str(latest_date_with_papers).split(".")[0])
+    st.metric("Latest date with papers", str(latest_date_with_papers).split(".")[0])
 
     if "date" in st.query_params:
         default_date_filter = st.query_params["date"]

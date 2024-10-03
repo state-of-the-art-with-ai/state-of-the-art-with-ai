@@ -6,9 +6,7 @@ def setup_login():
     from streamlit_cookies_manager import EncryptedCookieManager
     global cookies 
     cookies = EncryptedCookieManager(
-        # This prefix will get added to all your cookie names.
-        # This way you can run your app on Streamlit Cloud without cookie name clashes with other apps.
-        prefix="state-of-the-art-with-ai-750989039686",
+        prefix="state-of-the-art-with-ai-750989039686.europe-west3.run.app",
         # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
         password='1234',
     )
