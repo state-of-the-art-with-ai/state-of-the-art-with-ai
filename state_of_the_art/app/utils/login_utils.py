@@ -14,7 +14,7 @@ def setup_login():
         # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
         password='1234',
     )
-    import time ; time.sleep(0.1)
+    import time ; time.sleep(0.3)
     if not cookies.ready():
         # Wait for the component to load and send us current cookies.
         st.stop()
@@ -32,7 +32,7 @@ def render_loging_ui():
     email = st.text_input('E-mail')
     password = st.text_input('Password', type='password')
 
-    c1, c2, c3 = st.columns([1, 1, 3])
+    c1, c2 = st.columns([1, 1])
     with c1:
         submit = st.button('Login')
         # Check if user is logged in
@@ -45,11 +45,10 @@ def render_loging_ui():
                     import time ; time.sleep(0.1)
                     st.rerun()
                 else:
-                    st.warning('Invalid username or password')
+                    st.warning(f'Invalid username or password "{email}" "{password}"')
     
     with c2:
         st.text('Don\'t have an account?')
-    with c3:
         st.link_button('Create account', '/?page=create_account')
 
 def render_create_account_ui():
