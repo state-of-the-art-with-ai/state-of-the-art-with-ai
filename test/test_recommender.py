@@ -4,14 +4,19 @@ from state_of_the_art.recommenders.interest_recommender.embeddings_similarity im
     EmbeddingsSimilarity,
 )
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-    InterestsRecommender,
-)
-from state_of_the_art.tables.recommendations_history_table import (
-    RecommendationsHistoryTable,
+    InterestPaperRecommender,
 )
 import scipy.stats as stats
 import pytest
+import os
 
+from unittest import mock
+
+@mock.patch.dict(os.environ, {"SKIP_AUTH_FILTER": "1"})
+@mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
+def test_recommender_end2end():
+    recommender = InterestPaperRecommender()
+    recommender.generate(skip_register_new_papers=True)
 
 @pytest.mark.skipif(True, reason="failing in the ci")
 def test_single_interest_relevance():
@@ -28,14 +33,6 @@ def test_single_interest_relevance():
     papers, scores = recommender.get_papers_for_interest(interest)
     print(str([paper.title for paper in papers]))
 
-
-@pytest.mark.skipif(True, reason="not ready yet")
-def test_load_results():
-    recommendation, row = RecommendationsHistoryTable().get_parsed_recommended_papers()
-
-    import json
-
-    print(json.dumps(recommendation, indent=4))
 
 
 def test_remove_duplicates():
@@ -54,7 +51,7 @@ def test_remove_duplicates():
         },
     }
 
-    result = InterestsRecommender()._remove_duplicates(recommendation_structure=data)
+    result = InterestPaperRecommender()._remove_duplicates(recommendation_structure=data)
     print(result)
 
     assert len(result["first interest"]["papers"].items()) == 1
@@ -76,7 +73,7 @@ def test_sort_interests_by_paper_scores():
         },
     }
 
-    result = InterestsRecommender()._sort_interests_by_scores(data)
+    result = InterestPaperRecommender()._sort_interests_by_scores(data)
     iterator = iter(result.items())
     assert next(iterator)[0] == "second interest"
     assert next(iterator)[0] == "first interest"

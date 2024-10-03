@@ -1,9 +1,7 @@
+import os
 from typing import Any, Callable, Optional, Tuple
 import pandas as pd
-from tiny_data_warehouse import DataWarehouse
-
-tdw = DataWarehouse()
-
+from state_of_the_art.config import config
 
 class BaseTable:
     table_name = None
@@ -11,14 +9,15 @@ class BaseTable:
     auth_context : Optional[Tuple[Callable, str]]= None
 
     def __init__(self):
+        self.twd = config.get_datawarehouse()
         if not self.table_name:
             raise Exception("Table name is required")
 
     def read(self, recent_first=False):
         try:
-            df = tdw.event(self.table_name)
+            df = self.twd.event(self.table_name)
 
-            if self.auth_context:
+            if self.auth_context and not os.environ.get("SKIP_AUTH_FILTER"):
                 if self.auth_context[1] not in df.columns:
                     raise Exception(f"No authentication filter column found for table {self.table_name}. Skipping filter")
 
@@ -49,7 +48,7 @@ class BaseTable:
             data[key] = kwargs[key]
 
 
-        return tdw.write_event(self.table_name, data)
+        return self.twd.write_event(self.table_name, data)
 
     def len(self) -> int:
         return len(self.read().index)
@@ -67,10 +66,10 @@ class BaseTable:
 
         df = pd.DataFrame()
 
-        tdw.replace_df(self.table_name, df, dry_run=True)
+        self.twd.replace_df(self.table_name, df, dry_run=True)
 
     def replace(self, df, dry_run=True):
-        tdw.replace_df(self.table_name, df, dry_run=dry_run)
+        self.twd.replace_df(self.table_name, df, dry_run=dry_run)
 
     def is_empty(self) -> bool:
         return self.read().empty
@@ -94,7 +93,7 @@ class BaseTable:
                     axis=1,
                 )
 
-            tdw.replace_df(self.table_name, df, dry_run=False)
+            self.twd.replace_df(self.table_name, df, dry_run=False)
 
     def update(self, by_key: str, by_value: Any, new_values: dict):
         # fix the new values using the key when missing
@@ -115,14 +114,14 @@ class BaseTable:
                     axis=1,
                 )
 
-            tdw.replace_df(self.table_name, df, dry_run=False)
+            self.twd.replace_df(self.table_name, df, dry_run=False)
 
     def delete_by(self, column: str, value: Any):
         df = self.read()
         df = df.reset_index(drop=True)
 
         df_dropped = df.drop(df[df[column] == value].index)
-        tdw.replace_df(self.table_name, df_dropped)
+        self.twd.replace_df(self.table_name, df_dropped)
         return True
 
     def last(self):

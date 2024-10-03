@@ -4,7 +4,7 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-    InterestsRecommender,
+    InterestPaperRecommender,
 )
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.review import ReportReview
@@ -25,7 +25,7 @@ class Sota:
         self.downloader = PaperDownloader
         self.ArxivMiner = ArxivMiner
         self.ReportReview = ReportReview
-        self.InterestsRecommender = InterestsRecommender
+        self.InterestsRecommender = InterestPaperRecommender
         self.scheduler = scheduler
         self.cicd = Cli
         self.container_startup = ContainerStartup

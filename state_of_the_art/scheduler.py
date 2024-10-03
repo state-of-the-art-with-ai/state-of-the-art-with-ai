@@ -15,10 +15,10 @@ setup_sentry()
 def send_recommendations_job():
     print("Running recommender")
     from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-        InterestsRecommender,
+        InterestPaperRecommender,
     )
 
-    InterestsRecommender().generate(
+    InterestPaperRecommender().generate(
         repeat_check_disable=True,
         number_of_days_to_look_back=get_random_number_of_days(),
         skip_register_new_papers=True,

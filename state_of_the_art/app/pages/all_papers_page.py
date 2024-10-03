@@ -1,6 +1,6 @@
 from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-    InterestsRecommender,
+    InterestPaperRecommender,
 )
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime

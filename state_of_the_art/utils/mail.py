@@ -72,6 +72,10 @@ Content-Type: text/html; charset="UTF-8"
             cmd = f"""curl --url 'smtps://smtp.gmail.com:465' --ssl-reqd --mail-from '{self.SEND_FROM_EMAIL}' --mail-rcpt '{to}' --user '{self.SEND_FROM_EMAIL}:{password}' -T /tmp/foo  """
 
         print("Command to run:", cmd)
+        if os.environ.get("SOTA_TEST"):
+            print("Skipping email send during test")
+            return
+
         self._run(cmd)
 
     def _run(self, cmd):

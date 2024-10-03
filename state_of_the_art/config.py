@@ -132,7 +132,12 @@ class Config:
         if self.dwh:
             return self.dwh
 
+        events_folder=None
+        if os.environ.get("SOTA_TEST"):
+            print("Running tests so using a different folder for the datawarehouse")
+            events_folder='/tmp/.tinyws' if os.environ.get("SOTA_TEST") else None
         self.dwh = DataWarehouse(
+            events_folder=events_folder,
             events_config={"arxiv_papers": {"prevent_duplicates_col": "abstract_url"}}
         )
 

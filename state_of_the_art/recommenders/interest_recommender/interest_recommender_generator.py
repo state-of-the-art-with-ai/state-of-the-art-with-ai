@@ -14,7 +14,7 @@ from state_of_the_art.utils.mail import EmailService
 import scipy.stats as stats
 
 
-class InterestsRecommender:
+class InterestPaperRecommender:
     MAX_PAPERS_PER_TOPIC = 4
 
     def __init__(self) -> None:
@@ -24,7 +24,6 @@ class InterestsRecommender:
     def generate(
         self,
         number_of_days_to_look_back=1,
-        repeat_check_disable=False,
         skip_register_new_papers=False,
     ):
         """
@@ -37,13 +36,7 @@ class InterestsRecommender:
         print(f"Latest date with papers submitted in arxiv: {latest_date_with_papers}")
 
         last_recommendation = RecommendationsHistoryTable().last().to_dict()
-        if (
-            not repeat_check_disable
-            and last_recommendation["to_date"] == latest_date_with_papers.isoformat()
-        ):
-            raise Exception(
-                f"No new papers since last recommendations on {last_recommendation['to_date']}"
-            )
+        print(f"No new papers since last recommendations on {last_recommendation['to_date']}")
 
         self.date_to = latest_date_with_papers
         self.date_from = (
@@ -51,7 +44,7 @@ class InterestsRecommender:
             - datetime.timedelta(days=number_of_days_to_look_back)
         ).date()
 
-        if latest_date_with_papers < self.date_from and not repeat_check_disable:
+        if latest_date_with_papers < self.date_from:
             print("No new papers since {self.date_from} so skipping mining ")
         elif not skip_register_new_papers:
             print("Will now mine new papers")
@@ -242,4 +235,4 @@ Papers analysed: {data['papers_analysed_total']}<br><br>"""
 if __name__ == "__main__":
     import fire
 
-    fire.Fire(InterestsRecommender)
+    fire.Fire(InterestPaperRecommender)
