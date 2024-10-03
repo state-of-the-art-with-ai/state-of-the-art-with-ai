@@ -128,8 +128,8 @@ class Config:
     def load_config():
         return Config()
 
-    def get_datawarehouse(self) -> DataWarehouse:
-        if self.dwh:
+    def get_datawarehouse(self, skip_cache=False) -> DataWarehouse:
+        if self.dwh and not skip_cache:
             return self.dwh
 
         events_folder=None
