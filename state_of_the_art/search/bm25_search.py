@@ -50,7 +50,7 @@ class Bm25Search:
         return lemmas
 
 class PrecomputedSearch:
-    def pickle_search(self):
+    def pickle_all_documents(self):
         papers = self.setup_search_with_all_papers()
         if not os.path.exists(config.PRECOMPUTED_FOLDER):
             os.makedirs(config.PRECOMPUTED_FOLDER)

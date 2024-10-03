@@ -4,6 +4,7 @@ import datetime
 from state_of_the_art.infrastructure.sentry import setup_sentry
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.scheduling.utils import capture_errors
+from state_of_the_art.search.bm25_search import PrecomputedSearch
 from state_of_the_art.utils.mail import EmailService
 
 MINUTES_TO_REPEAT_LIVENESS_PROBE = 10
@@ -47,6 +48,7 @@ def push_data_to_s3():
 @capture_errors()
 def mine_all_keywords():
     ArxivMiner().mine_all_keywords()
+    PrecomputedSearch().pickle_all_documents()
 
 
 
