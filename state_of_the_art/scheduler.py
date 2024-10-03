@@ -34,8 +34,6 @@ def liveness_probe():
         f"Test run every {MINUTES_TO_REPEAT_LIVENESS_PROBE} mins at "
         + datetime.datetime.now().isoformat()
     )
-    raise Exception("Testing errors")
-
 
 @capture_errors()
 def push_data_to_s3():
