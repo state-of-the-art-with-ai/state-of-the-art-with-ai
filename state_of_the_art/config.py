@@ -127,6 +127,9 @@ class Config:
     @staticmethod
     def load_config():
         return Config()
+    
+    def is_production(self):
+        return os.environ.get("HOME") == 'root'
 
     def get_datawarehouse(self, skip_cache=False) -> DataWarehouse:
         if self.dwh and not skip_cache:
