@@ -28,8 +28,6 @@ def fetch_latest_date_with_papers():
 
 with st.spinner("Fetching metadata about papers..."):
     latest_date_with_papers = fetch_latest_date_with_papers()
-    st.metric("Latest date with papers", str(latest_date_with_papers).split(".")[0])
-
     if "date" in st.query_params:
         default_date_filter = st.query_params["date"]
         default_date_filter = datetime.datetime.strptime(
