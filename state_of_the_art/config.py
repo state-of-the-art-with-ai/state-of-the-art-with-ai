@@ -129,7 +129,8 @@ class Config:
         return Config()
     
     def is_production(self):
-        return os.environ.get("HOME") == 'root'
+        # in production user variable is not set
+        return os.environ.get("USER", '') == ''
 
     def get_datawarehouse(self, skip_cache=False) -> DataWarehouse:
         if self.dwh and not skip_cache:
