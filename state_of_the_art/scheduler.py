@@ -19,7 +19,6 @@ def send_recommendations_job():
     )
 
     InterestPaperRecommender().generate(
-        repeat_check_disable=True,
         number_of_days_to_look_back=get_random_number_of_days(),
         skip_register_new_papers=True,
     )

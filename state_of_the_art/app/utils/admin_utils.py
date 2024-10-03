@@ -60,6 +60,7 @@ def admin_panel():
                     st.write(out)
 
     with tab3:
+        st.link_button("Sentry", 'https://jean-machado.sentry.io/issues/?project=4508039830896640')
         if st.button("Show recommnder log"):
             with st.spinner("Loading logs"):
                 with st.expander("Log"):
