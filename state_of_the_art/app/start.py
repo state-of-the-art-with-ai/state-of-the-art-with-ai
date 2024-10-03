@@ -28,11 +28,11 @@ pg = st.navigation(pages)
 setup_login()
 is_admin = LoggedInUser().is_admin()
 with st.sidebar:
+    st.text("Welcome " +  LoggedInUser.get_instance().get_user_data().get("email") + "!")
     if is_admin or True:
         if st.button("Admin"):
             admin_panel()
 
-    st.text("Welcome " +  LoggedInUser.get_instance().get_user_data().get("email" ))
     if st.button("Logout"):
         logout()
     st.link_button(

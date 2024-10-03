@@ -13,9 +13,7 @@ from state_of_the_art.app.utils.paper_details_utils import (
 )
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
-from state_of_the_art.tables.comments_table import Comments
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.relevance_model.inference import Inference
 from state_of_the_art.text_feedback.feedback_elements import render_feedback
 
@@ -54,27 +52,30 @@ insights = insights.sort_values(by="tdw_timestamp", ascending=False)
 has_insights = not insights.empty
 
 st.title(paper.title)
-render_feedback(paper.title, type='paper_title', context={'paper_id': paper.abstract_url})
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
-    st.markdown(f"[{paper.abstract_url}]({paper.abstract_url})")
-    extract_insights = st.button("Generate AI Insights")
-
+    render_feedback(paper.title, type='paper_title', context={'paper_id': paper.abstract_url})
 with c2:
-    st.markdown(f"[Online PDF]({paper.pdf_url})")
-    edit_questions = st.button("Edit questions")
+    st.markdown(f"[{paper.abstract_url}]({paper.abstract_url})")
 with c3:
-    st.markdown("Published: " + paper.published_date_str())
-    if st.button("Send paper to email"):
-        with st.spinner("Sending..."):
-            if EmailAPaper().send(paper):
-                st.success("Paper sent successfully")
+    st.markdown(f"[Online PDF]({paper.pdf_url})")
 
 c1, c2 = st.columns([1, 1])
 with c1:
     render_tags_for_paper(paper)
 with c2:
     render_reading_progress(paper)
+
+c1, c2, c3 = st.columns([1, 1, 1])
+with c1:
+    extract_insights = st.button("Generate AI Insights")
+with c2:
+    edit_questions = st.button("Edit questions")
+with c3:
+    if st.button("Send paper to email"):
+        with st.spinner("Sending..."):
+            if EmailAPaper().send(paper):
+                st.success("Paper sent successfully")
 
 if edit_questions:
     questions(url)
@@ -86,12 +87,14 @@ if extract_insights:
         )
     st.rerun()
 
-c1, c2 = st.columns([1, 1])
+c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
+    st.markdown("Published: " + paper.published_date_str())
+with c2:
     institution = insights_table.get_lastest_answer("Institution", url)
     if institution:
         st.markdown(f"###### Institution ({institution})")
-with c2:
+with c3:
     conference = insights_table.get_lastest_answer("Conference", url)
     if conference:
         st.markdown(f"###### Conference ({conference})")
