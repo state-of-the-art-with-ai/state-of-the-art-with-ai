@@ -9,9 +9,9 @@ class BaseTable:
     auth_context : Optional[Tuple[Callable, str]]= None
 
     def __init__(self):
-        #skip_cache = True if os.environ.get("SOTA_TEST") else False
+        skip_cache = True if os.environ.get("SOTA_TEST") else False
 
-        self.twd = config.get_datawarehouse(skip_cache=False)
+        self.twd = config.get_datawarehouse(skip_cache=skip_cache)
         if not self.table_name:
             raise Exception("Table name is required")
 
