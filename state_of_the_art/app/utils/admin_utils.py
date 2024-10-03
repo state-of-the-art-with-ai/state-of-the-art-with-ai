@@ -34,7 +34,8 @@ def admin_panel():
         st.markdown("### Debug shell")
 
         shell_cmd = st.text_input("Shell command")
-        if shell_cmd:
+        
+        if st.button("Run command"):
             with st.spinner("Running shell command"):
                 p = subprocess.Popen(
                     shell_cmd, shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
