@@ -3,12 +3,10 @@ from state_of_the_art.tables.user_table import UserTable
 cookies = None
 def setup_login():
     import streamlit as st
-    from streamlit_cookies_manager import EncryptedCookieManager
+    from streamlit_cookies_manager import CookieManager
     global cookies 
-    cookies = EncryptedCookieManager(
+    cookies = CookieManager(
         prefix="state-of-the-art-with-ai-750989039686.europe-west3.run.app",
-        # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
-        password='1234',
     )
     import time ; time.sleep(0.3)
     if not cookies.ready():

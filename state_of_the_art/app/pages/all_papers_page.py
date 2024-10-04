@@ -14,6 +14,7 @@ lookback_days = None
 topic_description = None
 
 st.title("All Papers")
+MAX_PAPERS_TO_RENDER = 70
 
 papers_df = None
 filters = {}
@@ -53,6 +54,7 @@ def filter(papers_df):
 
     if search_query:
         papers = Bm25Search(papers).search_returning_papers(search_query)
+    papers = papers[:MAX_PAPERS_TO_RENDER]
     
     inference = Inference()
     # sort papers by inference score
