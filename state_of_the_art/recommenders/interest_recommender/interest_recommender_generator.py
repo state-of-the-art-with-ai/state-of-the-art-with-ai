@@ -33,16 +33,7 @@ class InterestPaperRecommender:
         Generate a new set of recommendations based on the interests and the number of days to look back
         """
         print("Recording execution ...")
-        self.execution_id = self.recommendations_runs_table.add(
-            from_date=None,
-            to_date=None,
-            recommended_papers=None,
-            start_time=datetime.datetime.now().isoformat(),
-            end_time=None,
-            papers_analysed="",
-            papers_analysed_total=None,
-            status=RecommendationGenerationStatus.STARTED,
-        )
+        self.record_execution_start()
         try: 
 
             print(
@@ -66,16 +57,18 @@ class InterestPaperRecommender:
                 print("Will now mine new papers")
                 ArxivMiner().mine_all_keywords()
 
-            self.papers, self.papers_embeddings = (
+            self.papers_analysed, self.papers_embeddings = (
                 self.embedding_similarity.load_papers_and_embeddings(
                     self.date_from, self.date_to
                 )
             )
 
-            self.bm25_search.set_papers_and_index(self.papers)
+            print(f"Setting {len(self.papers_analysed)} papers to BM25 search")
+            self.bm25_search.set_papers_and_index(self.papers_analysed)
 
             # get all interests
-            interests_df = InterestTable().read()
+            interests_df = InterestTable(auth_filter=False).read()
+            print(f"Found {len(interests_df.index)} interests")
 
             result = {}
             result["interest_papers"] = {}
@@ -88,6 +81,8 @@ class InterestPaperRecommender:
                 papers, bm25_scores = self.bm25_search.search_returning_paper_and_score(
                     query
                 )
+                print(f"Search in bm25  for query: {query} returned {len(papers)} papers")
+
                 bm25_scores = stats.zscore(bm25_scores)
                 for paper_indice, paper in enumerate(papers):
                     score = bm25_scores[paper_indice]
@@ -131,7 +126,7 @@ class InterestPaperRecommender:
 
             self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
                     'recommended_papers':str(result),
-                    'papers_analysed_total': len(self.papers),
+                    'papers_analysed_total': len(self.papers_analysed),
                     'status': RecommendationGenerationStatus.SUCCESS,
                     'from_date': self.date_from.isoformat(),
                     'to_date': self.date_to.isoformat(),
@@ -149,6 +144,19 @@ class InterestPaperRecommender:
             )
 
         return result
+
+    def record_execution_start(self):
+        self.execution_id = self.recommendations_runs_table.add(
+            from_date=None,
+            to_date=None,
+            recommended_papers=None,
+            start_time=datetime.datetime.now().isoformat(),
+            end_time=None,
+            papers_analysed="",
+            papers_analysed_total=None,
+            status=RecommendationGenerationStatus.STARTED,
+        )
+
 
     def format_and_send_email(self):
         content_structured, data = (

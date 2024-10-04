@@ -15,7 +15,6 @@ topic_description = None
 st.title("Recommendations")
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 
-
 PAPER_PER_TOPIC_TO_RENDER = 3
 
 c1, c2 = st.columns([2, 1])
@@ -52,7 +51,6 @@ with c1:
 
     with st.spinner("Loading latest recommendations ..."):
 
-
         recommendations_df = RecommendationsRunsTable().read(recent_first=True)
         recommendation_to_load = st.query_params.get("run_id", None)
 
@@ -60,18 +58,25 @@ with c1:
             recommendations_df = recommendations_df[recommendations_df["tdw_uuid"] == recommendation_to_load].to_dict()
         else: 
             recommendations_df = recommendations_df.iloc[0].to_dict()
-
-
-
-
-
-        structured = json.loads(recommendations_df["recommended_papers"].replace("'", '"'))
+    
         papers = []
-        for interest, interest_data in structured["interest_papers"].items():
-            for paper in PapersLoader().load_papers_from_urls(
-                interest_data["papers"].keys()
-            )[0:PAPER_PER_TOPIC_TO_RENDER]:
-                papers.append(paper)
+        papers_metadata = {}
+        if recommendations_df["recommended_papers"]:
+            structured = json.loads(recommendations_df["recommended_papers"].replace("'", '"'))
+            for interest, interest_data in structured["interest_papers"].items():
+                for paper in PapersLoader().load_papers_from_urls(
+                    interest_data["papers"].keys()
+                )[0:PAPER_PER_TOPIC_TO_RENDER]:
+                    papers.append(paper)
+
+            for topic, metadata in structured["interest_papers"].items():
+                for paper in metadata["papers"]:
+                    papers_metadata[paper] = (
+                        {"labels": [topic]}
+                        if paper not in papers_metadata
+                        else {"labels": papers_metadata[paper]["labels"] + [topic]}
+                    )
+
 
         recommendation_metadata = {
             "Papers from": recommendations_df["from_date"],
@@ -79,15 +84,6 @@ with c1:
             "Generation started": recommendations_df["start_time"].split(".")[0],
             "papers_analysed_total": recommendations_df["papers_analysed_total"],
         }
-
-        papers_metadata = {}
-        for topic, metadata in structured["interest_papers"].items():
-            for paper in metadata["papers"]:
-                papers_metadata[paper] = (
-                    {"labels": [topic]}
-                    if paper not in papers_metadata
-                    else {"labels": papers_metadata[paper]["labels"] + [topic]}
-                )
 
         PapersRenderer().render_papers(
             papers,
