@@ -135,6 +135,7 @@ class InterestPaperRecommender:
                     'status': RecommendationGenerationStatus.SUCCESS,
                     'from_date': self.date_from.isoformat(),
                     'to_date': self.date_to.isoformat(),
+                    'end_time': datetime.datetime.now().isoformat(),
                 }
             )
             self.format_and_send_email()
@@ -143,6 +144,7 @@ class InterestPaperRecommender:
             self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
                     'status': RecommendationGenerationStatus.ERROR,
                     'error_details': str(e),
+                    'end_time': datetime.datetime.now().isoformat(),
                 }
             )
 
