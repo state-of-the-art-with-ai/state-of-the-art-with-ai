@@ -20,6 +20,7 @@ class RecommendationsRunsTable(BaseTable):
         "papers_analysed_total": {"type": Any},
         "recommended_papers": {"type": str},
         "status": {"type": str},
+        "error_details": {"type": str},
     }
 
     def get_parsed_recommended_papers(self):

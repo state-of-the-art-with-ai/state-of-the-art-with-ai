@@ -136,6 +136,7 @@ class InterestPaperRecommender:
             self.format_and_send_email()
         except Exception as e:
             print(f"Error while generating recommendations: {e}")
+            result = ''  
             self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
                     'status': RecommendationGenerationStatus.ERROR,
                     'error_details': str(e),
@@ -155,6 +156,7 @@ class InterestPaperRecommender:
             papers_analysed="",
             papers_analysed_total=None,
             status=RecommendationGenerationStatus.STARTED,
+            error_details="",
         )
 
 
