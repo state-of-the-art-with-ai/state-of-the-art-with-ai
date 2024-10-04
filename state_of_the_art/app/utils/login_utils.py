@@ -92,6 +92,9 @@ class LoggedInUser:
 
     def is_logged_in(self):
         global cookies
+        if not cookies:
+            print("No cookies defined so returning not logged in")
+            return False
         return 'logged_in' in cookies and cookies['logged_in'] == 'True'
     
     def get_uuid(self) -> str:

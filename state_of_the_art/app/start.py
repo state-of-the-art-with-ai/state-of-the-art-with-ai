@@ -11,12 +11,12 @@ from state_of_the_art.app.utils.login_utils import LoggedInUser, logout, setup_l
 
 pages = {
     "": [
-        st.Page("pages/all_papers_page.py", title="Latest Papers"),
+        st.Page("pages/all_papers_page.py", title="All Papers"),
         st.Page("pages/interests_page.py", title="Your Interests"),
-        st.Page("pages/papers_recommended_page.py", title="Our Recommendations"),
+        st.Page("pages/papers_recommended_page.py", title="Recommendations For You"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         st.Page("pages/paper_details_page.py", title="Load a paper"),
-        st.Page("pages/profile_page.py", title="Profile Page"),
+        st.Page("pages/profile_page.py", title="Your Profile"),
     ],
 }
 

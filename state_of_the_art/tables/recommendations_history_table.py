@@ -2,6 +2,12 @@ import json
 from typing import Any
 from state_of_the_art.tables.base_table import BaseTable
 
+from enum import Enum
+
+class RecommendationGenerationStatus(str, Enum):
+    STARTED = "started"
+    ERROR = "error"
+    SUCCESS = "SUCCESS"
 
 class RecommendationsHistoryTable(BaseTable):
     table_name = "state_of_the_art_summary"
@@ -11,6 +17,7 @@ class RecommendationsHistoryTable(BaseTable):
         "papers_analysed": {"type": str},
         "papers_analysed_total": {"type": Any},
         "recommended_papers": {"type": str},
+        "status": {"type": str},
     }
 
     def get_parsed_recommended_papers(self):
