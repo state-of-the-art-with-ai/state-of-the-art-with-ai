@@ -1,19 +1,47 @@
 from state_of_the_art.tables.user_table import UserTable
+import streamlit as st
+import uuid
 
-cookies = None
+class LoginInterface:
+    @staticmethod
+    def get_instance():
+        if not hasattr(LoginInterface, 'instance'):
+            LoginInterface.instance = LoginInterface()
+        return LoginInterface.instance
+
+    def __init__(self) -> None:
+        from streamlit_cookies_manager import EncryptedCookieManager
+
+        # This should be on top of your script
+        cookies = EncryptedCookieManager(
+            # This prefix will get added to all your cookie names.
+            # This way you can run your app on Streamlit Cloud without cookie name clashes with other apps.
+            prefix="my_sota_app",
+            # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
+            password='123456',
+        )
+        if not cookies.ready():
+            st.sleep(0.3)
+        self.cookies = cookies
+        
+
+    def logged_in(self):
+        return self.cookies.get('logged_in') == "True"
+    
+    def get_uuid(self):
+        return self.cookies.get('user_uuid')
+
+    def register_login_state(self, user_uuid):
+        self.cookies['logged_in'] = 'True'
+        self.cookies['user_uuid'] = user_uuid
+        
+    def register_logout(self):
+            self.cookies['logged_in'] = 'False'
+            self.cookies['user_uuid'] = None
+
 def setup_login():
     import streamlit as st
-    from streamlit_cookies_manager import CookieManager
-    global cookies 
-    cookies = CookieManager(
-        prefix="state-of-the-art-with-ai-750989039686.europe-west3.run.app",
-    )
-    import time ; time.sleep(0.1)
-    if not cookies.ready():
-        # Wait for the component to load and send us current cookies.
-        st.stop()
-
-    if not 'logged_in' in cookies or cookies['logged_in'] != 'True':
+    if not LoginInterface.get_instance().logged_in():
         if st.query_params.get('page', False) == 'create_account':
             render_create_account_ui()
         else:
@@ -23,7 +51,7 @@ def setup_login():
 
 def render_loging_ui():
     import streamlit as st
-    st.write('Log in')
+    st.markdown('### Log in')
     email = st.text_input('E-mail')
     password = st.text_input('Password', type='password')
 
@@ -32,18 +60,15 @@ def render_loging_ui():
         submit = st.button('Login')
         # Check if user is logged in
         if submit:
-            with st.spinner("Logging in..."):
-                try: 
-                    if uuid := UserTable().authenticate_returning_uuid(email, password):
-                        cookies['user_uuid'] = uuid
-                        cookies['logged_in'] = 'True'
-                        cookies.save()
-                        import time ; time.sleep(0.1)
-                        st.rerun()
-                    else:
-                        st.warning(f'Invalid username or password "{email}" "{password}"')
-                except ValueError as e:
-                    st.warning(str(e))
+            try: 
+                if uuid := UserTable().check_password_returning_uuid(email, password):
+                    LoginInterface.get_instance().register_login_state(uuid)
+                    import time ; time.sleep(0.1)
+                    st.rerun()
+                else:
+                    st.warning(f'Invalid username or password "{email}" "{password}"')
+            except ValueError as e:
+                st.warning(str(e))
     
     with c2:
         st.text('Don\'t have an account?')
@@ -65,9 +90,7 @@ def render_create_account_ui():
                 except ValueError as e:
                     st.warning(str(e))
                     return
-                cookies['user_uuid'] = uuid
-                cookies['logged_in'] = 'True'
-                cookies.save()
+                LoginInterface.get_instance().register_login_state(uuid)
                 import time ; time.sleep(0.1)
                 st.rerun()
     with c2:
@@ -77,9 +100,7 @@ def render_create_account_ui():
 
 def logout():
     import streamlit as st
-    global cookies
-    cookies['logged_in'] = 'False'
-    cookies.save()
+    LoginInterface.get_instance().register_logout()
     st.success("Logged out")
     st.rerun()
 
@@ -91,17 +112,10 @@ class LoggedInUser:
         return LoggedInUser()
 
     def is_logged_in(self):
-        global cookies
-        if not cookies:
-            print("No cookies defined so returning not logged in")
-            return False
-        return 'logged_in' in cookies and cookies['logged_in'] == 'True'
+        return self.get_uuid() is not None
     
     def get_uuid(self) -> str:
-        if not self.is_logged_in():
-            raise ValueError("User is not logged in")
-        global cookies
-        return cookies['user_uuid']
+        return LoginInterface.get_instance().get_uuid()
 
     def get_user_data(self):
         user_uuid = self.get_uuid()

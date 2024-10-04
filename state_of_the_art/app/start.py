@@ -4,7 +4,6 @@ from state_of_the_art.config import config
 title = 'State of the Art with AI' if config.is_production() else 'DEV State of the Art with AI'
 st.set_page_config(page_title=title, layout="wide", initial_sidebar_state='expanded', menu_items=None)
 
-from state_of_the_art.app.utils.admin_utils import admin_panel
 
 from state_of_the_art.app.utils.login_utils import LoggedInUser, logout, setup_login
 
@@ -28,6 +27,7 @@ with st.sidebar:
     st.text("Welcome " +  LoggedInUser.get_instance().get_user_data().get("email") + "!")
     if is_admin or True:
         if st.button("Admin"):
+            from state_of_the_art.app.utils.admin_utils import admin_panel
             admin_panel()
 
     if st.button("Logout"):

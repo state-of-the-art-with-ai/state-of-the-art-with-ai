@@ -23,7 +23,7 @@ class UserTable(BaseTable):
             raise ValueError(f"User with email {email} already exists")
         return self.add(email=email, password_hash=password, prompt="", is_admin=False)
 
-    def authenticate_returning_uuid(self, email: str, given_password: str) ->Union[bool, str]:
+    def check_password_returning_uuid(self, email: str, given_password: str) ->Union[bool, str]:
         if not email:
             raise ValueError("Email is empty")
         if not given_password:
