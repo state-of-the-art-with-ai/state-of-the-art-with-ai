@@ -2,7 +2,7 @@ import subprocess
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.pages.render_papers import PapersRenderer
 from state_of_the_art.tables.recommendations_history_table import (
-    RecommendationsHistoryTable,
+    RecommendationsRunsTable,
 )
 import json
 import streamlit as st
@@ -50,7 +50,7 @@ if generate_clicked:
 
 @st.cache_data
 def load_latest_recommendations():
-    return RecommendationsHistoryTable().last().to_dict()
+    return RecommendationsRunsTable().last().to_dict()
 
 with st.spinner("Loading latest recommendations ..."):
     recommendations = load_latest_recommendations()

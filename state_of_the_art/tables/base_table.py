@@ -38,6 +38,7 @@ class BaseTable:
         """
         Use like:
             .add(message=message, paper_url=paper.abstract_ur)
+        Returns the tdw_uuid
         """
         data = {}
         if self.auth_context:

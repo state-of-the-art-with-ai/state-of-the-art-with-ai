@@ -1,6 +1,6 @@
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.tables.recommendations_history_table import (
-    RecommendationsHistoryTable,
+    RecommendationsRunsTable,
 )
 import streamlit as st
 
@@ -8,7 +8,7 @@ st.title("Past recommendations")
 st.divider()
 
 df = (
-    RecommendationsHistoryTable()
+    RecommendationsRunsTable()
     .read()
     .sort_values(by="tdw_timestamp", ascending=False)
 )

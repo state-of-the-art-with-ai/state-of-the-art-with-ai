@@ -1,7 +1,7 @@
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.paper.url_extractor import PapersUrlsExtractor
 from state_of_the_art.tables.recommendations_history_table import (
-    RecommendationsHistoryTable,
+    RecommendationsRunsTable,
 )
 import streamlit as st
 
@@ -33,7 +33,7 @@ def load_papers_from_insights(load_no):
 
 
 def load_papers_from_last_report(report_id=None, max_num_of_results=None):
-    report_df = RecommendationsHistoryTable().read()
+    report_df = RecommendationsRunsTable().read()
     if report_id:
         report_df = report_df[report_df["tdw_uuid"] == report_id].iloc[-1]
     else:

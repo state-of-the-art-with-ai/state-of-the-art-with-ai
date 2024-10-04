@@ -7,13 +7,15 @@ from enum import Enum
 class RecommendationGenerationStatus(str, Enum):
     STARTED = "started"
     ERROR = "error"
-    SUCCESS = "SUCCESS"
+    SUCCESS = "success"
 
-class RecommendationsHistoryTable(BaseTable):
+class RecommendationsRunsTable(BaseTable):
     table_name = "state_of_the_art_summary"
     schema = {
         "from_date": {"type": Any},
         "to_date": {"type": Any},
+        "start_time": {"type": Any},
+        "end_time": {"type": Any},
         "papers_analysed": {"type": str},
         "papers_analysed_total": {"type": Any},
         "recommended_papers": {"type": str},
