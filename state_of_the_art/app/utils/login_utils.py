@@ -8,7 +8,7 @@ def setup_login():
     cookies = CookieManager(
         prefix="state-of-the-art-with-ai-750989039686.europe-west3.run.app",
     )
-    import time ; time.sleep(0.3)
+    import time ; time.sleep(0.1)
     if not cookies.ready():
         # Wait for the component to load and send us current cookies.
         st.stop()
