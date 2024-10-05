@@ -15,6 +15,9 @@ class BaseTable:
         if not self.table_name:
             raise Exception("Table name is required")
 
+        if self.auth_context and not self.schema.get(self.auth_context[1]):
+            raise Exception(f"Auth context column {self.auth_context[1]} not found in schema")
+
     def read(self, recent_first=False):
         try:
             df = self.twd.event(self.table_name)
@@ -83,6 +86,12 @@ class BaseTable:
         # fix the new values using the key when missing
         if by_key not in new_values:
             new_values[by_key] = by_value
+
+        if self.auth_context:
+            new_values[self.auth_context[1]] = self.auth_context[0]()
+            print(f"Adding auth context to new values {new_values}")
+        else:
+            print('No auth context found')
 
         df = self.read()
         if df.empty or df[df[by_key] == by_value].empty:

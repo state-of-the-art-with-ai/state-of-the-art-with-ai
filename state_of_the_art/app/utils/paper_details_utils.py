@@ -63,18 +63,7 @@ def render_tags_for_paper(paper: ArxivPaper):
 
 
     if set(currently_selected_tags) != set(existing_tags):
-        if not currently_selected_tags:
-            tags_table.delete_by(
-                column="paper_id",
-                value=paper.abstract_url,
-            )
-            st.success("Tags deleted successfully")
-        else:
-            tags_table.update_or_create(
-                by_key="paper_id",
-                by_value=paper.abstract_url,
-                new_values={"tags": ",".join(currently_selected_tags)},
-            )
+            tags_table.replace_tags(paper.abstract_url, currently_selected_tags)
             st.success("Tags updated successfully")
 
 

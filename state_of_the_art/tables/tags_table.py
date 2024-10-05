@@ -7,6 +7,7 @@ class TagsTable(BaseTable):
     schema = {
         "tags": {"type": str},
         "paper_id": {"type": str},
+        'user_uuid': {"type": str},
     }
     DEFAULT_TAGS = ["To Read", "Save For Later"]
 
@@ -31,3 +32,19 @@ class TagsTable(BaseTable):
             )
         else:
             self.add(tags=tag, paper_id=paper_id)
+
+    def replace_tags(self, paper_id, new_tags):
+        if not new_tags:
+            self.delete_by(
+                column="paper_id",
+                value=paper_id,
+            )
+            return
+
+        self.update_or_create(
+            by_key="paper_id",
+            by_value=paper_id,
+            new_values={
+                "tags": ",".join(new_tags)
+            },
+        )
