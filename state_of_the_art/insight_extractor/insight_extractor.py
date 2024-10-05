@@ -165,7 +165,7 @@ class StructuredPaperInsights:
         self.profile = config.get_current_audience()
         self.model_to_use = model_to_use
 
-    def get_result(self, text: str, question=None) -> Tuple[str, dict]:
+    def get_result(self, paper_content: str, question=None) -> Tuple[str, dict]:
         if os.environ.get("SOTA_TEST"):
             return "Mocked result", {}
 
@@ -181,9 +181,14 @@ class StructuredPaperInsights:
             self.model_to_use if self.model_to_use else SupportedModels.gpt_4o.value
         )
         print("Using model: ", used_model)
+        print("Paper preview to summarize: ", paper_content[0:3000])
+
+        if len(paper_content) > 120000:
+            paper_content = paper_content[0:120000]
+
         result = client.chat.completions.create(
             model=used_model,
-            messages=[{"role": "user", "content": text}],
+            messages=[{"role": "user", "content": paper_content}],
             functions=[
                 {
                     "name": "get_insights_from_paper",
@@ -195,7 +200,7 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
                     "parameters": {"type": "object", "properties": parameters},
                 }
             ],
-            function_call="auto",
+            function_call={"name": "get_insights_from_paper"},
         )
 
         if not hasattr(result.choices[0].message, "function_call"):
@@ -203,6 +208,7 @@ It optimized the answers for the following audience: {self.profile.get_preferenc
                 f"""Function call extraction operation failed returned {result.choices[0].message.content} instead """
             )
 
+        print("Result: ", str(result))
         structured_results = result.choices[0].message.function_call.arguments
         structured_results = json.loads(str(structured_results))
         print("structured_results:", structured_results)

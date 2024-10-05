@@ -62,7 +62,7 @@ def get_website_content(url: str):
     text = "\n".join(chunk for chunk in chunks if chunk)
 
     # get teh page title
-    title = soup.title.string
+    title = soup.title.string if soup.title else url
 
     location = pdf.create_pdf(
         data=text, output_path_description="webpage " + title, disable_open=True

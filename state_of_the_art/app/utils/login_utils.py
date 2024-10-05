@@ -1,6 +1,6 @@
 from state_of_the_art.tables.user_table import UserTable
 import streamlit as st
-import uuid
+import time
 
 class LoginInterface:
     @staticmethod
@@ -11,7 +11,6 @@ class LoginInterface:
 
     def __init__(self) -> None:
         from streamlit_cookies_manager import EncryptedCookieManager
-
         # This should be on top of your script
         cookies = EncryptedCookieManager(
             # This prefix will get added to all your cookie names.
@@ -22,7 +21,7 @@ class LoginInterface:
         )
         while not cookies.ready():
             print("Waiting for cookies to be ready")
-            st.sleep(0.1)
+            time.sleep(0.3)
         print("Cookies are ready")
         self.cookies = cookies
         
