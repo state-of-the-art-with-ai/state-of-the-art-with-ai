@@ -62,12 +62,6 @@ with st.spinner("Loading"):
     with c3:
         st.markdown(f"[Online PDF]({paper.pdf_url})")
 
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        render_tags_for_paper(paper)
-    with c2:
-        render_reading_progress(paper)
-
     c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
         extract_insights = st.button("Generate AI Insights")
@@ -91,6 +85,13 @@ with st.spinner("Loading"):
                 url, email_skip=True, disable_pdf_open=True
             )
         st.rerun()
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        render_tags_for_paper(paper)
+    with c2:
+        render_reading_progress(paper)
+
 
     c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
@@ -118,20 +119,14 @@ with st.spinner("Loading"):
 
     outcomes = insights_table.get_lastest_answer("Outcomes", url)
     if outcomes:
-        st.markdown(
-            f""" ##### Outcomes
-        {outcomes}
-        """
-        )
+        st.markdown( f""" ##### Outcomes """)
+        st.text(outcomes)
         render_feedback(outcomes, type="paper_insight", context={'paper_id': paper.abstract_url})
 
     structure = insights_table.get_lastest_answer("DeepSummaryOfStructure", url)
     if structure:
-        st.markdown(
-            f""" ##### Structure
-        {structure}
-        """
-        )
+        st.markdown( f""" ##### Structure """)
+        st.text(structure)
         render_feedback(structure, type="paper_insight", context={'paper_id': paper.abstract_url})
 
     with st.expander("Definitions"):
