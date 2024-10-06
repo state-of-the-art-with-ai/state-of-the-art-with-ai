@@ -145,3 +145,12 @@ class BaseTable:
 
     def list(self):
         return self.read(recent_first=True).to_dict(orient="records")
+    
+    def register_dummy(self):
+        data = {}
+        for key, value in self.schema.items():
+            if value["type"] == bool:
+                data[key] = True
+            else:
+                data[key] = f"{key} dummy"
+        return self.add(**data)
