@@ -1,5 +1,4 @@
 from state_of_the_art.tables.user_table import UserTable
-import streamlit as st
 import time
 
 class LoginInterface:
@@ -38,7 +37,7 @@ class LoginInterface:
         
     def register_logout(self):
             self.cookies['logged_in'] = 'False'
-            self.cookies['user_uuid'] = None
+            self.cookies['user_uuid'] = ''
 
 def setup_login():
     import streamlit as st
@@ -77,7 +76,7 @@ def render_loging_ui():
 
 def render_create_account_ui():
     import streamlit as st
-    st.write('Create account')
+    st.markdown('### Create account')
     email = st.text_input('E-mail')
     password = st.text_input('Password', type='password')
 
@@ -102,6 +101,7 @@ def render_create_account_ui():
 def logout():
     import streamlit as st
     LoginInterface.get_instance().register_logout()
+    time.sleep(0.3)
     st.success("Logged out")
     st.rerun()
 

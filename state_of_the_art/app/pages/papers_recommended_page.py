@@ -1,7 +1,7 @@
 import datetime
 import subprocess
 from state_of_the_art.app.data import papers
-from state_of_the_art.app.pages.render_papers import PapersRenderer
+from state_of_the_art.app.utils.render_papers import PapersRenderer
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsRunsTable,
 )

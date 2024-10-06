@@ -1,4 +1,4 @@
-from state_of_the_art.app.pages.render_papers import PapersRenderer
+from state_of_the_art.app.utils.render_papers import PapersRenderer
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
     InterestPaperRecommender,
 )

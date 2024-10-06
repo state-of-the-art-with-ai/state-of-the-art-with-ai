@@ -7,12 +7,13 @@ class UserTable(BaseTable):
     table_name = "user"
     schema = {
         "email": {"type": str},
+        "name": {"type": str},
         "password_hash": {"type": str},
         "prompt": {"type": str},
         "is_admin": {"type": bool},
     }
 
-    def add_user(self, email: str, password: str) -> str:
+    def add_user(self, email: str, password: str, name) -> str:
         if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
             raise ValueError(f"Invalid email pattern: {email}")
         if len(password) < 4:
@@ -21,7 +22,7 @@ class UserTable(BaseTable):
         df = self.read()
         if email in df["email"].values:
             raise ValueError(f"User with email {email} already exists")
-        return self.add(email=email, password_hash=password, prompt="", is_admin=False)
+        return self.add(email=email, password_hash=password, prompt="", name="", is_admin=False)
 
     def check_password_returning_uuid(self, email: str, given_password: str) ->Union[bool, str]:
         if not email:
