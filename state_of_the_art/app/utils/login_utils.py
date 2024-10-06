@@ -19,8 +19,8 @@ class LoginInterface:
             # You should really setup a long COOKIES_PASSWORD secret if you're running on Streamlit Cloud.
             password='123456',
         )
+        print("Waiting for cookies to be ready every 0.3 seconds")
         while not cookies.ready():
-            print("Waiting for cookies to be ready")
             time.sleep(0.3)
         print("Cookies are ready")
         self.cookies = cookies

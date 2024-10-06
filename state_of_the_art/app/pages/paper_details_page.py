@@ -15,6 +15,7 @@ from state_of_the_art.insight_extractor.insight_extractor import InsightExtracto
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.relevance_model.inference import Inference
+from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.text_feedback.feedback_elements import render_feedback
 
 with st.expander("Create or load a paper"):
@@ -70,8 +71,11 @@ with st.spinner("Loading"):
     c1, c2, c3 = st.columns([1, 1, 1])
     with c1:
         extract_insights = st.button("Generate AI Insights")
-    with c2:
         edit_questions = st.button("Edit questions")
+    with c2:
+        if st.button("Save For Later", key=f"save_for_later"):
+            TagsTable().add_tag_to_paper(paper.abstract_url, "save for later")
+            st.success("Saved")
     with c3:
         if st.button("Send paper to email"):
             with st.spinner("Sending..."):
