@@ -58,14 +58,13 @@ def run():
     schedule.every(20).minutes.do(push_data_to_s3)
 
     schedule.every().day.at("05:00").do(mine_all_keywords)
+    schedule.every().day.at("08:00").do(mine_all_keywords)
     schedule.every().day.at("12:00").do(mine_all_keywords)
+    schedule.every().day.at("15:00").do(mine_all_keywords)
     schedule.every().day.at("23:00").do(mine_all_keywords)
 
     # send email
-    schedule.every().day.at("00:00").do(send_recommendations_job)
     schedule.every().day.at("01:00").do(send_recommendations_job)
-    schedule.every().day.at("03:00").do(send_recommendations_job)
-    schedule.every().day.at("06:00").do(send_recommendations_job)
     schedule.every().day.at("08:30").do(send_recommendations_job)
     schedule.every().day.at("13:00").do(send_recommendations_job)
     schedule.every().day.at("17:35").do(send_recommendations_job)
