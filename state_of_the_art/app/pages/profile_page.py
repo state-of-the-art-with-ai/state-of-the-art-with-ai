@@ -7,12 +7,13 @@ from state_of_the_art.tables.user_table import UserTable
 user_data = LoggedInUser().get_user_data()
 
 st.title("Profile page")
+name = st.text_input("Email", value=user_data.get('name', ''))
 email = st.text_input("Email", value=user_data["email"])
 prompt = st.text_area("About me prompt", value=user_data.get('prompt', ''))
 password = st.text_input("Password", type="password", value=user_data["password_hash"])
 
 
 if st.button("Save Changes"):
-    UserTable().update(by_key="tdw_uuid", by_value=user_data['tdw_uuid'], new_values={'email': email, 'prompt': prompt, 'password_hash': password})
+    UserTable().update(by_key="tdw_uuid", by_value=user_data['tdw_uuid'], new_values={'email': email, 'prompt': prompt, 'password_hash': password, 'name': name})
     st.success("Changes saved successfully")
     st.rerun()
