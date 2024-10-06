@@ -39,23 +39,13 @@ class InterestPaperRecommender:
             print(
                 f"Generating recomemndations for the last {number_of_days_to_look_back} days"
             )
-            latest_date_with_papers = ArxivMiner().latest_date_with_papers()
-            print(f"Latest date with papers submitted in arxiv: {latest_date_with_papers}")
+            self.date_to = ArxivMiner().latest_date_with_papers()
+            print(f"Latest date with papers submitted in arxiv: {self.date_to}")
 
-            last_recommendation = RecommendationsRunsTable().last().to_dict()
-            print(f"No new papers since last recommendations on {last_recommendation['to_date']}")
-
-            self.date_to = latest_date_with_papers
             self.date_from = (
                 datetime.datetime.fromisoformat(self.date_to.isoformat())
                 - datetime.timedelta(days=number_of_days_to_look_back)
             ).date()
-
-            if latest_date_with_papers < self.date_from:
-                print("No new papers since {self.date_from} so skipping mining ")
-            elif not skip_register_new_papers:
-                print("Will now mine new papers")
-                ArxivMiner().mine_all_keywords()
 
             self.papers_analysed, self.papers_embeddings = (
                 self.embedding_similarity.load_papers_and_embeddings(
@@ -135,16 +125,20 @@ class InterestPaperRecommender:
             )
             self.format_and_send_email()
         except Exception as e:
-            print(f"Error while generating recommendations: {e}")
+            self.record_error(e)
             result = ''  
-            self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
-                    'status': RecommendationGenerationStatus.ERROR,
-                    'error_details': str(e),
-                    'end_time': datetime.datetime.now().isoformat(),
-                }
-            )
 
         return result
+
+    def record_error(self, e):
+        print(f"Error while generating recommendations: {e}")
+        self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
+                'status': RecommendationGenerationStatus.ERROR,
+                'error_details': str(e),
+                'end_time': datetime.datetime.now().isoformat(),
+            }
+        )
+
 
     def record_execution_start(self):
         self.execution_id = self.recommendations_runs_table.add(
