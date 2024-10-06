@@ -1,4 +1,5 @@
 import streamlit as st
+import itertools
 
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.utils.render_papers import PapersRenderer
@@ -18,7 +19,6 @@ with st.spinner("Loading page"):
     all_tags_df = TagsTable().read()
     all_tags = all_tags_df["tags"].to_list()
     all_tags = [tags.split(",") for tags in all_tags]
-    import itertools
 
     merged = list(itertools.chain(*all_tags))
     unique = list(set(merged))

@@ -24,7 +24,7 @@ class InterestPaperRecommender:
         self.embedding_similarity = EmbeddingsSimilarity()
         self.bm25_search = Bm25Search()
         self.execution_id = None
-        self.recommendations_runs_table = RecommendationsRunsTable()
+        self.recommendations_runs_table = RecommendationsRunsTable(auth_filter=False)
         self.current_user_id = None
         self.current_user = None
 
@@ -176,7 +176,7 @@ class InterestPaperRecommender:
 
     def format_and_send_email(self):
         content_structured, data = (
-            RecommendationsRunsTable().get_parsed_recommended_papers()
+            self.recommendations_runs_table.get_parsed_recommended_papers()
         )
         import datetime
 
