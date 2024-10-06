@@ -144,3 +144,6 @@ class BaseTable:
     def print(self):
         df = self.read(recent_first=True)
         print(df)
+
+    def list(self):
+        return self.read(recent_first=True).to_dict(orient="records")

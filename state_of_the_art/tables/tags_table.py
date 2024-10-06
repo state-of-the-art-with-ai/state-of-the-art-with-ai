@@ -1,7 +1,6 @@
 from state_of_the_art.app.utils.login_utils import LoggedInUser
 from state_of_the_art.tables.base_table import BaseTable
 
-
 class TagsTable(BaseTable):
     table_name = "tags"
     schema = {

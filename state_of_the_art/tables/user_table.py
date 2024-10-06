@@ -40,8 +40,6 @@ class UserTable(BaseTable):
 
         return False
 
-    def list_users(self):
-        return self.read().to_dict(orient="records")
     
     def toggle_admin(self, email: str):
         read = self.read()

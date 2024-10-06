@@ -11,7 +11,7 @@ from state_of_the_art.review import ReportReview
 from state_of_the_art import scheduler
 from state_of_the_art.ci_cd import Cli
 from state_of_the_art.search.bm25_search import PrecomputedSearch
-from state_of_the_art.tables.user_table import UserTable
+from state_of_the_art.tables.tables import Table
 
 
 class Sota:
@@ -29,7 +29,7 @@ class Sota:
         self.scheduler = scheduler
         self.cicd = Cli
         self.container_startup = ContainerStartup
-        self.user_table = UserTable
+        self.table = Table
         self.PrecomputedSearch = PrecomputedSearch
 
 
