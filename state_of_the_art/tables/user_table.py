@@ -13,7 +13,7 @@ class UserTable(BaseTable):
         "is_admin": {"type": bool},
     }
 
-    def add_user(self, email: str, password: str, name) -> str:
+    def add_user(self, email: str, password: str, name: str) -> str:
         if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
             raise ValueError(f"Invalid email pattern: {email}")
         if len(password) < 4:

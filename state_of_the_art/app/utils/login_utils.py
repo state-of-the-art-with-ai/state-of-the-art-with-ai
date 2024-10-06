@@ -78,6 +78,7 @@ def render_create_account_ui():
     import streamlit as st
     st.markdown('### Create account')
     email = st.text_input('E-mail')
+    name = st.text_input('Name')
     password = st.text_input('Password', type='password')
 
     c1, c2 = st.columns([1, 2])
@@ -86,7 +87,7 @@ def render_create_account_ui():
             st.session_state['create_account'] = True
             with st.spinner("Creating account..."):
                 try:
-                    uuid = UserTable().add_user(email, password)
+                    uuid = UserTable().add_user(email, password, name)
                 except ValueError as e:
                     st.warning(str(e))
                     return
