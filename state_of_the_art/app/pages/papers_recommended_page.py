@@ -21,18 +21,18 @@ with c1:
 
     with st.spinner("Loading latest recommendations ..."):
 
-        recommendations_df = RecommendationsRunsTable().read(recent_first=True)
-        recommendation_to_load = st.query_params.get("run_id", None)
+        base_recos_df = RecommendationsRunsTable().read(recent_first=True)
+        id_to_load = st.query_params.get("run_id", None)
 
-        if recommendation_to_load:
-            recommendations_df = recommendations_df[recommendations_df["tdw_uuid"] == recommendation_to_load].to_dict()
+        if id_to_load:
+            filtered_df = base_recos_df[base_recos_df["tdw_uuid"] == id_to_load].iloc[0].to_dict()
         else: 
-            recommendations_df = recommendations_df.iloc[0].to_dict()
+            filtered_df = base_recos_df.iloc[0].to_dict()
     
         papers = []
         papers_metadata = {}
-        if recommendations_df["recommended_papers"]:
-            structured = json.loads(recommendations_df["recommended_papers"].replace("'", '"'))
+        if filtered_df["recommended_papers"]:
+            structured = json.loads(filtered_df["recommended_papers"])
             for interest, interest_data in structured["interest_papers"].items():
                 for paper in PapersLoader().load_papers_from_urls(
                     interest_data["papers"].keys()
@@ -47,12 +47,12 @@ with c1:
                         else {"labels": papers_metadata[paper]["labels"] + [topic]}
                     )
 
-
         recommendation_metadata = {
-            "Papers from": recommendations_df["from_date"],
-            "Papers to": recommendations_df["to_date"],
-            "Generation started": recommendations_df["start_time"].split(".")[0],
-            "papers_analysed_total": recommendations_df["papers_analysed_total"],
+            "Id": filtered_df["tdw_uuid"][0:8],
+            "Papers from": filtered_df["from_date"],
+            "Papers to": filtered_df["to_date"],
+            "Generation started": filtered_df["start_time"].split(".")[0],
+            "papers_analysed_total": filtered_df["papers_analysed_total"],
         }
 
         PapersRenderer().render_papers(
@@ -73,9 +73,16 @@ with c2:
         current_time = datetime.datetime.now()
         time_since_start = str(current_time - datetime.datetime.fromisoformat(run["start_time"])).split(".")[0]
 
-        st.markdown(f"""
-###### Started at {time_since_start} Status: {run['status']} Papers analysed: {run['papers_analysed_total']}
-""")
-        st.link_button("View", "/papers_recommended_page?run_id=" + run["tdw_uuid"])
+        c1, c2 = st.columns([3, 1])
+        with c1:
+            text = f'Recommendation ({run['tdw_uuid'][0:8]}) at {time_since_start}  Papers analysed: {run['papers_analysed_total']}'
+            if run["status"] == "error":
+                st.error(text)
+            elif run["status"] == "success":
+                st.success(text)
+            else:
+                st.warning(text)
+        with c2:
+            st.link_button("View", "/papers_recommended_page?run_id=" + run["tdw_uuid"])
 
         

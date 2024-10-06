@@ -1,3 +1,4 @@
+import json
 import os
 import datetime
 from state_of_the_art.paper.papers_data_loader import PapersLoader
@@ -122,7 +123,7 @@ class InterestPaperRecommender:
                 )
 
                 self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
-                        'recommended_papers':str(result),
+                        'recommended_papers':json.dumps(result),
                         'papers_analysed_total': len(self.papers_analysed),
                         'status': RecommendationGenerationStatus.SUCCESS,
                         'from_date': self.date_from.isoformat(),
