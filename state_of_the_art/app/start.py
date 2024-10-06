@@ -24,8 +24,6 @@ pg = st.navigation(pages)
 setup_login()
 is_admin = LoggedInUser().is_admin()
 
-
-
 with st.sidebar:
     username = LoggedInUser.get_instance().get_user_data().get("name", "")
     if username:

@@ -24,6 +24,11 @@ topics_names = topics_df["name"].tolist()
 
 c1, c2 = st.columns([2, 1])
 with c2:
+    if len(topics_names) > 0:
+        st.write(f"{len(topics_names)} Interests registered")
+    else:
+        st.write("Create a new interest to get started")
+
     for topic in topics_names:
         try:
             if st.button(topic, key=f"t{topic}"):
