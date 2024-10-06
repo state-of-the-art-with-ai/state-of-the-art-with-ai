@@ -9,7 +9,6 @@ import json
 import streamlit as st
 
 generated_date = None
-lookback_days = None
 topic_description = None
 
 st.title("Recommendations")
@@ -19,35 +18,6 @@ PAPER_PER_TOPIC_TO_RENDER = 3
 
 c1, c2 = st.columns([2, 1])
 with c1:
-    lookback_days = 1
-    generate_clicked = False
-    ca, cb = st.columns([1, 1])
-    with ca:
-        generate_clicked = st.button("Generate")
-    with cb:
-        lookback_days = st.number_input(
-            "Lookback days", value=1, min_value=1, max_value=365
-        )
-
-    if generate_clicked:
-        with st.status(f"Generating new recommendations for {lookback_days} days ... "):
-            p = subprocess.Popen(
-                f"sota InterestsRecommender generate -s -n {lookback_days} | tee /tmp/generator.log",
-                shell=True,
-                text=True,
-                stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-            )
-            for line in p.stdout:
-                st.text(line)  # Continuously update the placeholder with the output
-
-            for line in p.stderr:
-                st.text(line)  # Continuously update the placeholder with the output
-
-            p.stderr.close()
-            p.stdout.close()
-
-            p.wait()
 
     with st.spinner("Loading latest recommendations ..."):
 

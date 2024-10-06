@@ -31,6 +31,7 @@ class InterestPaperRecommender:
         self,
         number_of_days_to_look_back=1,
         skip_register_new_papers=False,
+        for_user=None
     ):
         """
         Generate a new set of recommendations based on the interests and the number of days to look back
@@ -56,12 +57,15 @@ class InterestPaperRecommender:
             print("Current user id: ", self.current_user_id)
             self.current_user = UserTable().find_user_by_uuid(self.current_user_id)
             print('Starting recommendations for user:', self.current_user.name)
+            interests_df = InterestTable(auth_callable=lambda: self.current_user_id).read()
+            print(f"Found {len(interests_df.index)} interests")
+            if len(interests_df.index) == 0:
+                print(f"No interests found for user {self.current_user.email} skipping ")
+                continue
             try: 
                 print("Recording execution ...")
                 self.record_execution_start()
                 # get all interests
-                interests_df = InterestTable(auth_callable=lambda: self.current_user_id).read()
-                print(f"Found {len(interests_df.index)} interests")
 
                 result = {}
                 result["interest_papers"] = {}
@@ -179,7 +183,7 @@ class InterestPaperRecommender:
         from_date = datetime.datetime.strptime(data["from_date"], "%Y-%m-%d").date()
         days = (to_date - from_date).days
 
-        content_str = f"""Hello, {self.current_user.name},<br><br>
+        content_str = f"""Hello, {self.current_user.get_name()},<br><br>
 
 Some details about the recommendations:<br>
 Papers from: {data['from_date']} To: {data['to_date']} ({days}) days<br>

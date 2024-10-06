@@ -52,11 +52,23 @@ class UserTable(BaseTable):
 
     def find_user_by_uuid(self, uuid: str) -> 'UserEntity':
         df = self.read()
-        return UserEntity(df[df["tdw_uuid"] == uuid].iloc[0].to_dict())
+        data = df[df["tdw_uuid"] == uuid].iloc[0].to_dict()
+        if not data:
+            raise ValueError(f"User with uuid {uuid} not found")
+        return UserEntity(data)
 
 class UserEntity:
     def __init__(self, data) -> None:
         self.email = data["email"]
         self.name = data.get("name")
         self.tdw_uuid = data["tdw_uuid"]
+    
+    def get_name(self):
+        return self.name
+    
+    def get_email(self):
+        return self.email
+    
+    def get_uuid(self):
+        return self.tdw_uuid
     
