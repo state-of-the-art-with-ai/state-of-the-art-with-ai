@@ -1,14 +1,13 @@
+import subprocess
+import streamlit as st
 from state_of_the_art.app.utils.login_utils import LoggedInUser
 from state_of_the_art.infrastructure.s3 import S3
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.tables.data_sync_table import PushHistory
-import streamlit as st
-import subprocess
 from state_of_the_art.tables.text_feedback_table import TextFeedbackTable
 
 @st.dialog("Admin panel")
 def admin_panel():
-
     tab1, tab2, tab3 = st.tabs(["Stats & Shell", 'Actions', "Logs"])
 
     with tab1:
@@ -64,8 +63,6 @@ def admin_panel():
         if st.button("Show recommnder log"):
             with st.spinner("Loading logs"):
                 with st.expander("Log"):
-                    import subprocess
-
                     p = subprocess.Popen(
                         f"cat /tmp/generator.log",
                         shell=True,
@@ -80,8 +77,6 @@ def admin_panel():
         if st.button("Show scheduler"):
             with st.spinner("Loading logs"):
                 with st.expander("Log"):
-                    import subprocess
-
                     p = subprocess.Popen(
                         f"cat /tmp/scheduler.log",
                         shell=True,
