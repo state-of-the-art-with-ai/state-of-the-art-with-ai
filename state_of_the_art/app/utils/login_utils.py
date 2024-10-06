@@ -119,7 +119,10 @@ class LoggedInUser:
     def get_uuid(self) -> str:
         return LoginInterface.get_instance().get_uuid()
 
-    def get_user_data(self):
+    def get_user_data(self) -> dict:
+        """
+        Fetch the user data from the database and return as dict
+        """
         user_uuid = self.get_uuid()
         user_df = UserTable().read()
         return user_df[user_df["tdw_uuid"] == user_uuid].iloc[0].to_dict()

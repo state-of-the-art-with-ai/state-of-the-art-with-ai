@@ -23,8 +23,13 @@ pg = st.navigation(pages)
 
 setup_login()
 is_admin = LoggedInUser().is_admin()
+
+
+
 with st.sidebar:
-    st.text("Welcome " +  LoggedInUser.get_instance().get_user_data().get("email") + "!")
+    username = LoggedInUser.get_instance().get_user_data().get("name", "")
+    if username:
+        st.text("Welcome " + username + "!")
     if is_admin or True:
         if st.button("Admin"):
             from state_of_the_art.app.utils.admin_utils import admin_panel
