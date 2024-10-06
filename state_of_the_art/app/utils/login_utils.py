@@ -108,7 +108,6 @@ def logout():
 
 
 class LoggedInUser:
-    
     @staticmethod
     def get_instance():
         return LoggedInUser()

@@ -40,7 +40,6 @@ class UserTable(BaseTable):
 
         return False
 
-    
     def toggle_admin(self, email: str):
         read = self.read()
         if 'is_admin' not in read.columns:
@@ -51,7 +50,13 @@ class UserTable(BaseTable):
         self.update(by_key="email", by_value=email, new_values={"is_admin": not is_admin})
 
 
-if __name__ == "__main__":
-    import fire
+    def find_user_by_uuid(self, uuid: str) -> 'UserEntity':
+        df = self.read()
+        return UserEntity(df[df["tdw_uuid"] == uuid].iloc[0].to_dict())
 
-    fire.Fire()
+class UserEntity:
+    def __init__(self, data) -> None:
+        self.email = data["email"]
+        self.name = data.get("name")
+        self.tdw_uuid = data["tdw_uuid"]
+    

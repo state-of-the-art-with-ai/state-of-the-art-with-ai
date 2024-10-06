@@ -5,27 +5,25 @@ from state_of_the_art.infrastructure.sentry import setup_sentry
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.scheduling.utils import capture_errors
 from state_of_the_art.search.bm25_search import PrecomputedSearch
-from state_of_the_art.utils.mail import EmailService
+from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
+    InterestPaperRecommender,
+)
 
 MINUTES_TO_REPEAT_LIVENESS_PROBE = 10
 
 setup_sentry()
 
 @capture_errors()
-def send_recommendations_job():
-    print("Running recommender")
-    from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-        InterestPaperRecommender,
-    )
+def send_recommendations_job(number_of_days_to_look_back=1):
+    def _send_recos():
+        print("Sending recommendations")
+        print("Running recommender")
 
-    InterestPaperRecommender().generate(
-        number_of_days_to_look_back=get_random_number_of_days(),
-        skip_register_new_papers=True,
-    )
+        InterestPaperRecommender().generate(
+            number_of_days_to_look_back=number_of_days_to_look_back,
+        )
+    return _send_recos
 
-def get_random_number_of_days():
-    import random
-    return random.randint(1, 20)
 
 @capture_errors()
 def liveness_probe():
@@ -64,11 +62,13 @@ def run():
     schedule.every().day.at("23:00").do(mine_all_keywords)
 
     # send email
-    schedule.every().day.at("01:00").do(send_recommendations_job)
-    schedule.every().day.at("08:30").do(send_recommendations_job)
-    schedule.every().day.at("13:00").do(send_recommendations_job)
-    schedule.every().day.at("17:35").do(send_recommendations_job)
-    schedule.every().day.at("23:00").do(send_recommendations_job)
+    schedule.every().day.at("01:00").do(send_recommendations_job(7))
+    schedule.every().day.at("03:00").do(send_recommendations_job(15))
+    schedule.every().day.at("06:00").do(send_recommendations_job(30))
+    schedule.every().day.at("08:00").do(send_recommendations_job(1))
+    schedule.every().day.at("13:00").do(send_recommendations_job(2))
+    schedule.every().day.at("17:35").do(send_recommendations_job(3))
+    schedule.every().day.at("23:00").do(send_recommendations_job(1))
 
 
     print("Scheduler infinite loop started")

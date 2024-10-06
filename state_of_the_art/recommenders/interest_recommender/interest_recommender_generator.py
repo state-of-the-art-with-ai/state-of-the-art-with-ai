@@ -11,6 +11,7 @@ from state_of_the_art.tables.recommendations_history_table import (
     RecommendationGenerationStatus,
     RecommendationsRunsTable,
 )
+from state_of_the_art.tables.user_table import UserTable
 from state_of_the_art.utils.mail import EmailService
 import scipy.stats as stats
 
@@ -23,6 +24,8 @@ class InterestPaperRecommender:
         self.bm25_search = Bm25Search()
         self.execution_id = None
         self.recommendations_runs_table = RecommendationsRunsTable()
+        self.current_user_id = None
+        self.current_user = None
 
     def generate(
         self,
@@ -32,103 +35,114 @@ class InterestPaperRecommender:
         """
         Generate a new set of recommendations based on the interests and the number of days to look back
         """
-        print("Recording execution ...")
-        self.record_execution_start()
-        try: 
 
-            print(
-                f"Generating recomemndations for the last {number_of_days_to_look_back} days"
-            )
-            self.date_to = ArxivMiner().latest_date_with_papers()
-            print(f"Latest date with papers submitted in arxiv: {self.date_to}")
+        print(
+            f"Generating recomemndations for the last {number_of_days_to_look_back} days"
+        )
+        self.date_to = ArxivMiner().latest_date_with_papers()
+        print(f"Latest date with papers submitted in arxiv: {self.date_to}")
 
-            self.date_from = (
-                datetime.datetime.fromisoformat(self.date_to.isoformat())
-                - datetime.timedelta(days=number_of_days_to_look_back)
-            ).date()
+        self.date_from = (
+            datetime.datetime.fromisoformat(self.date_to.isoformat())
+            - datetime.timedelta(days=number_of_days_to_look_back)
+        ).date()
 
-            self.papers_analysed, self.papers_embeddings = (
-                self.embedding_similarity.load_papers_and_embeddings(
-                    self.date_from, self.date_to
-                )
-            )
+        self.setup_papers()
+        users_df = UserTable().read()
+        print(f"Total users found {len(users_df.index)} ")
 
-            print(f"Setting {len(self.papers_analysed)} papers to BM25 search")
-            self.bm25_search.set_papers_and_index(self.papers_analysed)
+        for user_dict in users_df.to_dict(orient="records"):
+            self.current_user_id = user_dict["tdw_uuid"]
+            print("Current user id: ", self.current_user_id)
+            self.current_user = UserTable().find_user_by_uuid(self.current_user_id)
+            print('Starting recommendations for user:', self.current_user.name)
+            try: 
+                print("Recording execution ...")
+                self.record_execution_start()
+                # get all interests
+                interests_df = InterestTable(auth_callable=lambda: self.current_user_id).read()
+                print(f"Found {len(interests_df.index)} interests")
 
-            # get all interests
-            interests_df = InterestTable(auth_filter=False).read()
-            print(f"Found {len(interests_df.index)} interests")
+                result = {}
+                result["interest_papers"] = {}
+                for interest in interests_df.to_dict(orient="records"):
+                    # get the top most similar papers indexes positions
+                    query = interest["name"] + " " + interest["description"]
+                    result["interest_papers"][interest["name"]] = {}
+                    result["interest_papers"][interest["name"]]["papers"] = {}
 
-            result = {}
-            result["interest_papers"] = {}
-            for interest in interests_df.to_dict(orient="records"):
-                # get the top most similar papers indexes positions
-                query = interest["name"] + " " + interest["description"]
-                result["interest_papers"][interest["name"]] = {}
-                result["interest_papers"][interest["name"]]["papers"] = {}
-
-                papers, bm25_scores = self.bm25_search.search_returning_paper_and_score(
-                    query
-                )
-                print(f"Search in bm25  for query: {query} returned {len(papers)} papers")
-
-                bm25_scores = stats.zscore(bm25_scores)
-                for paper_indice, paper in enumerate(papers):
-                    score = bm25_scores[paper_indice]
-                    if (
-                        paper.abstract_url
-                        in result["interest_papers"][interest["name"]]["papers"]
-                    ):
-                        result["interest_papers"][interest["name"]]["papers"][
-                            paper.abstract_url
-                        ]["bm25_score"] = score
-                    else:
-                        result["interest_papers"][interest["name"]]["papers"][
-                            paper.abstract_url
-                        ] = {"bm25_score": score, "semantic_score": 0}
-
-                top_papers, semantic_scores = (
-                    self.embedding_similarity.get_papers_for_interest(query)
-                )
-                semantic_scores = stats.zscore(semantic_scores)
-
-                for paper_indice, paper in enumerate(top_papers):
-                    semantic_score = semantic_scores[paper_indice]
-                    result["interest_papers"][interest["name"]]["papers"][
-                        paper.abstract_url
-                    ] = {"semantic_score": semantic_score, "bm25_score": 0}
-
-            # sum scores in a final score
-            for interest in result["interest_papers"]:
-                for paper in result["interest_papers"][interest]["papers"]:
-                    result["interest_papers"][interest]["papers"][paper]["final_score"] = (
-                        result["interest_papers"][interest]["papers"][paper]["bm25_score"]
-                        + result["interest_papers"][interest]["papers"][paper][
-                            "semantic_score"
-                        ]
+                    papers, bm25_scores = self.bm25_search.search_returning_paper_and_score(
+                        query
                     )
+                    print(f"Search in bm25  for query: {query} returned {len(papers)} papers")
 
-            result["interest_papers"] = self._remove_duplicates(result["interest_papers"])
-            result["interest_papers"] = self._sort_interests_by_scores(
-                result["interest_papers"]
-            )
+                    bm25_scores = stats.zscore(bm25_scores)
+                    for paper_indice, paper in enumerate(papers):
+                        score = bm25_scores[paper_indice]
+                        if (
+                            paper.abstract_url
+                            in result["interest_papers"][interest["name"]]["papers"]
+                        ):
+                            result["interest_papers"][interest["name"]]["papers"][
+                                paper.abstract_url
+                            ]["bm25_score"] = score
+                        else:
+                            result["interest_papers"][interest["name"]]["papers"][
+                                paper.abstract_url
+                            ] = {"bm25_score": score, "semantic_score": 0}
 
-            self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
-                    'recommended_papers':str(result),
-                    'papers_analysed_total': len(self.papers_analysed),
-                    'status': RecommendationGenerationStatus.SUCCESS,
-                    'from_date': self.date_from.isoformat(),
-                    'to_date': self.date_to.isoformat(),
-                    'end_time': datetime.datetime.now().isoformat(),
-                }
-            )
-            self.format_and_send_email()
-        except Exception as e:
-            self.record_error(e)
-            result = ''  
+                    top_papers, semantic_scores = (
+                        self.embedding_similarity.get_papers_for_interest(query)
+                    )
+                    semantic_scores = stats.zscore(semantic_scores)
+
+                    for paper_indice, paper in enumerate(top_papers):
+                        semantic_score = semantic_scores[paper_indice]
+                        result["interest_papers"][interest["name"]]["papers"][
+                            paper.abstract_url
+                        ] = {"semantic_score": semantic_score, "bm25_score": 0}
+
+                # sum scores in a final score
+                for interest in result["interest_papers"]:
+                    for paper in result["interest_papers"][interest]["papers"]:
+                        result["interest_papers"][interest]["papers"][paper]["final_score"] = (
+                            result["interest_papers"][interest]["papers"][paper]["bm25_score"]
+                            + result["interest_papers"][interest]["papers"][paper][
+                                "semantic_score"
+                            ]
+                        )
+
+                result["interest_papers"] = self._remove_duplicates(result["interest_papers"])
+                result["interest_papers"] = self._sort_interests_by_scores(
+                    result["interest_papers"]
+                )
+
+                self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
+                        'recommended_papers':str(result),
+                        'papers_analysed_total': len(self.papers_analysed),
+                        'status': RecommendationGenerationStatus.SUCCESS,
+                        'from_date': self.date_from.isoformat(),
+                        'to_date': self.date_to.isoformat(),
+                        'end_time': datetime.datetime.now().isoformat(),
+                    }
+                )
+                self.format_and_send_email()
+            except Exception as e:
+                self.record_error(e)
+                result = ''  
 
         return result
+
+    def setup_papers(self):
+        self.papers_analysed, self.papers_embeddings = (
+            self.embedding_similarity.load_papers_and_embeddings(
+                self.date_from, self.date_to
+            )
+        )
+
+        print(f"Setting {len(self.papers_analysed)} papers to BM25 search")
+        self.bm25_search.set_papers_and_index(self.papers_analysed)
+
 
     def record_error(self, e):
         print(f"Error while generating recommendations: {e}")
@@ -151,6 +165,7 @@ class InterestPaperRecommender:
             papers_analysed_total=None,
             status=RecommendationGenerationStatus.STARTED,
             error_details="",
+            user_id = self.current_user_id
         )
 
 
@@ -164,13 +179,15 @@ class InterestPaperRecommender:
         from_date = datetime.datetime.strptime(data["from_date"], "%Y-%m-%d").date()
         days = (to_date - from_date).days
 
-        content_str = f"""
-Period from: {data['from_date']}<br>
-Period to: {data['to_date']}<br>
-Days = {days}<br>
-Generated at: {data['tdw_timestamp']}<br>
-By user: {os.environ.get('USER', "None set")}<br>
-Papers analysed: {data['papers_analysed_total']}<br><br>"""
+        content_str = f"""Hello, {self.current_user.name},<br><br>
+
+Some details about the recommendations:<br>
+Papers from: {data['from_date']} To: {data['to_date']} ({days}) days<br>
+Generated at: {data['tdw_timestamp']} By user: {os.environ.get('USER', "None set")}<br>
+Papers analysed: {data['papers_analysed_total']}<br><br>
+
+Reommendations:<br><br>
+"""
 
         print(content_str)
         topic_counter = 1
@@ -195,7 +212,7 @@ Papers analysed: {data['papers_analysed_total']}<br><br>"""
             f"Papers covering {days} days up to "
             + str(datetime.datetime.now()).split(".")[0]
         )
-        EmailService().send(content=content_str, subject=title)
+        EmailService().send(content=content_str, subject=title, recepient=self.current_user.email)
 
     def _remove_duplicates(self, recommendation_structure, score_column="final_score"):
         papers_scores_by_category = {}

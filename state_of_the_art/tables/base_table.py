@@ -90,8 +90,6 @@ class BaseTable:
         if self.auth_context:
             new_values[self.auth_context[1]] = self.auth_context[0]()
             print(f"Adding auth context to new values {new_values}")
-        else:
-            print('No auth context found')
 
         df = self.read()
         if df.empty or df[df[by_key] == by_value].empty:
@@ -116,7 +114,7 @@ class BaseTable:
 
         df = self.read()
         if df.empty or df[df[by_key] == by_value].empty:
-            raise ValueError(f"Row does not exist for value {by_value}")
+            raise ValueError(f"While attempting to update {self.table_name} found that row does not exist for value {by_value} in column {by_key}" )
         else:
             print(
                 f"Row does exist for value {by_value}, updating row with values {new_values}"

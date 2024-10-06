@@ -21,6 +21,7 @@ class RecommendationsRunsTable(BaseTable):
         "recommended_papers": {"type": str},
         "status": {"type": str},
         "error_details": {"type": str},
+        "user_id": {"type": str},
     }
 
     def get_parsed_recommended_papers(self):
