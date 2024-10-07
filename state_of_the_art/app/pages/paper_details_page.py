@@ -69,6 +69,7 @@ with c2:
     if st.button("Save For Later", key=f"save_for_later"):
         TagsTable().add_tag_to_paper(paper.abstract_url, "save for later")
         st.success("Saved")
+        st.rerun()
 with c3:
     if st.button("Send paper to email"):
         with st.spinner("Sending..."):
