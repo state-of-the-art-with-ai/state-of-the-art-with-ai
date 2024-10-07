@@ -1,6 +1,7 @@
 import json
 import os
 import datetime
+from tqdm import tqdm
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.recommenders.interest_recommender.embeddings_similarity import (
     EmbeddingsSimilarity,
@@ -72,7 +73,8 @@ class InterestPaperRecommender:
 
                 result = {}
                 result["interest_papers"] = {}
-                for interest in interests_df.to_dict(orient="records"):
+
+                for interest in tqdm(interests_df.to_dict(orient="records")):
                     # get the top most similar papers indexes positions
                     query = interest["name"] + " " + interest["description"]
                     result["interest_papers"][interest["name"]] = {}
@@ -103,12 +105,16 @@ class InterestPaperRecommender:
                         ] = {"semantic_score": semantic_score, "bm25_score": existing_bm25_score}
 
                     # add text evaluation score
-                    #for paper in result["interest_papers"][interest["name"]]["papers"]:
-                    #    result["interest_papers"][interest["name"]]["papers"][
-                    #        paper.abstract_url
+                for interest_name, interest_data in result["interest_papers"].items():
+                    print("Loading papers for ", interest_name)
+                    papers_of_interest = PapersLoader().load_papers_from_urls(interest_data['papers'].keys())
+                    print("Loaded ", len(papers_of_interest), " papers for ", interest_name)
+                    print("Text evaluation inference for ", interest_name)
+                    text_evaluation_scores = self.text_evaluation_inference.predict_batch([paper.title for paper in papers_of_interest])
+                    text_evaluation_scores = stats.zscore(text_evaluation_scores)
 
-                        
-                        
+                    for paper_indice, paper_key in enumerate(interest_data['papers']):
+                        result["interest_papers"][interest_name]["papers"][paper_key]["text_evaluation_score"] = text_evaluation_scores[paper_indice]
 
                 # sum scores in a final score
                 result = self.sum_scores(result)
@@ -137,12 +143,11 @@ class InterestPaperRecommender:
     def sum_scores(self, result):
         for interest in result["interest_papers"]:
             for paper in result["interest_papers"][interest]["papers"]:
-                result["interest_papers"][interest]["papers"][paper]["final_score"] = (
-                    result["interest_papers"][interest]["papers"][paper]["bm25_score"]
-                    + result["interest_papers"][interest]["papers"][paper][
-                        "semantic_score"
-                    ]
-                )
+                bm25_score = result["interest_papers"][interest]["papers"][paper]['bm25_score']
+                semantic_score = result["interest_papers"][interest]["papers"][paper]['semantic_score']
+                text_evaluation_score = result["interest_papers"][interest]["papers"][paper]['text_evaluation_score']
+
+                result["interest_papers"][interest]["papers"][paper]["final_score"] = bm25_score + semantic_score + text_evaluation_score
         return result
 
     def setup_papers(self):
@@ -158,6 +163,10 @@ class InterestPaperRecommender:
 
     def record_error(self, e):
         print(f"Error while generating recommendations: {e}")
+        import traceback
+        print(traceback.format_exc())
+
+
         self.recommendations_runs_table.update(by_key='tdw_uuid', by_value=self.execution_id, new_values={
                 'status': RecommendationGenerationStatus.ERROR,
                 'error_details': str(e),
