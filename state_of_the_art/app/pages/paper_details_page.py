@@ -111,7 +111,7 @@ with st.expander("Abstract", expanded=not has_insights):
 
 
 def format_text(text) -> str:
-    ROW_SIZE = 120
+    ROW_SIZE = 80
     # break text into 80 character lines
     result = ""
     for i in range(0, len(text), ROW_SIZE):
