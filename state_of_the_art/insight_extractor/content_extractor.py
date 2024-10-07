@@ -1,7 +1,6 @@
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.downloader import PaperDownloader
 from state_of_the_art.paper.paper_entity import Paper
-from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 from state_of_the_art.register_papers.register_paper import PaperCreator
 from state_of_the_art.utils import pdf
 import os

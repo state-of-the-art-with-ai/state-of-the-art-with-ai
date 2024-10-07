@@ -157,7 +157,6 @@ Abstract: {url}
         url = url.replace("file://", "")
         return url
 
-
 class StructuredPaperInsights:
     def __init__(self, model_to_use: Optional[str] = None):
         self.profile = config.get_current_audience()

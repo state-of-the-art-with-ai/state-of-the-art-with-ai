@@ -2,6 +2,8 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.paper_entity import Paper
 import os
 from state_of_the_art.utils import pdf
+import urllib
+import urllib.request
 
 
 class PaperDownloader:
@@ -37,12 +39,14 @@ class PaperDownloader:
 
         print(f"Downloading file {paper.pdf_url} to {destination}")
 
-        import urllib
-
         opener = urllib.request.build_opener()
         opener.addheaders = [("User-agent", "Mozilla/5.0")]
+        # add timeout
+        opener.timeout = 15
+
         urllib.request.install_opener(opener)
         urllib.request.urlretrieve(paper.pdf_url, destination)
+        print("Downloaded file to ", destination)
         return destination
 
     def _get_destination(self, pdf_url, title=None):
@@ -60,3 +64,9 @@ class PaperDownloader:
         path = self._get_destination(pdf_url, title=title)
         pdf.open_pdf(path)
         print(f"Opened file {path}")
+
+
+
+if __name__ == "__main__":
+    import fire
+    fire.Fire(PaperDownloader)
