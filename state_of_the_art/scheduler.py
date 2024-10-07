@@ -62,14 +62,11 @@ def run():
     schedule.every().day.at("23:00").do(mine_all_keywords)
 
     # send email
-    schedule.every().day.at("01:00").do(send_recommendations_job(15))
-    schedule.every().day.at("03:00").do(send_recommendations_job(30))
+    schedule.every().day.at("01:00").do(send_recommendations_job(30))
     schedule.every().day.at("06:00").do(send_recommendations_job(60))
     schedule.every().day.at("06:00").do(send_recommendations_job(90))
-    schedule.every().day.at("08:00").do(send_recommendations_job(1))
-    schedule.every().day.at("13:00").do(send_recommendations_job(2))
-    schedule.every().day.at("17:35").do(send_recommendations_job(3))
-    schedule.every().day.at("23:00").do(send_recommendations_job(7))
+    schedule.every().day.at("11:00").do(send_recommendations_job(1))
+    schedule.every().day.at("17:30").do(send_recommendations_job(7))
 
 
     print("Scheduler infinite loop started")
