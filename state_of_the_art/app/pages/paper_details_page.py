@@ -14,7 +14,7 @@ from state_of_the_art.app.utils.paper_details_utils import (
 from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.paper.papers_data_loader import PapersLoader
-from state_of_the_art.relevance_model.inference import Inference
+from state_of_the_art.relevance_model.inference import TextEvaluationInference
 from state_of_the_art.tables.tags_table import TagsTable
 from state_of_the_art.text_feedback.feedback_elements import render_feedback
 
@@ -154,7 +154,7 @@ with st.expander("Resources", expanded=True):
 st.markdown("### More insights by relevance")
 
 with st.spinner("Loading more insights..."):
-    inference = Inference()
+    inference = TextEvaluationInference()
     insights_list = insights.to_dict(orient="records")
     for insight in insights_list:
         insight["predicted_score"] = inference.predict(insight["tdw_uuid"])

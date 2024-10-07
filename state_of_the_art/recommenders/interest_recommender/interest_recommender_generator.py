@@ -6,6 +6,7 @@ from state_of_the_art.recommenders.interest_recommender.embeddings_similarity im
     EmbeddingsSimilarity,
 )
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
+from state_of_the_art.relevance_model.inference import TextEvaluationInference
 from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.interest_table import InterestTable
 from state_of_the_art.tables.recommendations_history_table import (
@@ -27,6 +28,7 @@ class InterestPaperRecommender:
         self.recommendations_runs_table = RecommendationsRunsTable(auth_filter=False)
         self.current_user_id = None
         self.current_user = None
+        self.text_evaluation_inference = TextEvaluationInference()
 
     def generate(
         self,
@@ -99,6 +101,14 @@ class InterestPaperRecommender:
                         result["interest_papers"][interest["name"]]["papers"][
                             paper.abstract_url
                         ] = {"semantic_score": semantic_score, "bm25_score": existing_bm25_score}
+
+                    # add text evaluation score
+                    #for paper in result["interest_papers"][interest["name"]]["papers"]:
+                    #    result["interest_papers"][interest["name"]]["papers"][
+                    #        paper.abstract_url
+
+                        
+                        
 
                 # sum scores in a final score
                 result = self.sum_scores(result)
@@ -182,12 +192,11 @@ class InterestPaperRecommender:
 
         content_str = f"""Hello, {self.current_user.get_name()},<br><br>
 
-Some details about the recommendations:<br>
+About these recommendations:<br>
 Papers from: {data['from_date']} To: {data['to_date']} ({days}) days<br>
 Generated at: {data['tdw_timestamp']} By user: {os.environ.get('USER', "None set")}<br>
 Papers analysed: {data['papers_analysed_total']}<br><br>
 
-Reommendations:<br><br>
 """
 
         print(content_str)

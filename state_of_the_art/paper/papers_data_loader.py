@@ -21,7 +21,7 @@ class PapersLoader:
         df = self.load_papers_df().sort_values(by="published", ascending=False)
         return self.to_papers(df)
 
-    def to_papers(self, df) -> Union[List[ArxivPaper], dict[str, ArxivPaper]]:
+    def to_papers(self, df) -> List[ArxivPaper]:
         papers = []
         for i in df.iterrows():
             try:

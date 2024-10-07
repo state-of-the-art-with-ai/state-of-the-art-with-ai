@@ -1,10 +1,7 @@
 from state_of_the_art.app.utils.render_papers import PapersRenderer
-from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import (
-    InterestPaperRecommender,
-)
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
-from state_of_the_art.relevance_model.inference import Inference
+from state_of_the_art.relevance_model.inference import TextEvaluationInference
 from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.mine_history import ArxivMiningHistory
 import streamlit as st
@@ -50,17 +47,18 @@ def filter(papers_df):
     if not search_query:
         papers_df = papers_df[papers_df["published"].dt.date == date_filter]
         filters["Date"] = date_filter.isoformat()
-    papers = PapersLoader().to_papers(papers_df)
+    paper_list = PapersLoader().to_papers(papers_df)
 
     if search_query:
-        papers = Bm25Search(papers).search_returning_papers(search_query)
-    papers = papers[:MAX_PAPERS_TO_RENDER]
+        paper_list = Bm25Search(paper_list).search_returning_papers(search_query)
+    paper_list = paper_list[:MAX_PAPERS_TO_RENDER]
     
-    inference = Inference()
+    inference = TextEvaluationInference()
+    papers_scored = inference.predict_batch([paper.title for paper in paper_list])
     # sort papers by inference score
-    papers = sorted(papers, key=lambda paper: inference.predict(paper.title), reverse=True)
+    paper_list = [paper for _, paper in sorted(zip(papers_scored, paper_list), key=lambda pair: pair[0], reverse=True)]
 
-    return papers
+    return paper_list
 
 if search_query:
     filters["Query"] = search_query

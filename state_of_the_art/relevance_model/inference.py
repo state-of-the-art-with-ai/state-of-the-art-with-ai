@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 from state_of_the_art.config import config
 
 
-class Inference:
+class TextEvaluationInference:
     def __init__(self) -> None:
         self.model = NeuralNetwork()
         self.model.load_state_dict(torch.load(config.TEXT_PREDICTOR_PATH_LOCALLY))
@@ -18,6 +18,11 @@ class Inference:
 
         index = torch.argmax(self.model(data)).item()
         return index
+
+    def predict_batch(self, texts: List[str]) -> List[int]:
+        data = torch.from_numpy(self.create_embeddings(texts))
+        indices = torch.argmax(self.model(data), dim=1).tolist()
+        return indices
 
     def create_embeddings(self, texts: List[str]):
         return self.sentence_transformer.encode(texts)
