@@ -182,6 +182,9 @@ class StructuredPaperInsights:
         print("Using model: ", used_model)
         print("Paper preview to summarize: ", paper_content[0:3000])
 
+        if len(paper_content) < 300:
+            raise Exception(f"Paper content too short to send to OpenAI content: {paper_content}")
+
         if len(paper_content) > 120000:
             paper_content = paper_content[0:120000]
 
