@@ -110,6 +110,16 @@ with st.expander("Abstract", expanded=not has_insights):
     render_feedback(paper.abstract, type='paper_insight', context={'paper_id': paper.abstract_url})
 
 
+def format_text(text) -> str:
+    ROW_SIZE = 120
+    # break text into 80 character lines
+    result = ""
+    for i in range(0, len(text), ROW_SIZE):
+        result += text[i : i + ROW_SIZE] + "\n"
+    return result
+
+
+
 with st.expander("Top insights", expanded=True):
     defintions = insights_table.get_all_answers("TopInsights", url)
     for definition in defintions:
@@ -120,13 +130,13 @@ with st.expander("Top insights", expanded=True):
 outcomes = insights_table.get_lastest_answer("Outcomes", url)
 if outcomes:
     st.markdown( f""" ##### Outcomes """)
-    st.text(outcomes)
+    st.text(format_text(outcomes))
     render_feedback(outcomes, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 structure = insights_table.get_lastest_answer("DeepSummaryOfStructure", url)
 if structure:
     st.markdown( f""" ##### Structure """)
-    st.text(structure)
+    st.text(format_text(structure))
     render_feedback(structure, type="paper_insight", context={'paper_id': paper.abstract_url})
 
 with st.expander("Definitions"):
