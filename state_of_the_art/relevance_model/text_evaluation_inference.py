@@ -3,12 +3,18 @@ import torch
 from typing import List
 from sentence_transformers import SentenceTransformer
 from state_of_the_art.config import config
+import os
 
 
 class TextEvaluationInference:
     def __init__(self) -> None:
         self.model = NeuralNetwork()
-        self.model.load_state_dict(torch.load(config.TEXT_PREDICTOR_PATH_LOCALLY))
+        try:
+            self.model.load_state_dict(torch.load(config.TEXT_PREDICTOR_PATH_LOCALLY))
+        except Exception as e:
+            print(f"Error loading the model for inference: {e}")
+            if not os.environ.get("SOTA_TEST"):
+                raise e
         self.model.eval()
 
         self.sentence_transformer = SentenceTransformer("all-mpnet-base-v2")
