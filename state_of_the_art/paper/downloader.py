@@ -2,8 +2,7 @@ from state_of_the_art.paper.arxiv_paper import ArxivPaper
 from state_of_the_art.paper.paper_entity import Paper
 import os
 from state_of_the_art.utils import pdf
-import urllib
-import urllib.request
+import requests
 
 
 class PaperDownloader:
@@ -39,13 +38,8 @@ class PaperDownloader:
 
         print(f"Downloading file {paper.pdf_url} to {destination}")
 
-        opener = urllib.request.build_opener()
-        opener.addheaders = [("User-agent", "Mozilla/5.0")]
-        # add timeout
-        opener.timeout = 15
+        self._download(pdf_url, destination)
 
-        urllib.request.install_opener(opener)
-        urllib.request.urlretrieve(paper.pdf_url, destination)
         print("Downloaded file to ", destination)
         return destination
 
@@ -64,6 +58,22 @@ class PaperDownloader:
         path = self._get_destination(pdf_url, title=title)
         pdf.open_pdf(path)
         print(f"Opened file {path}")
+
+    def _download(self, url, destination):
+        session = requests.Session()
+        session.headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
+        with session.get(url,stream=True, timeout=30) as r:
+            r.raise_for_status()
+            with open(destination, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192): 
+                    # If you have chunk encoded response uncomment if
+                    # and set chunk_size parameter to None.
+                    #if chunk: 
+                    f.write(chunk)
+        return destination
+        
+
+
 
 
 

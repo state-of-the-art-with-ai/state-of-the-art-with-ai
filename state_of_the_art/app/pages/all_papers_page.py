@@ -3,7 +3,6 @@ from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
 from state_of_the_art.relevance_model.text_evaluation_inference import TextEvaluationInference
 from state_of_the_art.search.bm25_search import Bm25Search
-from state_of_the_art.tables.mine_history import ArxivMiningHistory
 import streamlit as st
 
 generated_date = None

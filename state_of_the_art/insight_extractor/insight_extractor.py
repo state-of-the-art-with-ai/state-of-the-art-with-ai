@@ -39,7 +39,12 @@ class InsightExtractor:
         if open_existing and self._open_insight_summary_if_exists(url):
             return
 
-        article_content, title, document_pdf_location = get_content_from_url(url)
+        try:
+            article_content, title, document_pdf_location = get_content_from_url(url)
+        except Exception as e:
+            raise e
+            #raise Exception(f"Error while downloading paper: {e}")
+
         result, structured_result = StructuredPaperInsights(
             model_to_use=model_to_use
         ).get_result(article_content, question=question)

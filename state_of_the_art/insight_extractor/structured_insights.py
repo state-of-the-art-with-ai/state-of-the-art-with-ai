@@ -65,6 +65,13 @@ class StructuredPaperInsights:
 
         if len(paper_content) > 120000:
             paper_content = paper_content[0:120000]
+        
+        print("parameters to send to openai: ", parameters)
+
+        prompt = f"""This function returns expert science insights that ecompasses the knwoeldge of all world top scientists.
+It returns the most insightful and actionable information from the given paper content
+It optimized the answers for the following audience: {self.profile.get_preferences()[0:300]}"""
+        print("prompt: ", prompt)
 
         result = client.chat.completions.create(
             model=used_model,
@@ -72,11 +79,7 @@ class StructuredPaperInsights:
             functions=[
                 {
                     "name": "get_insights_from_paper",
-                    "description": f"""This function returns expert data science insights that ecompasses the knwoeldge of all world top scientists.
-It returns the most insightful and actionable information from the given paper content
-The written style is in richard feyman style of explanations
-It optimized the answers for the following audience: {self.profile.get_preferences()[0:300]}
-""",
+                    "description": prompt,
                     "parameters": {"type": "object", "properties": parameters},
                 }
             ],
