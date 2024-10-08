@@ -63,7 +63,7 @@ def run():
 
     # send email
     schedule.every().day.at("01:00").do(send_recommendations_job(30))
-    schedule.every().day.at("06:00").do(send_recommendations_job(60))
+    schedule.every().day.at("03:00").do(send_recommendations_job(60))
     schedule.every().day.at("06:00").do(send_recommendations_job(90))
     schedule.every().day.at("11:00").do(send_recommendations_job(1))
     schedule.every().day.at("17:30").do(send_recommendations_job(7))
