@@ -46,6 +46,11 @@ def admin_panel():
         if st.button("Mine new papers"):
             with st.spinner("Mining all keywords"):
                 ArxivMiner().mine_all_keywords()
+        
+        if st.button("Index and store documents"):
+            with st.spinner("Indexing documents"):
+                from state_of_the_art.search.bm25_search import PrecomputedSearch
+                PrecomputedSearch().index_and_store_documents()
 
         if st.button("Push data"):
             with st.spinner("Pushing data"):
@@ -57,6 +62,7 @@ def admin_panel():
             with st.spinner("Pushing data"):
                 for out in S3().pull_events_data():
                     st.write(out)
+            
 
     with tab3:
         st.link_button("Sentry", 'https://jean-machado.sentry.io/issues/?project=4508039830896640')

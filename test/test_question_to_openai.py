@@ -1,4 +1,4 @@
-from state_of_the_art.insight_extractor.insight_extractor import (
+from state_of_the_art.insight_extractor.structured_insights import (
     convert_questions_to_openai_call,
 )
 import pytest

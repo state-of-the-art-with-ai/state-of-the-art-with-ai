@@ -43,7 +43,7 @@ def push_data_to_s3():
 @capture_errors()
 def mine_all_keywords():
     ArxivMiner().mine_all_keywords()
-    PrecomputedSearch().pickle_all_documents()
+    PrecomputedSearch().index_and_store_documents()
 
 
 

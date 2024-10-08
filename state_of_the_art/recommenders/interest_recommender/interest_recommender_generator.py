@@ -7,7 +7,7 @@ from state_of_the_art.recommenders.interest_recommender.embeddings_similarity im
     EmbeddingsSimilarity,
 )
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
-from state_of_the_art.relevance_model.inference import TextEvaluationInference
+from state_of_the_art.relevance_model.text_evaluation_inference import TextEvaluationInference
 from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.interest_table import InterestTable
 from state_of_the_art.tables.recommendations_history_table import (

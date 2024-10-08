@@ -1,7 +1,7 @@
 from state_of_the_art.app.utils.render_papers import PapersRenderer
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
-from state_of_the_art.relevance_model.inference import TextEvaluationInference
+from state_of_the_art.relevance_model.text_evaluation_inference import TextEvaluationInference
 from state_of_the_art.search.bm25_search import Bm25Search
 from state_of_the_art.tables.mine_history import ArxivMiningHistory
 import streamlit as st
@@ -53,10 +53,11 @@ def filter(papers_df):
         paper_list = Bm25Search(paper_list).search_returning_papers(search_query)
     paper_list = paper_list[:MAX_PAPERS_TO_RENDER]
     
-    inference = TextEvaluationInference()
-    papers_scored = inference.predict_batch([paper.title for paper in paper_list])
-    # sort papers by inference score
-    paper_list = [paper for _, paper in sorted(zip(papers_scored, paper_list), key=lambda pair: pair[0], reverse=True)]
+    if paper_list:
+        inference = TextEvaluationInference()
+        papers_scored = inference.predict_batch([paper.title for paper in paper_list])
+        # sort papers by inference score
+        paper_list = [paper for _, paper in sorted(zip(papers_scored, paper_list), key=lambda pair: pair[0], reverse=True)]
 
     return paper_list
 

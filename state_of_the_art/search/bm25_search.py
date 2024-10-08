@@ -50,14 +50,16 @@ class Bm25Search:
         return lemmas
 
 class PrecomputedSearch:
-    def pickle_all_documents(self):
-        papers = self.setup_search_with_all_papers()
+    def index_and_store_documents(self):
+        bm25 = self.setup_search_with_all_papers()
         if not os.path.exists(config.PRECOMPUTED_FOLDER):
             os.makedirs(config.PRECOMPUTED_FOLDER)
 
         with open(config.PRECOMPUTED_SEARCH, "wb") as f:
-            pickle.dump(papers, f)
+            pickle.dump(bm25, f)
+
         print(f"Search pickled to {config.PRECOMPUTED_SEARCH} scuccessfully")
+
     def setup_search_with_all_papers(self):
         papers = PapersLoader().get_all_papers()
         return Bm25Search(papers)

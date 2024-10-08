@@ -1,3 +1,4 @@
+from state_of_the_art.insight_extractor.structured_insights import SupportedModels
 from state_of_the_art.paper.url_sanitizer import UrlSanitizer
 from streamlit_tags import st_tags
 from state_of_the_art.paper.arxiv_paper import ArxivPaper
@@ -7,7 +8,6 @@ from state_of_the_art.tables.tags_table import TagsTable
 import streamlit as st
 from state_of_the_art.insight_extractor.insight_extractor import (
     InsightExtractor,
-    SupportedModels,
 )
 from state_of_the_art.tables.questions_table import QuestionsTable
 

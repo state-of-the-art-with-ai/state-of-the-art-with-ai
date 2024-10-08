@@ -21,7 +21,7 @@ class ContainerStartup:
 
         self.pull_models()
 
-        PrecomputedSearch().pickle_all_documents()
+        PrecomputedSearch().index_and_store_documents()
 
     def download_ntlk(self):
         print("Downloading ntlk")

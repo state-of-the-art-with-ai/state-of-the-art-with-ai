@@ -1,9 +1,9 @@
 import os
 from unittest import mock
 
+from state_of_the_art.insight_extractor.structured_insights import StructuredPaperInsights
 from state_of_the_art.insight_extractor.insight_extractor import (
     InsightExtractor,
-    StructuredPaperInsights,
 )
 
 
