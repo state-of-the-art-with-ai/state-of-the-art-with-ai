@@ -5,6 +5,7 @@ from state_of_the_art.app.data import papers
 from state_of_the_art.app.utils.login_utils import LoggedInUser
 from state_of_the_art.app.utils.render_papers import PapersRenderer
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestPaperRecommender
+from state_of_the_art.tables.interest_table import InterestTable
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsRunsTable,
 )
@@ -24,6 +25,13 @@ def generate_new_recommendations(number_of_days_to_look_back):
     cmd = f"sota InterestsRecommender generate -n {number_of_days_to_look_back} -u {user_id} & "
     print(cmd)
     os.system(cmd)
+
+topics = InterestTable()
+topics_df = topics.read(recent_first=True)
+
+if len(topics_df) == 0:
+    st.error("You dont have any interests. Please define some interests to get recommendations")
+    st.stop()
 
 c1, c2 = st.columns([2, 1])
 with c1:

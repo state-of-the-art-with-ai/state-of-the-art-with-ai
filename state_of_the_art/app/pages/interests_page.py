@@ -26,8 +26,6 @@ c1, c2 = st.columns([2, 1])
 with c2:
     if len(topics_names) > 0:
         st.write(f"{len(topics_names)} Interests registered")
-    else:
-        st.write("Create a new interest to get started")
 
     for topic in topics_names:
         try:
@@ -69,7 +67,11 @@ with c1:
             st.rerun()
             st.success("Interest deleted successfully")
 
-    st.divider()
+
+    if not interest_name:
+        st.error("You need to create an interest to get started")
+        st.stop()
+
     st.write(f"Selected interest: {interest_name}")
     with st.spinner("Loading papers"):
         papers = load_bm25_papers().search_returning_papers(
