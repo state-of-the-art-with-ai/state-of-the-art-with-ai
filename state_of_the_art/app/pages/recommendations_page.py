@@ -79,13 +79,12 @@ with c1:
                     )
 
         recommendation_metadata = {
-            "Id": filtered_df["tdw_uuid"][0:8],
-            # first convert to date
             "Number of days": (datetime.datetime.fromisoformat(filtered_df["to_date"]) - datetime.datetime.fromisoformat(filtered_df["from_date"])).days,
             "Papers from": filtered_df["from_date"],
             "Papers to": filtered_df["to_date"],
             "Generation started": filtered_df["start_time"].split(".")[0],
-            "papers_analysed_total": filtered_df["papers_analysed_total"],
+            "Total papers analysed": filtered_df["papers_analysed_total"],
+            "Id": filtered_df["tdw_uuid"][0:8],
         }
 
         PapersRenderer().render_papers(

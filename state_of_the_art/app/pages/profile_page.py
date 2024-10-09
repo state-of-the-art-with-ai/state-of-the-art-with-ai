@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 
 from state_of_the_art.app.utils.login_utils import LoggedInUser
@@ -30,4 +31,5 @@ if st.button("Save Changes"):
 
     UserTable().update(by_key="tdw_uuid", by_value=user_data['tdw_uuid'], new_values=new_values)
     st.success("Changes saved successfully")
+    time.sleep(1)
     st.rerun()

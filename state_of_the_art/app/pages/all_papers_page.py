@@ -9,7 +9,7 @@ generated_date = None
 lookback_days = None
 topic_description = None
 
-st.title("All Papers")
+st.title("Latest Papers")
 MAX_PAPERS_TO_RENDER = 70
 
 
