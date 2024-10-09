@@ -110,9 +110,6 @@ with st.expander("Abstract", expanded=not has_insights):
     render_feedback(paper.abstract, type='paper_insight', context={'paper_id': paper.abstract_url})
 
 
-
-
-
 with st.expander("Top insights", expanded=True):
     defintions = insights_table.get_all_answers("TopInsights", url)
     for definition in defintions:

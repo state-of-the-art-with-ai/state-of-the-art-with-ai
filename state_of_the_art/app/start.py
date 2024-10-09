@@ -1,5 +1,6 @@
 import streamlit as st
 
+import subprocess
 from state_of_the_art.config import config
 title = 'State of the Art with AI' if config.is_production() else 'DEV State of the Art with AI'
 st.set_page_config(page_title=title, layout="wide", initial_sidebar_state='expanded', menu_items=None)
@@ -46,6 +47,15 @@ If you have any feedback, please let us know!
         "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform",
     )
         
+@st.cache_data
+def get_last_release_date():
+    p = subprocess.Popen(
+        "uptime", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+    )
+    out, error = p.communicate()
+    time_up = out.split(" up ")[1].split(",")[0]
+    return time_up
+
 
 with st.sidebar:
     username = LoggedInUser.get_instance().get_user_data().get("name", "")
@@ -64,5 +74,8 @@ with st.sidebar:
         "Give us Feedback",
         "https://docs.google.com/forms/d/e/1FAIpQLSffU-t3PBVLaqsW_5QF9JqnO8oFXGyHjLw0I6nfYvJ6QSztVA/viewform",
     )
+
+    # get uptime of system and display it in a nice format
+    st.info(f"Last release: {get_last_release_date()}")
 
 pg.run()

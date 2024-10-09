@@ -18,12 +18,6 @@ def admin_panel():
         out, error  = p.communicate()
         st.write(f"Memory: {out}, {error}")
 
-        p = subprocess.Popen(
-            "uptime", shell=True, text=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-        )
-        out, error = p.communicate()
-        time_up = out.split(" up ")[1].split(",")[0]
-        st.markdown("#### Uptime: " + time_up)
         minutes = PushHistory().minutes_since_last_push()
         hours = int(minutes / 60)
         remaining_minutes = round(minutes % 60)

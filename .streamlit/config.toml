@@ -4,3 +4,6 @@ suppressDeprecationWarnings = true
 [client]
 showErrorDetails = true
 disableWidgetStateDuplicationWarning = true
+
+[ui]
+hideTopBar = true
