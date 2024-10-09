@@ -19,7 +19,7 @@ def send_recommendations_job(number_of_days_to_look_back=1):
         print("Sending recommendations")
         print("Running recommender")
 
-        InterestPaperRecommender().generate(
+        InterestPaperRecommender(automated_run=True).generate(
             number_of_days_to_look_back=number_of_days_to_look_back,
         )
     return _send_recos
@@ -62,11 +62,10 @@ def run():
     schedule.every().day.at("23:00").do(mine_all_keywords)
 
     # send email
-    schedule.every().day.at("01:00").do(send_recommendations_job(30))
-    schedule.every().day.at("03:00").do(send_recommendations_job(60))
-    schedule.every().day.at("06:00").do(send_recommendations_job(90))
-    schedule.every().day.at("11:00").do(send_recommendations_job(1))
-    schedule.every().day.at("17:30").do(send_recommendations_job(7))
+    schedule.every().day.at("01:00").do(send_recommendations_job(1))
+    schedule.every().thursday.at("03:00").do(send_recommendations_job(7))
+    schedule.every().day.at("02:00").do(send_recommendations_job(30))
+    schedule.every().day.at("17:50").do(send_recommendations_job(1))
 
 
     print("Scheduler infinite loop started")

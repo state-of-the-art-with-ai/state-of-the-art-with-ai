@@ -14,7 +14,7 @@ from state_of_the_art.tables.recommendations_history_table import (
     RecommendationGenerationStatus,
     RecommendationsRunsTable,
 )
-from state_of_the_art.tables.user_table import UserTable
+from state_of_the_art.tables.user_table import UserEntity, UserTable
 from state_of_the_art.utils.mail import EmailService
 
 import scipy.stats as stats
@@ -23,7 +23,7 @@ from typing import Optional
 class InterestPaperRecommender:
     MAX_PAPERS_PER_TOPIC = 4
 
-    def __init__(self) -> None:
+    def __init__(self, automated_run: bool = False) -> None:
         self.embedding_similarity = EmbeddingsSimilarity()
         self.bm25_search = Bm25Search()
         self.execution_id = None
@@ -31,11 +31,13 @@ class InterestPaperRecommender:
         self.current_user_id = None
         self.current_user = None
         self.text_evaluation_inference = TextEvaluationInference()
+        self.automated_run = automated_run
+        print(f"Automated run status: {self.automated_run}")
 
     def generate(
         self,
         number_of_days_to_look_back=1,
-        user_id: Optional[str] = None
+        user_id_given: Optional[str] = None
     ):
         """
         Generate a new set of recommendations based on the interests and the number of days to look back
@@ -53,9 +55,11 @@ class InterestPaperRecommender:
         ).date()
 
         users_df = UserTable().read()
-        if user_id:
-            print(f"Filtering for user id: {user_id}")
-            users_df = users_df[users_df["tdw_uuid"] == user_id]
+        if user_id_given:
+            print(f"Filtering for user id: {user_id_given}")
+            users_df = users_df[users_df["tdw_uuid"] == user_id_given]
+            self.current_user_id = user_id_given
+            self.record_user_execution()
 
         print(f"Total users found {len(users_df.index)} ")
         self.setup_papers()
@@ -63,8 +67,19 @@ class InterestPaperRecommender:
         for user_dict in users_df.to_dict(orient="records"):
             self.current_user_id = user_dict["tdw_uuid"]
             print("Current user id: ", self.current_user_id)
-            self.current_user = UserTable().find_user_by_uuid(self.current_user_id)
+            self.current_user: UserEntity = UserTable().find_user_by_uuid(self.current_user_id)
             print(f'User details: {self.current_user.name} {self.current_user.email}')
+
+            if self.automated_run and number_of_days_to_look_back == 1 and not self.current_user.has_daily_email_enabled():
+                print(f"User {self.current_user.email} has daily email disabled, skipping")
+                continue
+            if self.automated_run and number_of_days_to_look_back == 7 and not self.current_user.has_weekly_email_enabled():
+                print(f"User {self.current_user.email} has weekly email disabled, skipping")
+                continue
+            if self.automated_run and number_of_days_to_look_back == 30 and not self.current_user.has_monthly_email_enabled():
+                print(f"User {self.current_user.email} has monthly email disabled, skipping")
+                continue
+
             interests_df = InterestTable(auth_callable=lambda: self.current_user_id).read()
             print(f"Found {len(interests_df.index)} interests")
             if len(interests_df.index) == 0:
@@ -72,7 +87,8 @@ class InterestPaperRecommender:
                 continue
             try: 
                 print("Recording execution ...")
-                self.record_user_execution()
+                if not user_id_given:
+                    self.record_user_execution()
 
                 result = {}
                 result["interest_papers"] = {}
@@ -177,6 +193,7 @@ class InterestPaperRecommender:
 
 
     def record_user_execution(self):
+        print("Recording user execution")
         self.execution_id = self.recommendations_runs_table.add(
             from_date=self.date_from.isoformat(),
             to_date=self.date_to.isoformat(),

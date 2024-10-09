@@ -1,6 +1,8 @@
 import datetime
 import os
+import time
 from state_of_the_art.app.data import papers
+from state_of_the_art.app.utils.login_utils import LoggedInUser
 from state_of_the_art.app.utils.render_papers import PapersRenderer
 from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestPaperRecommender
 from state_of_the_art.tables.recommendations_history_table import (
@@ -18,7 +20,8 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 PAPER_PER_TOPIC_TO_RENDER = 3
 
 def generate_new_recommendations(number_of_days_to_look_back):
-    cmd = f"sota InterestsRecommender generate -n {number_of_days_to_look_back} & "
+    user_id = LoggedInUser().get_uuid()
+    cmd = f"sota InterestsRecommender generate -n {number_of_days_to_look_back} -u {user_id} & "
     print(cmd)
     os.system(cmd)
 
@@ -26,21 +29,25 @@ c1, c2 = st.columns([2, 1])
 with c1:
 
     ca, cb, cc = st.columns([1, 1, 1])
+    time_to_sleep = 5
     with ca:
         if st.button("Generate 1 day recommendations"):
             generate_new_recommendations(1)
             st.success("Recommendations generation started ")
+            time.sleep(time_to_sleep)
             st.rerun()
 
     with cb:
         if st.button("Generate 7 day recommendations"):
             generate_new_recommendations(7)
             st.success("Recommendations generation started ")
+            time.sleep(time_to_sleep)
             st.rerun()
     with cc:
         if st.button("Generate 30 day recommendations"):
             generate_new_recommendations(30)
             st.success("Recommendations generation started ")
+            time.sleep(time_to_sleep)
             st.rerun()
 
     with st.spinner("Loading latest recommendations ..."):
@@ -73,6 +80,8 @@ with c1:
 
         recommendation_metadata = {
             "Id": filtered_df["tdw_uuid"][0:8],
+            # first convert to date
+            "Number of days": (datetime.datetime.fromisoformat(filtered_df["to_date"]) - datetime.datetime.fromisoformat(filtered_df["from_date"])).days,
             "Papers from": filtered_df["from_date"],
             "Papers to": filtered_df["to_date"],
             "Generation started": filtered_df["start_time"].split(".")[0],
@@ -113,6 +122,6 @@ with c2:
             else:
                 raise ValueError(f"Unknown status: {run['status']}")
         with c2:
-            st.link_button("View", "/papers_recommended_page?run_id=" + run["tdw_uuid"])
+            st.link_button("View", "/recommendations_page?run_id=" + run["tdw_uuid"])
 
         

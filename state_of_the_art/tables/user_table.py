@@ -65,6 +65,11 @@ class UserEntity:
         self.email = data["email"]
         self.name = data.get("name")
         self.tdw_uuid = data["tdw_uuid"]
+        self.prompt = data.get("prompt")
+        self.is_admin = data.get("is_admin", False)
+        self.daily_email_enabled = data.get("daily_email_enabled", True)
+        self.weekly_email_enabled = data.get("weekly_email_enabled", True)
+        self.monthly_email_enabled = data.get("monthly_email_enabled", True)
     
     def get_name(self):
         return self.name
@@ -74,4 +79,19 @@ class UserEntity:
     
     def get_uuid(self):
         return self.tdw_uuid
+    
+    def get_prompt(self):
+        return self.prompt
+    
+    def get_is_admin(self):
+        return self.is_admin
+    
+    def has_daily_email_enabled(self):
+        return self.daily_email_enabled
+    
+    def has_weekly_email_enabled(self):
+        return self.weekly_email_enabled
+    
+    def has_monthly_email_enabled(self):
+        return self.monthly_email_enabled
     
