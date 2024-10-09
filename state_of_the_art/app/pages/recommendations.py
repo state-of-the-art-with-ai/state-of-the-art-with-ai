@@ -60,6 +60,7 @@ with c1:
             papers_metadata=papers_metadata,
             generated_date=generated_date,
             metadata=recommendation_metadata,
+            collapse_metadata=True,
         )
 
 with c2:

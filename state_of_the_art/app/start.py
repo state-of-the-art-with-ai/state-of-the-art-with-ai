@@ -12,7 +12,7 @@ pages = {
     "": [
         st.Page("pages/all_papers_page.py", title="All Papers"),
         st.Page("pages/interests_page.py", title="Your Interests"),
-        st.Page("pages/papers_recommended_page.py", title="Recommendations For You"),
+        st.Page("pages/recommendations.py", title="Recommendations For You"),
         st.Page("pages/your_papers_page.py", title="Your Papers"),
         st.Page("pages/paper_details_page.py", title="Load a paper"),
         st.Page("pages/profile_page.py", title="Your Profile"),

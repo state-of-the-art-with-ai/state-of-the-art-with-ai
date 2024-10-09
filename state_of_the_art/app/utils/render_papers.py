@@ -32,50 +32,53 @@ class PapersRenderer:
         generated_date=None,
         metadata: Optional[dict[str, str]] = None,
         max_num_of_renderable_results=None,
+        collapse_metadata=False,
     ):
         """
         metadata is a dictionary with the metadata to be displayed as titles
         """
-        if generated_date:
-            st.markdown(f"###### Generated at {str(generated_date).split('.')[0]}")
-        if metadata:
-            for k, v in metadata.items():
-                st.markdown(f"###### {k}: {v}")
-        with st.container():
-            if not papers:
-                st.markdown("No papers found")
-                return
-            else:
-                st.markdown(f"#### {len(papers)} papers found")
 
-            for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
-                c1, c2= st.columns([7, 3])
-                with c1:
-                    st.markdown(
-                        f"""##### {k+1}. [{paper.title}](./paper_details_page?paper_url={paper.abstract_url})"""
-                    )
-                    render_feedback(paper.title, type='paper_title')
-                    st.write(f"({paper.published_date_str()})")
-                    if (
-                        papers_metadata
-                        and paper.abstract_url in papers_metadata
-                        and "labels" in papers_metadata[paper.abstract_url]
-                    ):
-                        for label in papers_metadata[paper.abstract_url]["labels"]:
-                            st.markdown(f"###### {label}")
-                    
+        with st.expander("Details", expanded=not collapse_metadata):
+            if generated_date:
+                st.markdown(f"###### Generated at {str(generated_date).split('.')[0]}")
+            if metadata:
+                for k, v in metadata.items():
+                    st.markdown(f"###### {k}: {v}")
 
-                with c2:
-                    if st.button("More", key=f"feedback{k}"):
-                        preview(paper)
-                    if not self.disable_save_button:
-                        if st.button("Save", key=f"save{k}"):
-                            tags_table.add_tag_to_paper(paper.abstract_url, "save for later")
-                            st.success("Saved")
-                    if self.enable_tags:
-                        if st.button("Edit Tags", key=f"etags{k}") or ('tags_table' in st.session_state and paper.abstract_url in st.session_state.tags_table):
-                            render_tags_for_paper(paper)
-                            if not 'tags_table' in st.session_state:
-                                st.session_state.tags_table = [paper.abstract_url]
-                            else:
-                                st.session_state.tags_table.append(paper.abstract_url)
+        if not papers:
+            st.markdown("No papers found")
+            return
+        else:
+            st.markdown(f"#### {len(papers)} papers found")
+
+        for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
+            c1, c2= st.columns([7, 3])
+            with c1:
+                st.markdown(
+                    f"""##### {k+1}. [{paper.title}](./paper_details_page?paper_url={paper.abstract_url})"""
+                )
+                render_feedback(paper.title, type='paper_title')
+                st.write(f"({paper.published_date_str()})")
+                if (
+                    papers_metadata
+                    and paper.abstract_url in papers_metadata
+                    and "labels" in papers_metadata[paper.abstract_url]
+                ):
+                    for label in papers_metadata[paper.abstract_url]["labels"]:
+                        st.markdown(f"###### {label}")
+                
+
+            with c2:
+                if st.button("More", key=f"feedback{k}"):
+                    preview(paper)
+                if not self.disable_save_button:
+                    if st.button("Save", key=f"save{k}"):
+                        tags_table.add_tag_to_paper(paper.abstract_url, "save for later")
+                        st.success("Saved")
+                if self.enable_tags:
+                    if st.button("Edit Tags", key=f"etags{k}") or ('tags_table' in st.session_state and paper.abstract_url in st.session_state.tags_table):
+                        render_tags_for_paper(paper)
+                        if not 'tags_table' in st.session_state:
+                            st.session_state.tags_table = [paper.abstract_url]
+                        else:
+                            st.session_state.tags_table.append(paper.abstract_url)
