@@ -151,17 +151,6 @@ with st.expander("Resources", expanded=True):
         st.markdown(" - " + definition)
         render_feedback(definition, type="paper_insight", context={'paper_id': paper.abstract_url})
 
-st.markdown("### More insights by relevance")
-
-with st.spinner("Loading more insights..."):
-    inference = TextEvaluationInference()
-    insights_list = insights.to_dict(orient="records")
-    for insight in insights_list:
-        insight["predicted_score"] = inference.predict(insight["tdw_uuid"])
-
-insights_list = sorted(
-    insights_list, key=lambda el: el["predicted_score"], reverse=True
-)
 IGNORED_INSIGHTS = [
     "DeepSummaryOfStructure",
     "Institution",
@@ -171,24 +160,37 @@ IGNORED_INSIGHTS = [
     "Outcomes",
 ]
 
-insights_list = filter(lambda x: x["question"] not in IGNORED_INSIGHTS, insights_list)
+def get_more_insights():
+    inference = TextEvaluationInference()
+    insights_list = insights.to_dict(orient="records")
+    for insight in insights_list:
+        insight["predicted_score"] = inference.predict(insight["tdw_uuid"])
 
-
-for insight in insights_list:
-    c1, c2 = st.columns([3, 1])
-    insight_len = len(insight["insight"])
-    appendix = ""
-    if insight_len > 200:
-        appendix = "..."
-
-    st.markdown(
-        f"**{insight["question"]}**: {insight["insight"][0:200]} {appendix}"
+    insights_list = sorted(
+        insights_list, key=lambda el: el["predicted_score"], reverse=True
     )
-    if len(insight["insight"]) > 200:
-        st.expander("Read more").markdown(insight["insight"])
-    render_feedback(insight['insight'], type="paper_insight", context={'paper_id': paper.abstract_url})
 
-    
+    insights_list = list(filter(lambda x: x["question"] not in IGNORED_INSIGHTS, insights_list))
+    return insights_list
 
 
-already_rendered = True
+
+more_insights_list = get_more_insights()
+if len(more_insights_list) > 0:
+    st.markdown("### More insights by relevance")
+    with st.spinner("Loading more insights..."):
+        for insight in more_insights_list:
+            c1, c2 = st.columns([3, 1])
+            insight_len = len(insight["insight"])
+            appendix = ""
+            if insight_len > 200:
+                appendix = "..."
+
+            st.markdown(
+                f"**{insight["question"]}**: {insight["insight"][0:200]} {appendix}"
+            )
+            if len(insight["insight"]) > 200:
+                st.expander("Read more").markdown(insight["insight"])
+            render_feedback(insight['insight'], type="paper_insight", context={'paper_id': paper.abstract_url})
+
+            

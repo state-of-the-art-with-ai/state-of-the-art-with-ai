@@ -1,9 +1,11 @@
 
+import uuid
 import streamlit as st
 from state_of_the_art.tables.text_feedback_table import TextFeedbackTable
 
 def render_feedback(text: str, type='paper_title', context=None):
     id = "".join([i for i in text if i.isalnum()])
+    id = id + str(uuid.uuid4())
 
     try:
         feedback_score = st.feedback(options="faces", key=f"feedback{id}")

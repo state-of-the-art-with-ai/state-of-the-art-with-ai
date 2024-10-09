@@ -72,7 +72,7 @@ class PapersRenderer:
                 if st.button("More", key=f"feedback{k}"):
                     preview(paper)
                 if not self.disable_save_button:
-                    if st.button("Save", key=f"save{k}"):
+                    if st.button("Save into Your Papers", key=f"save{k}"):
                         tags_table.add_tag_to_paper(paper.abstract_url, "save for later")
                         st.success("Saved")
                 if self.enable_tags:
