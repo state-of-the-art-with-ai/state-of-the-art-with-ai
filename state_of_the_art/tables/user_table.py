@@ -11,6 +11,9 @@ class UserTable(BaseTable):
         "password_hash": {"type": str},
         "prompt": {"type": str},
         "is_admin": {"type": bool},
+        "daily_email_enabled": {"type": bool},
+        "weekly_email_enabled": {"type": bool},
+        "monthly_email_enabled": {"type": bool},
     }
 
     def add_user(self, email: str, password: str, name: str) -> str:

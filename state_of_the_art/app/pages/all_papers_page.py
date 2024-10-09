@@ -12,6 +12,7 @@ topic_description = None
 st.title("All Papers")
 MAX_PAPERS_TO_RENDER = 70
 
+
 papers_df = None
 filters = {}
 
