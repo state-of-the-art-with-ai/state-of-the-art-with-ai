@@ -11,7 +11,7 @@ from state_of_the_art.app.utils.paper_details_utils import (
     render_reading_progress,
     render_tags_for_paper,
 )
-from state_of_the_art.insight_extractor.insight_extractor import InsightExtractor
+from state_of_the_art.insight_extractor.insight_extractor import AIInsightsExtractor
 from state_of_the_art.tables.insights_table import InsightsTable
 from state_of_the_art.paper.papers_data_loader import PapersLoader
 from state_of_the_art.relevance_model.text_evaluation_inference import TextEvaluationInference
@@ -66,7 +66,7 @@ with c1:
     extract_insights = st.button("Generate AI Insights")
     edit_questions = st.button("Edit questions")
 with c2:
-    if st.button("Save For Later", key=f"save_for_later"):
+    if st.button("Save in Your Papers", key=f"save_for_later"):
         TagsTable().add_tag_to_paper(paper.abstract_url, "save for later")
         st.success("Saved")
         st.rerun()
@@ -81,7 +81,7 @@ if edit_questions:
 
 if extract_insights:
     with st.spinner("Extracting insights..."):
-        InsightExtractor().extract_insights_from_paper_url(
+        AIInsightsExtractor().extract_insights_from_paper_url(
             url, email_skip=True, disable_pdf_open=True
         )
     st.rerun()

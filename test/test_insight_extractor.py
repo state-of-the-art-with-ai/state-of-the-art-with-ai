@@ -3,7 +3,7 @@ from unittest import mock
 
 from state_of_the_art.insight_extractor.structured_insights import StructuredPaperInsights
 from state_of_the_art.insight_extractor.insight_extractor import (
-    InsightExtractor,
+    AIInsightsExtractor,
 )
 
 
@@ -49,13 +49,13 @@ from unittest import mock
 
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_post_extraction():
-    InsightExtractor().post_extraction(
+    AIInsightsExtractor().post_extraction(
         "foo", EXAMPLE_LLM_OUTPUT, "a path", "http://asdfasdd", "a title"
     )
 
 
 def test_insigts_structure():
-    result = InsightExtractor()._convert_sturctured_output_to_insights(
+    result = AIInsightsExtractor()._convert_sturctured_output_to_insights(
         EXAMPLE_LLM_OUTPUT, "https://arxiv.org/abs/2202.02484v1"
     )
     print(result)
@@ -74,6 +74,6 @@ def test_structured_output():
 
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_extract():
-    InsightExtractor().extract_insights_from_paper_url(
-        "https://arxiv.org/abs/2202.02484v1", open_existing=False
+    AIInsightsExtractor().extract_insights_from_paper_url(
+        "https://arxiv.org/abs/2202.02484v1"
     )

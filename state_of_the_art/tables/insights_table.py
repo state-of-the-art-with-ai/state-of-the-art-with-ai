@@ -18,6 +18,9 @@ class InsightsTable:
 
     TABLE_NAME = "sota_paper_insights_new"
 
+    def __init__(self):
+        self._cached_df = None
+
     def read(self) -> pd.DataFrame:
         return config.get_datawarehouse().event(self.TABLE_NAME)
 
@@ -59,6 +62,16 @@ class InsightsTable:
             return ""
 
         return result["insight"].iloc[0]
+    
+
+    def get_all_answers_cached(self, question: str, paper) -> List[str]:
+        if self._cached_df is None:
+            self._cached_df = self.read().sort_values(by="tdw_timestamp", ascending=False)
+
+        return self._cached_df[(self._cached_df["question"] == question) & (self._cached_df["paper_id"] == paper)][
+            "insight"
+        ].to_list()
+
 
     def get_all_answers(self, question: str, paper) -> List[str]:
         df = self.read().sort_values(by="tdw_timestamp", ascending=False)

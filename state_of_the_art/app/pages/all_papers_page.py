@@ -1,3 +1,4 @@
+from state_of_the_art.app.utils.cached_data import load_all_papers_df
 from state_of_the_art.app.utils.render_papers import PapersRenderer
 from state_of_the_art.register_papers.arxiv_miner import ArxivMiner
 import datetime
@@ -10,7 +11,7 @@ lookback_days = None
 topic_description = None
 
 st.title("Latest Papers")
-MAX_PAPERS_TO_RENDER = 70
+MAX_PAPERS_TO_RENDER = 50
 
 
 papers_df = None
@@ -36,21 +37,11 @@ with st.spinner("Fetching metadata about papers..."):
     date_filter = st.date_input("Filter By Day", value=default_date_filter)
     st.query_params["date"] = date_filter
 
-    search_query = st.text_input("Enter your Search Query", value="")
 
-@st.cache_data
-def load_papers():
-    return PapersLoader().load_papers_df()
-
-
-def filter(papers_df):
-    if not search_query:
-        papers_df = papers_df[papers_df["published"].dt.date == date_filter]
-        filters["Date"] = date_filter.isoformat()
+def fetch_and_filter():
+    papers_df = load_all_papers_df()
+    papers_df = papers_df[papers_df["published"].dt.date == date_filter]
     paper_list = PapersLoader().to_papers(papers_df)
-
-    if search_query:
-        paper_list = Bm25Search(paper_list).search_returning_papers(search_query)
     paper_list = paper_list[:MAX_PAPERS_TO_RENDER]
     
     if paper_list:
@@ -61,11 +52,5 @@ def filter(papers_df):
 
     return paper_list
 
-if search_query:
-    filters["Query"] = search_query
-    filters["Total Papers"] = len(papers_df.index)
-
 with st.spinner("Rendering papers..."):
-    papers_df = load_papers()
-    papers = filter(papers_df)
-    PapersRenderer().render_papers(papers, metadata=filters, generated_date=generated_date)
+    PapersRenderer().render_papers(fetch_and_filter(), metadata=filters, generated_date=generated_date)

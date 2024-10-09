@@ -7,7 +7,7 @@ from state_of_the_art.tables.paper_metadata_from_user_table import PaperMetadata
 from state_of_the_art.tables.tags_table import TagsTable
 import streamlit as st
 from state_of_the_art.insight_extractor.insight_extractor import (
-    InsightExtractor,
+    AIInsightsExtractor,
 )
 from state_of_the_art.tables.questions_table import QuestionsTable
 
@@ -35,7 +35,7 @@ def questions(paper_url):
     )
     extract_insights = st.button("Generate Insights", key="generate_insights_dialog")
     if extract_insights:
-        InsightExtractor().extract_insights_from_paper_url(
+        AIInsightsExtractor().extract_insights_from_paper_url(
             paper_url,
             email_skip=True,
             disable_pdf_open=True,

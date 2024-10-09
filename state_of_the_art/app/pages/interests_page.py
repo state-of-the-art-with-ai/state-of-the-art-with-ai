@@ -24,15 +24,16 @@ topics_names = topics_df["name"].tolist()
 
 c1, c2 = st.columns([2, 1])
 with c2:
-    if len(topics_names) > 0:
-        st.write(f"{len(topics_names)} Interests registered")
+    with st.expander("Interests", expanded=True):
+        if len(topics_names) > 0:
+            st.write(f"{len(topics_names)} Interests registered")
 
-    for topic in topics_names:
-        try:
-            if st.button(topic, key=f"t{topic}"):
-                st.query_params["interest"] = topic
-        except:
-            pass
+        for topic in topics_names:
+            try:
+                if st.button(topic, key=f"t{topic}"):
+                    st.query_params["interest"] = topic
+            except:
+                pass
 with c1:
     if "interest" in st.query_params:
         selected_interest = st.query_params["interest"]
@@ -73,10 +74,10 @@ with c1:
         st.stop()
 
     st.write(f"Selected interest: {interest_name}")
-    with st.spinner("Loading papers"):
-        papers = load_bm25_papers().search_returning_papers(
-            interest_name + " " + topic_description
-        )
+st.divider()
+papers = load_bm25_papers().search_returning_papers(
+    interest_name + " " + topic_description
+)
 
-        # render all papeers
-        PapersRenderer().render_papers(papers, generated_date=generated_date)
+# render all papeers
+PapersRenderer().render_papers(papers, generated_date=generated_date)

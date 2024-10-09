@@ -15,8 +15,11 @@ send_by_email = False
 
 st.title("Your papers")
 
+def load_tags_df():
+    return TagsTable().read()
+
 with st.spinner("Loading page"):
-    all_tags_df = TagsTable().read()
+    all_tags_df = load_tags_df()
     all_tags = all_tags_df["tags"].to_list()
     all_tags = [tags.split(",") for tags in all_tags]
 

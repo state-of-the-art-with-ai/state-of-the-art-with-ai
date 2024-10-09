@@ -8,7 +8,7 @@ from state_of_the_art.utils import pdf
 from state_of_the_art.insight_extractor.content_extractor import get_content_from_url
 
 
-class InsightExtractor:
+class AIInsightsExtractor:
     """
     Looks into a single paper and extracts insights
     """
@@ -24,9 +24,6 @@ class InsightExtractor:
     def extract_insights_from_paper_url(
         self,
         url: str,
-        open_existing: bool = False,
-        email_skip: bool = False,
-        disable_pdf_open=False,
         question=None,
         model_to_use=SupportedModels.gpt_4o.value,
     ):
@@ -36,8 +33,6 @@ class InsightExtractor:
 
         url = self._clean_url(url)
 
-        if open_existing and self._open_insight_summary_if_exists(url):
-            return
 
         try:
             article_content, title, document_pdf_location = get_content_from_url(url)
@@ -59,8 +54,6 @@ Abstract: {url}
             document_pdf_location,
             url,
             title,
-            email_skip,
-            disable_pdf_open,
         )
 
     def post_extraction(
@@ -70,8 +63,6 @@ Abstract: {url}
         document_pdf_location: str,
         url,
         title,
-        email_skip=False,
-        disable_pdf_open=False,
     ):
         if os.environ.get("SOTA_TEST"):
             return
@@ -89,10 +80,8 @@ Abstract: {url}
         self._write_insights_into_table(insights, url)
 
         paper_path = self._create_pdf(
-            title, result, document_pdf_location, disable_pdf_open=disable_pdf_open
+            title, result, document_pdf_location
         )
-        if not email_skip:
-            EmailService().send("", f"Insights from {title}", paper_path)
 
     def _convert_sturctured_output_to_insights(self, structured_result, url):
         result = []
@@ -118,7 +107,7 @@ Abstract: {url}
         for question, insight in insights:
             insights_table.add_insight(insight, question, url, None)
 
-    def _create_pdf(self, title, result, document_pdf_location, disable_pdf_open=False):
+    def _create_pdf(self, title, result, document_pdf_location):
         pdf.create_pdf(
             data=result, output_path="/tmp/current_paper.pdf", disable_open=True
         )
@@ -127,7 +116,7 @@ Abstract: {url}
         pdf.merge_pdfs(
             paper_path,
             ["/tmp/current_paper.pdf", document_pdf_location],
-            disable_open=disable_pdf_open,
+            disable_open=True,
         )
         return paper_path
 
