@@ -11,8 +11,6 @@ lookback_days = None
 topic_description = None
 
 st.title("Latest Papers")
-MAX_PAPERS_TO_RENDER = 50
-
 
 papers_df = None
 filters = {}
@@ -27,22 +25,52 @@ def fetch_latest_date_with_papers():
 
 with st.spinner("Fetching metadata about papers..."):
     latest_date_with_papers = fetch_latest_date_with_papers()
-    if "date" in st.query_params:
-        default_date_filter = st.query_params["date"]
-        default_date_filter = datetime.datetime.strptime(
-            default_date_filter, "%Y-%m-%d"
-        ).date()
-    else:
-        default_date_filter = latest_date_with_papers
-    date_filter = st.date_input("Filter By Day", value=default_date_filter)
-    st.query_params["date"] = date_filter
+
+if "date" in st.query_params:
+    default_date_filter = st.query_params["date"]
+    default_date_filter = datetime.datetime.strptime(
+        default_date_filter, "%Y-%m-%d"
+    ).date()
+else:
+    default_date_filter = latest_date_with_papers
+
+date_filter = st.date_input("Filter By Day", value=default_date_filter)
+
+current_page = int(st.query_params.get('page', 1))
+
+c1, c2, c3 = st.columns([1,1, 3])
+
+with c1:
+    if st.button("Load next page"):
+        current_page += 1
+        st.query_params['page'] = current_page
+with c2:
+    if current_page > 1:
+        if st.button("Previous page"):
+            current_page -= 1
+            st.query_params['page'] = current_page
+
+with c3:
+    if current_page > 1:
+        if st.button("First page"):
+            st.query_params["page"] = 1
+            current_page = 1
 
 
+PAGE_SIZE = 50
+FROM_INDEX = (current_page - 1) * PAGE_SIZE
+TO_INDEX = FROM_INDEX + PAGE_SIZE
+st.query_params["date"] = date_filter
+
+
+metadata = {}
+metadata["Page"] = current_page
 def fetch_and_filter():
     papers_df = load_all_papers_df()
     papers_df = papers_df[papers_df["published"].dt.date == date_filter]
+    metadata["Papers found for date"] = len(papers_df.index)
     paper_list = PapersLoader().to_papers(papers_df)
-    paper_list = paper_list[:MAX_PAPERS_TO_RENDER]
+    paper_list = paper_list[FROM_INDEX:TO_INDEX]
     
     if paper_list:
         inference = TextEvaluationInference()
@@ -53,4 +81,4 @@ def fetch_and_filter():
     return paper_list
 
 with st.spinner("Rendering papers..."):
-    PapersRenderer().render_papers(fetch_and_filter(), metadata=filters, generated_date=generated_date)
+    PapersRenderer().render_papers(fetch_and_filter(), metadata=metadata, generated_date=generated_date)
