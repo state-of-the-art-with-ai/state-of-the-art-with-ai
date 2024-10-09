@@ -38,7 +38,7 @@ class PapersRenderer:
         metadata is a dictionary with the metadata to be displayed as titles
         """
 
-        with st.expander("Details", expanded=not collapse_metadata):
+        with st.expander("Result Details", expanded=not collapse_metadata):
             if generated_date:
                 st.markdown(f"###### Generated at {str(generated_date).split('.')[0]}")
             if metadata:

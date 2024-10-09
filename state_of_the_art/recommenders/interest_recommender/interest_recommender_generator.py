@@ -16,8 +16,9 @@ from state_of_the_art.tables.recommendations_history_table import (
 )
 from state_of_the_art.tables.user_table import UserTable
 from state_of_the_art.utils.mail import EmailService
-import scipy.stats as stats
 
+import scipy.stats as stats
+from typing import Optional
 
 class InterestPaperRecommender:
     MAX_PAPERS_PER_TOPIC = 4
@@ -34,8 +35,7 @@ class InterestPaperRecommender:
     def generate(
         self,
         number_of_days_to_look_back=1,
-        skip_register_new_papers=False,
-        for_user=None
+        user_id: Optional[str] = None
     ):
         """
         Generate a new set of recommendations based on the interests and the number of days to look back
@@ -52,15 +52,19 @@ class InterestPaperRecommender:
             - datetime.timedelta(days=number_of_days_to_look_back)
         ).date()
 
-        self.setup_papers()
         users_df = UserTable().read()
+        if user_id:
+            print(f"Filtering for user id: {user_id}")
+            users_df = users_df[users_df["tdw_uuid"] == user_id]
+
         print(f"Total users found {len(users_df.index)} ")
+        self.setup_papers()
 
         for user_dict in users_df.to_dict(orient="records"):
             self.current_user_id = user_dict["tdw_uuid"]
             print("Current user id: ", self.current_user_id)
             self.current_user = UserTable().find_user_by_uuid(self.current_user_id)
-            print('Starting recommendations for user:', self.current_user.name)
+            print(f'User details: {self.current_user.name} {self.current_user.email}')
             interests_df = InterestTable(auth_callable=lambda: self.current_user_id).read()
             print(f"Found {len(interests_df.index)} interests")
             if len(interests_df.index) == 0:
@@ -68,8 +72,7 @@ class InterestPaperRecommender:
                 continue
             try: 
                 print("Recording execution ...")
-                self.record_execution_start()
-                # get all interests
+                self.record_user_execution()
 
                 result = {}
                 result["interest_papers"] = {}
@@ -128,8 +131,6 @@ class InterestPaperRecommender:
                         'recommended_papers':json.dumps(result),
                         'papers_analysed_total': len(self.papers_analysed),
                         'status': RecommendationGenerationStatus.SUCCESS,
-                        'from_date': self.date_from.isoformat(),
-                        'to_date': self.date_to.isoformat(),
                         'end_time': datetime.datetime.now().isoformat(),
                     }
                 )
@@ -175,10 +176,10 @@ class InterestPaperRecommender:
         )
 
 
-    def record_execution_start(self):
+    def record_user_execution(self):
         self.execution_id = self.recommendations_runs_table.add(
-            from_date=None,
-            to_date=None,
+            from_date=self.date_from.isoformat(),
+            to_date=self.date_to.isoformat(),
             recommended_papers=None,
             start_time=datetime.datetime.now().isoformat(),
             end_time=None,

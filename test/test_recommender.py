@@ -17,7 +17,7 @@ from unittest import mock
 @mock.patch.dict(os.environ, {"SOTA_TEST": "1"})
 def test_recommender_end2end():
     recommender = InterestPaperRecommender()
-    recommender.generate(skip_register_new_papers=True)
+    recommender.generate()
 
 @pytest.mark.skipif(True, reason="failing in the ci")
 def test_single_interest_relevance():

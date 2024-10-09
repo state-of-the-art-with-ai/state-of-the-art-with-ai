@@ -1,7 +1,8 @@
 import datetime
-import subprocess
+import os
 from state_of_the_art.app.data import papers
 from state_of_the_art.app.utils.render_papers import PapersRenderer
+from state_of_the_art.recommenders.interest_recommender.interest_recommender_generator import InterestPaperRecommender
 from state_of_the_art.tables.recommendations_history_table import (
     RecommendationsRunsTable,
 )
@@ -16,8 +17,31 @@ from state_of_the_art.paper.papers_data_loader import PapersLoader
 
 PAPER_PER_TOPIC_TO_RENDER = 3
 
+def generate_new_recommendations(number_of_days_to_look_back):
+    cmd = f"sota InterestsRecommender generate -n {number_of_days_to_look_back} & "
+    print(cmd)
+    os.system(cmd)
+
 c1, c2 = st.columns([2, 1])
 with c1:
+
+    ca, cb, cc = st.columns([1, 1, 1])
+    with ca:
+        if st.button("Generate 1 day recommendations"):
+            generate_new_recommendations(1)
+            st.success("Recommendations generation started ")
+            st.rerun()
+
+    with cb:
+        if st.button("Generate 7 day recommendations"):
+            generate_new_recommendations(7)
+            st.success("Recommendations generation started ")
+            st.rerun()
+    with cc:
+        if st.button("Generate 30 day recommendations"):
+            generate_new_recommendations(30)
+            st.success("Recommendations generation started ")
+            st.rerun()
 
     with st.spinner("Loading latest recommendations ..."):
 
@@ -64,7 +88,7 @@ with c1:
         )
 
 with c2:
-    st.markdown("""##### Previous ones""")
+    st.markdown("""##### Previous recommendations""")
     recommendations_table = RecommendationsRunsTable()
     runs = recommendations_table.read(recent_first=True)
     MAX_RUNS_TO_SHOW = 5
@@ -72,17 +96,22 @@ with c2:
 
     for run in runs.to_dict(orient='records'):
         current_time = datetime.datetime.now()
-        time_since_start = str(current_time - datetime.datetime.fromisoformat(run["start_time"])).split(".")[0]
+        days_covered = (datetime.datetime.fromisoformat(run["to_date"]) - datetime.datetime.fromisoformat(run["from_date"])).days
+        time_since_start_in_minutes = (current_time - datetime.datetime.fromisoformat(run["start_time"])).total_seconds() / 60
+        time_since_start_in_minutes = round(time_since_start_in_minutes, 2)
+
 
         c1, c2 = st.columns([3, 1])
         with c1:
-            text = f'Recommendation ({run['tdw_uuid'][0:8]}) at {time_since_start}  Papers analysed: {run['papers_analysed_total']}'
+            text = f'Run {run['tdw_uuid'][0:4]} {run['status']} {time_since_start_in_minutes} minutes ago, {days_covered} days covered {run['papers_analysed_total']} papers analysed'
             if run["status"] == "error":
                 st.error(text)
             elif run["status"] == "success":
                 st.success(text)
-            else:
+            elif run["status"] == "started":
                 st.warning(text)
+            else:
+                raise ValueError(f"Unknown status: {run['status']}")
         with c2:
             st.link_button("View", "/papers_recommended_page?run_id=" + run["tdw_uuid"])
 

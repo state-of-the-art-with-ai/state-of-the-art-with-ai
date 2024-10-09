@@ -65,7 +65,6 @@ if search_query:
     filters["Query"] = search_query
     filters["Total Papers"] = len(papers_df.index)
 
-st.divider()
 with st.spinner("Rendering papers..."):
     papers_df = load_papers()
     papers = filter(papers_df)
