@@ -24,7 +24,7 @@ topics_names = topics_df["name"].tolist()
 
 c1, c2 = st.columns([2, 1])
 with c2:
-    with st.expander("Interests", expanded=True):
+    with st.expander("Interests", expanded=False):
         if len(topics_names) > 0:
             st.write(f"{len(topics_names)} Interests registered")
 
@@ -74,10 +74,9 @@ with c1:
         st.stop()
 
     st.write(f"Selected interest: {interest_name}")
-st.divider()
-papers = load_bm25_papers().search_returning_papers(
-    interest_name + " " + topic_description
-)
-
+with st.spinner("Searching papers ..."):
+    papers = load_bm25_papers().search_returning_papers(
+        interest_name + " " + topic_description
+    )
 # render all papeers
-PapersRenderer().render_papers(papers, generated_date=generated_date)
+PapersRenderer(enable_pagination=True).render_papers(papers, generated_date=generated_date)

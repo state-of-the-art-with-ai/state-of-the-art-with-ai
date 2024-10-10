@@ -92,6 +92,9 @@ class PapersRenderer:
             st.markdown(f"#### {len(papers)} papers rendered out of {self.total_papers_passed}")
         insights_table = InsightsTable()
         with st.spinner("Rendering papers ..."):
+            if not papers:
+                st.markdown("No papers found")
+                return
             for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
                 ca, cb = st.columns([2, 1])
                 with ca:
