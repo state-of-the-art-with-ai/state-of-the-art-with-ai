@@ -93,7 +93,7 @@ class PapersRenderer:
         insights_table = InsightsTable()
         with st.spinner("Rendering papers ..."):
             for k, paper in enumerate(papers[0:max_num_of_renderable_results]):
-                ca, cb = st.columns([3, 1])
+                ca, cb = st.columns([2, 1])
                 with ca:
                     st.markdown(
                         f"""##### {k+1}. [{paper.title}](./paper_details_page?paper_url={paper.abstract_url})"""
