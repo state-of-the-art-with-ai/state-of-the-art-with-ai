@@ -24,7 +24,7 @@ topics_names = topics_df["name"].tolist()
 
 c1, c2 = st.columns([2, 1])
 with c2:
-    with st.expander("Interests", expanded=False):
+    with st.expander("All Interests", expanded=False):
         if len(topics_names) > 0:
             st.write(f"{len(topics_names)} Interests registered")
 
