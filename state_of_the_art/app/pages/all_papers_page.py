@@ -69,5 +69,6 @@ def fetch_and_filter():
         paper_list = [paper for _, paper in sorted(zip(papers_scored, paper_list), key=lambda pair: pair[0], reverse=True)]
     return paper_list
 
-renderer = PapersRenderer(enable_pagination=True)
-renderer.render_papers(fetch_and_filter(), metadata=metadata, generated_date=generated_date)
+with st.spinner("Rendering papers ..."):
+    renderer = PapersRenderer(enable_pagination=True)
+    renderer.render_papers(fetch_and_filter(), metadata=metadata, generated_date=generated_date)

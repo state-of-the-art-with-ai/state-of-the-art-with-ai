@@ -50,4 +50,5 @@ papers = sorted(
     reverse=True,
 )
 
-PapersRenderer(disable_save_button=True, enable_tags=True, enable_pagination=True).render_papers(papers)
+with st.spinner("Rendering papers ..."):
+    PapersRenderer(disable_save_button=True, enable_tags=True, enable_pagination=True).render_papers(papers)
