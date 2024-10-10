@@ -33,23 +33,21 @@ with st.spinner("Loading page"):
     else:
         selected_tags = [selected_tags]
 
-with st.spinner("Loading Papers"):
+all_papers_selected = all_tags_df[
+    all_tags_df["tags"].str.contains("|".join(selected_tags))
+]
+all_papers_selected = all_papers_selected["paper_id"].to_list()
 
-    all_papers_selected = all_tags_df[
-        all_tags_df["tags"].str.contains("|".join(selected_tags))
-    ]
-    all_papers_selected = all_papers_selected["paper_id"].to_list()
+unique_papers = list(set(all_papers_selected))
 
-    unique_papers = list(set(all_papers_selected))
+papers = PapersLoader().load_papers_from_urls(unique_papers)
+# sort papers by the bookmarked date
+papers = sorted(
+    papers,
+    key=lambda x: all_tags_df[all_tags_df["paper_id"] == x.abstract_url][
+        "tdw_timestamp"
+    ].values[0],
+    reverse=True,
+)
 
-    papers = PapersLoader().load_papers_from_urls(unique_papers)
-    # sort papers by the bookmarked date
-    papers = sorted(
-        papers,
-        key=lambda x: all_tags_df[all_tags_df["paper_id"] == x.abstract_url][
-            "tdw_timestamp"
-        ].values[0],
-        reverse=True,
-    )
-
-    PapersRenderer(disable_save_button=True, enable_tags=True).render_papers(papers)
+PapersRenderer(disable_save_button=True, enable_tags=True, enable_pagination=True).render_papers(papers)
