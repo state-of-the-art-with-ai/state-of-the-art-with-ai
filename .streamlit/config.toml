@@ -3,7 +3,7 @@ suppressDeprecationWarnings = true
 
 [client]
 # hide error details like warnings about deprecated functions
-showErrorDetails = false
+showErrorDetails = true
 disableWidgetStateDuplicationWarning = true
 
 [ui]
