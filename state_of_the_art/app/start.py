@@ -4,8 +4,8 @@ import subprocess
 from state_of_the_art.config import config
 title = 'State of the Art with AI' if config.is_production() else 'DEV State of the Art with AI'
 st.set_page_config(page_title=title, layout="wide", initial_sidebar_state='expanded', menu_items=None)
-
-
+from state_of_the_art.infrastructure.sentry import setup_sentry
+setup_sentry()
 from state_of_the_art.app.utils.login_utils import LoggedInUser, logout, setup_login
 
 
