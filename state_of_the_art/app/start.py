@@ -61,7 +61,7 @@ with st.sidebar:
     username = LoggedInUser.get_instance().get_user_data().get("name", "")
     if username:
         st.text("Welcome " + username + "!")
-    if is_admin or True:
+    if is_admin:
         if st.button("Admin"):
             from state_of_the_art.app.utils.admin_utils import admin_panel
             admin_panel()
